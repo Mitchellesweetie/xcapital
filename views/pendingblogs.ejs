@@ -45,6 +45,8 @@
     <!-- We use those styles to show code examples, you should remove them in your application.-->
     <link href="/css/examples.css" rel="stylesheet">
     <script src="/js/config.js"></script>
+    <script src="js/event.js"></script>
+
     <script src="/js/color-modes.js"></script>
     <link href="/node_modules/@coreui/chartjs/dist/css/coreui-chartjs.css" rel="stylesheet">
   </head>
@@ -224,21 +226,28 @@
                 <!-- <div class="card-body"> -->
                
                   <!-- <div class="card"> -->
-                    <ul>
+                  
                     <div class="card-body">
                       <% if (blogs.length > 0) { %>
                         <% blogs.forEach(blog => { %>
                             <div class="card">
                               <div class="card-body">
                               <small style="float: right;">Created at: <%= new Date(blog.create_at).toLocaleString() %></small>
-                              <small style="float: right;">Updated at: <%= new Date(blog.updated_at).toLocaleString() %></small>
+                              <!-- <small style="float: right;">Updated at: <%= new Date(blog.updated_at).toLocaleString() %></small> -->
 
 
                                 <h2><%= blog.title %></h2>
                                 <p><%= blog.message %></p>
+                                <p>Status: <%= blog.status %></p>
                                 <a href="/api/pendingblogs/<%= blog.id %>"><button type="button" class="btn btn-warning">Edit</button></a>
-                                <button type="button" class="btn btn-primary" id="pending" >Pending</button>
-                              </div>
+                                <% if (blog.status === 'pending') { %>
+                                  <form action="/api/approve/<%= blog.id %>" method="post" style="display:inline;">
+                                      <button type="submit" class="btn btn-success">Approve</button>
+                                  </form>
+                              <% } else { %>
+                                  <span class="badge badge-success">Approved</span>
+                              <% } %>                              
+                            </div>
 
                                 <hr>
                             </div>
@@ -247,10 +256,10 @@
                         <p>No blogs available.</p>
                     <% } %>                
                     </div>
-                    </ul>
-                   </div>
+                  
+                   
               
-            </div>
+            
           <!-- /.card -->
           
             
