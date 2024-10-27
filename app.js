@@ -40,22 +40,15 @@ app.get('/', (req, res) => {
     res.render('index'); // Render the index.ejs file
 })
 
-app.get('/pendingeditview', (req, res) => {
-    res.render('pendingeditview'); // Render the index.ejs file
-})
 
-app.get('/approvedblogs', (req, res) => {
-    res.render('approvedblogs'); // Render the index.ejs file
-})
+
 app.get('/register', (req, res) => {
     res.render('register'); // Render the index.ejs file
 })
 app.get('/login', (req, res) => {
     res.render('login'); // Render the index.ejs file
 })
-app.get('/form', (req, res) => {
-    res.render('form'); // Render the index.ejs file
-})
+
 
 
 
