@@ -38,9 +38,10 @@
         })
         
     })
+        
     //gets all the posts
 
-    router.get('/pendingblogs', (req, res) => {
+    router.get('/pendingblogs',(req, res) => {
         db.query('SELECT * FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching data:', err);
@@ -81,7 +82,7 @@
                 console.log('Error updating blog:');
                 return res.status(500).send('Database error');
             }
-            res.redirect('pendingblogs'); // Redirect after successful update
+            res.redirect('/api/pendingblogs'); // Redirect after successful update
         });
     })
     //get all approved blogs
@@ -108,9 +109,9 @@
 
             if(results.length>0){
                 const blog=results[0]
-                res.status(200).render('/pendingblogs', {blog})}
-            else{
-                res.status(400).send('<h1>Gateway 404</h1>')}
+                res.status(200).render('/api/pendingblogs', {blog})}
+            // else{
+            //     res.status(400).send('<h1>Error in submitting forms</h1>')}
             
             
         })
