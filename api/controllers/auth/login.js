@@ -49,5 +49,23 @@ router.post('/login',(req,res)=>{
 
     })
 })
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+  
+    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
+      if (err) throw err;
+  
+      if (results.length > 0 && bcrypt.compareSync(password, results[0].password)) {
+        req.session.loggedIn = true;
+        req.session.username = username;
+        res.redirect('/');
+      } else {
+        res.send('Incorrect username or password');
+      }
+    });
+  });
+  
+  // Logout Route
+  
 
 module.exports=router

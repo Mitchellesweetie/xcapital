@@ -49,8 +49,25 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-8">
+            <% if (errorMessage) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= errorMessage %>
+              </div>
+            <% } %>
+        
+            <% if (successMessage) { %>
+              <div class="alert alert-success" role="alert">
+                <%= successMessage %>
+              </div>
+            <% } %>
+            <!-- <% if (typeof message !== 'undefined' && message) { %>
+              <div class="alert alert-success" role="alert">
+                <%= message %>
+              </div>
+            <% } %> -->
             <div class="card-group d-block d-md-flex row">
-              <div class="card col-md-7 p-4 mb-0"><form action="/auth/register" method="post">
+              <div class="card col-md-7 p-4 mb-0">
+                <form action="/auth/register" method="post">
                 <div class="card-body">
                   <h1>Sign Up</h1>
                   <p class="text-body-secondary">Sign up your account</p>
@@ -80,7 +97,7 @@
                   </div>
                   <div class="row">
                     <div class="col-6">
-                      <button class="btn btn-primary px-4" type="button">register</button>
+                      <button class="btn btn-primary px-4" type="submit">register</button>
                     </div>
                     
                   </div>

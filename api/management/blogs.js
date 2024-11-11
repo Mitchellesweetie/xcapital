@@ -3,6 +3,7 @@
     const mysql=require('mysql')
     const dotenv=require('dotenv')
     const cors=require('cors')
+    const multer=require('multer')
 
     const jwt=require('jsonwebtoken')
 
@@ -22,7 +23,15 @@
         
     })
 
-
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, 'uploads');
+        },
+        filename: (req, file, cb) => {
+          cb(null, Date.now() + path.extname(file.originalname));
+        }
+      });
+      const upload = multer({ storage: storage });
     //insert data into the table
     router.post('/post',(req,res)=>{
 
@@ -87,7 +96,7 @@
     })
     //get all approved blogs
     router.get('/approvedblogs', (req, res) => {
-        db.query('SELECT * FROM form', (err, results) => {
+        db.query('SELECT * FROM form  WHERE status=?',['approved'], (err, results) => {
             if (err) {
                 console.error('Error fetching data:', err);
                 return res.status(500).json({ message: 'Database error' });
@@ -107,11 +116,14 @@
             if(err) throw err;
             
 
-            if(results.length>0){
-                const blog=results[0]
-                res.status(200).render('/api/pendingblogs', {blog})}
-            // else{
-            //     res.status(400).send('<h1>Error in submitting forms</h1>')}
+           
+        if (results.affectedRows > 0) {
+            // Redirect to '/api/pendingblogs' without passing data directly in redirect
+            res.status(200).redirect('/api/pendingblogs');
+        } else {
+            res.status(400).send('<h1>Error in submitting forms</h1>');
+        }
+           
             
             
         })

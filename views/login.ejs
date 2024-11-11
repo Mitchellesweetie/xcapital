@@ -49,8 +49,19 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-8">
+            <% if (errorMessage) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= errorMessage %>
+              </div>
+            <% } %>
+        
+            <% if (successMessage) { %>
+              <div class="alert alert-success" role="alert">
+                <%= successMessage %>
+              </div>
+            <% } %>
             <div class="card-group d-block d-md-flex row">
-              <div class="card col-md-7 p-4 mb-0"><form action="/api/login" method="post">
+              <div class="card col-md-7 p-4 mb-0"><form action="/auth/login" method="post">
                 <div class="card-body">
                   <h1>Login</h1>
                   <p class="text-body-secondary">Sign In to your account</p>
@@ -83,7 +94,7 @@
                   <div>
                     <h2>Sign up</h2>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-                  <a href="/register"> <button class="btn btn-lg btn-outline-light mt-3" type="button">Register Now!</button></a>
+                  <a href="/register"> <button class="btn btn-lg btn-outline-light mt-3" type="submit">Register Now!</button></a>
                   </div>
                 </div>
               </div>
