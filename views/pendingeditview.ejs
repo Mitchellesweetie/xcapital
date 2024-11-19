@@ -227,7 +227,21 @@
               
                 <!-- <div class="card-body"> -->
                
-                  <!-- <div class="card"> --> 
+                  <div class="card"> 
+                    <% if (errorMessage) { %>
+                      <div class="alert alert-warning success-dismissible fade show" role="alert">
+                        <strong><%= errorMessage %></strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                  
+                    <% if (successMessage) { %>
+                      <div class="alert alert-warning success-dismissible fade show" role="alert">
+                        <strong><%= successMessage %></strong> 
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                   
                     <div class="form">
                       <form action="/api/update/<%= blog.id %>" method="post" class="form-control">
                         
@@ -237,7 +251,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="message" class="form-label">Blog</label>
-                            <textarea class="form-control" id="message" rows="3" name="message" required><%= blog.message %></textarea>
+                            <textarea class="form-control" id="message" rows="10" name="message" required><%= blog.message %></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button>
                     </form>

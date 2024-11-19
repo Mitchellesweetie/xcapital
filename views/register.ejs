@@ -50,14 +50,16 @@
         <div class="row justify-content-center">
           <div class="col-lg-8">
             <% if (errorMessage) { %>
-              <div class="alert alert-danger" role="alert">
-                <%= errorMessage %>
+              <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <strong><%= errorMessage %><strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             <% } %>
         
             <% if (successMessage) { %>
-              <div class="alert alert-success" role="alert">
-                <%= successMessage %>
+              <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong><%= successMessage %><strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             <% } %>
             <!-- <% if (typeof message !== 'undefined' && message) { %>

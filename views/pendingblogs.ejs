@@ -219,7 +219,96 @@
       <div class="body flex-grow-1">
         <div class="container-lg px-4">
           <div class="row g-4 mb-4">
-          
+            <div class="col-sm-6 col-xl-3">
+              <div class="card text-white bg-primary">
+                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="fs-4 fw-semibold" >Total Blogs</div>
+                    <div style="font-style: italic; font-size: 40px;"><strong> <%= totalBlogs %> </strong></div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <svg class="icon">
+                        <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-options"></use>
+                      </svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
+                  </div>
+                </div>
+                <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <canvas class="chart" id="card-chart1" height="70"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- /.col-->
+            <div class="col-sm-6 col-xl-3">
+              <div class="card text-white bg-info">
+                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="fs-4 fw-semibold">Pending Blogs</div>
+                    <div style="font-style: italic; font-size: 40px;"><strong> <%= pendingBlogs %> </strong></div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <svg class="icon">
+                        <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-options"></use>
+                      </svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
+                  </div>
+                </div>
+                <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <canvas class="chart" id="card-chart2" height="70"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- /.col-->
+            <div class="col-sm-6 col-xl-3">
+              <div class="card text-white bg-warning">
+                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="fs-4 fw-semibold">Approved Blogs</div>
+                    <div style="font-style: italic; font-size: 40px;"><strong> <%= approvedBlogs %> </strong></div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <svg class="icon">
+                        <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-options"></use>
+                      </svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
+                  </div>
+                </div>
+                <div class="c-chart-wrapper mt-3" style="height:70px;">
+                  <canvas class="chart" id="card-chart3" height="70"></canvas>
+                </div>
+              </div>
+            </div>
+            <!-- /.col-->
+            <div class="col-sm-6 col-xl-3">
+              <div class="card text-white bg-danger">
+                <div class="card-body pb-0 d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="fs-4 fw-semibold">44K <span class="fs-6 fw-normal">(-23.6%
+                        <svg class="icon">
+                          <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-arrow-bottom"></use>
+                        </svg>)</span></div>
+                    <div>Sessions</div>
+                  </div>
+                  <div class="dropdown">
+                    <button class="btn btn-transparent text-white p-0" type="button" data-coreui-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <svg class="icon">
+                        <use xlink:href="node_modules/@coreui/icons/sprites/free.svg#cil-options"></use>
+                      </svg>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end"><a class="dropdown-item" href="#">Action</a><a class="dropdown-item" href="#">Another action</a><a class="dropdown-item" href="#">Something else here</a></div>
+                  </div>
+                </div>
+                <div class="c-chart-wrapper mt-3 mx-3" style="height:70px;">
+                  <canvas class="chart" id="card-chart4" height="70"></canvas>
+                </div>
+              </div>
+            </div>          
         
         
         
@@ -231,37 +320,65 @@
                 <!-- <div class="card-body"> -->
                
                   <!-- <div class="card"> -->
-                  
+                    <% if (errorMessage) { %>
+                      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><%= errorMessage %><strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                
+                    <% if (successMessage) { %>
+                      <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong><%= successMessage %><strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                    
                     <div class="card-body">
                       <% if (blogs.length > 0) { %>
                         <% blogs.forEach(blog => { %>
-                            <div class="card">
-                              <div class="card-body">
-                              <small style="float: right;">Created at: <%= new Date(blog.create_at).toLocaleString() %></small>
-                              <!-- <small style="float: right;">Updated at: <%= new Date(blog.updated_at).toLocaleString() %></small> -->
-
-
-                                <h2><%= blog.title %></h2>
-                                <p><%= blog.message %></p>
-                                <p>Status: <%= blog.status %></p>
-                                <a href="/api/pendingblogs/<%= blog.id %>"><button type="button" class="btn btn-warning">Edit</button></a>
-                                <% if (blog.status === 'pending') { %>
-                                  <form action="/api/approve/<%= blog.id %>" method="post" style="display:inline;">
-                                      <button type="submit" class="btn btn-success">Approve</button>
-                                  </form>
+                          <div class="card"style="padding: 30px; margin: 10px;">
+                            <div class="card-body">
+                              <h2 style="font-size: 40px;"><%= blog.title %></h2>
+                              <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
+                    
+                              <div class="d-flex" style="flex-wrap: wrap;">
+                                <!-- Image on the left -->
+                                <img src="<%= blog.file %>" style="width: 600px; height: 400px; margin-right: 20px;">
+                                
+                                <!-- Paragraph on the right -->
+                                <p id="blog-content-<%= blog.id %>"
+                                  data-truncated="<%- blog.truncatedContent %>"
+                                  data-full="<%- blog.fullContent %>"
+                                  data-is-full-content="false" style="flex: 1; position: relative;">
+                                  
+                                  <%- blog.truncatedContent %> <!-- Initially show truncated content -->
+                               
+                                  <a href="javascript:void(0);" onclick="toggleReadMore('<%= blog.id %>')"
+                                     id="read-more-link-<%= blog.id %>" style="color: red;">... Read More</a>
+                               </p>
+                               
+                              </div>
+                    
+                              <p>Status: <%= blog.status %></p>
+                              <a href="/api/pendingblogs/<%= blog.id %>"><button type="button" class="btn btn-warning">Edit</button></a>
+                              <% if (blog.status === 'pending') { %>
+                                <form action="/api/approve/<%= blog.id %>" method="post" style="display:inline;">
+                                  <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
                               <% } else { %>
-                                  <span class="badge badge-success">Approved</span>
-                              <% } %>                              
+                                <span class="badge badge-success">Approved</span>
+                              <% } %>
                             </div>
-
-                                <hr>
-                            </div>
+                            <hr>
+                          </div>
                         <% }); %>
-                    <% } else { %>
+                      <% } else { %>
                         <p>No blogs available.</p>
-                    <% } %>                
+                      <% } %>
                     </div>
-                  
+                    
+                    
                    
               
             
@@ -297,8 +414,8 @@
           <!-- /.row-->
          
       
-          <footer class="footer px-9" style="position:fixed; bottom: 0px; width: 100%;">
-            <div><a href="#">Ngoli&copy; 2024</a>
+      <footer class="footer px-9" style="position:fixed; bottom: 0px; width: 100%;">
+            <div><a href="">Ngoli&copy; 2024</a></div>
       </footer>
       <script>
         
@@ -322,6 +439,31 @@
       });
       
     </script>
+    <script>
+      //read more and less
+     
+      function toggleReadMore(blogId) {
+  const blogContentElement = document.getElementById('blog-content-' + blogId);
+  const isFullContent = blogContentElement.getAttribute('data-is-full-content') === 'true';
+
+  if (isFullContent) {
+    // Show truncated content
+    blogContentElement.innerHTML = blogContentElement.getAttribute('data-truncated') + 
+      ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '" style="color: red;">... Read More</a>';
+    blogContentElement.setAttribute('data-is-full-content', 'false');
+  } else {
+    // Show full content
+    blogContentElement.innerHTML = blogContentElement.getAttribute('data-full') + 
+      ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '" style="color: red;">... Read Less</a>';
+    blogContentElement.setAttribute('data-is-full-content', 'true');
+  }
+}
+
+
+
+
+  </script>
+  
     <!-- Plugins and scripts required by this view-->
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="node_modules/@coreui/chartjs/dist/js/coreui-chartjs.js"></script>

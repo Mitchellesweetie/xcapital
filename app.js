@@ -1,3 +1,9 @@
+// messages done
+//login done but need to verify your login link
+//images
+//remove all res.send done
+//read more done 
+//on update and approve need to see the latest blogs
 const express=require('express')
 const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
@@ -6,6 +12,7 @@ const port=process.env.port
 const path=require('path')
 const cors=require('cors')
 const flash = require('connect-flash')
+
 
 dotenv.config()
 const db=mysql.createConnection({
@@ -24,28 +31,72 @@ db.connect((err)=>{
 const app=express()
 app.use(cors())
 app.use(flash());
-app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json())//parse json bodies as sent by api clients
-app.use(express.urlencoded({extend:false}))// parse url encoded bodies (as sent as HTML forms)
-
+app.use(express.urlencoded({limit: '20mb',extend:true}))// parse url encoded bodies (as sent as HTML forms)
+app.use(express.json({limit: '20mb'}))
 
 
 app.use('/api',require('./api/management/blogs'))
 app.use('/auth',require('./api/management/auth'))
 
+app.use('/uploads/images',express.static(path.join(__dirname, 'uploads/images')));
+
 app.get('/', (req, res) => {
-    res.render('index'); // Render the index.ejs file
-})
+    // Query to get the total number of blogs
+    db.query('SELECT COUNT(*) AS totalBlogs FROM form', (err, results) => {
+        if (err) {
+            console.error('Error fetching blog count:', err);
+            return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the blog count', totalBlogs: 0 });
+        }
+
+        const totalBlogs = results[0].totalBlogs; // Get total blog count
+
+        // Query to get the number of pending blogs
+        db.query("SELECT COUNT(ID) AS pendingBlogs FROM form WHERE status='pending'", (err, results) => {
+            if (err) {
+                console.error('Error fetching pending blog count:', err);
+                return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the pending count', pendingBlogs: 0 });
+            }
+
+            const pendingBlogs = results[0].pendingBlogs; // Get pending blog count
+
+            // Query to get the number of approved blogs
+            db.query("SELECT COUNT(ID) AS approvedBlogs FROM form WHERE status='approved'", (err, results) => {
+                if (err) {
+                    console.error('Error fetching approved blog count:', err);
+                    return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the approved count', approvedBlogs: 0 });
+                }
+
+                const approvedBlogs = results[0].approvedBlogs; // Get approved blog count
+
+                // Now render the 'index' page and pass the data
+                res.render('index', {
+                    totalBlogs: totalBlogs,
+                    pendingBlogs: pendingBlogs,
+                    approvedBlogs: approvedBlogs
+                });
+            });
+        });
+    });
+});
+
 app.get('/register', (req, res) => {
     res.render('register', { successMessage: null, errorMessage: null }); 
   });
 app.get('/login', (req, res) => {
     res.render('login', { successMessage: null, errorMessage: null }); 
   });
+app.get('/form',(req,res)=>{
+
+    res.render('form', { successMessage: null, errorMessage: null }); 
+
+})
+
 app.get('/single',(req,res)=>{
     res.render('single')
 })

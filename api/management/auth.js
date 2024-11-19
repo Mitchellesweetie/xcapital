@@ -4,6 +4,7 @@ const authController=require('../controllers/auth/auth')
 const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
 const flash = require('connect-flash');
+const session=require('session')
 
 router.use(flash());
 const db=mysql.createConnection({
@@ -15,6 +16,12 @@ const db=mysql.createConnection({
 })
 
 
+// router.get('/register', (req, res) => {
+//   res.render('register', { successMessage: null, errorMessage: null }); 
+// });
+// router.get('/login', (req, res) => {
+//   res.render('login', { successMessage: null, errorMessage: null }); 
+// });
 
 router.post('/register', (req, res) => {
   const { username, email, password, confirmpassword } = req.body;
@@ -40,26 +47,38 @@ router.post('/register', (req, res) => {
         return res.render('register', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
       }
 
-      res.render('/login', { successMessage: 'Registration successful! You can now log in.', errorMessage: null });
+      res.render('login', { successMessage: 'Registration successful! You can now log in.', errorMessage: null });
     });
   });
 });
 
+
 router.post('/login', (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
 
-  db.query('SELECT * FROM registration WHERE username = ?', [username], (err, results) => {
-    if (err) throw err;
-
-    if (results.length > 0 && bcrypt.compareSync(password, results[0].password)) {
-      // req.session.loggedIn = true;
-      // req.session.username = username;
-      res.redirect('/', { successMessage: 'LoggedIn Successful!.', errorMessage: null });
-    } else {
-      res.render('login', { successMessage: null, errorMessage: 'Incorrect username or password'});
+  db.query('SELECT * FROM registration WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err);
+      return res.render('login', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
     }
+
+    if (results.length === 0) {
+      return res.render('login', { successMessage: null, errorMessage: 'Invalid email or password.' });
+    }
+
+    const user = results[0];
+    const passwordMatch = bcrypt.compareSync(password, user.password);
+
+    if (!passwordMatch) {
+      return res.render('login', { successMessage: null, errorMessage: 'Invalid email or password.' });
+    }
+
+    // If login is successful, you may set a session or redirect to a protected page
+    // req.session.user = user; // Example: setting session data
+    res.redirect('/?success=1');
   });
 });
+
 
 // router.get('/logout', (req, res) => {
 //       req.session.destroy(err => {

@@ -24,8 +24,28 @@
     }
 </style>
 <body>
+  
+  <% if (errorMessage) { %>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <strong><%= errorMessage %><strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+  <% if (successMessage) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <strong><%= successMessage %><strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+
+   
   <div class="form">
-    <form action="/api/post" method="post" class="form-control">
+    <form action="/api/post" method="post" class="form-control" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Title</label>
+        <input type="file" class="form-control" id="tittle" name="file">
+      </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Title</label>
             <input type="text" class="form-control" id="tittle" name="title">
@@ -35,8 +55,10 @@
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="message"></textarea>
           </div>
           <button type="submit" class="btn btn-primary">Post</button>
-    </form>
-  </div>
-    
+  </form>
+  
+  
+ </div>
+
 </body>
 </html>
