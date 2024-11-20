@@ -45,7 +45,7 @@ const getBlogCounts = (callback) => {
             console.error('Error fetching blog counts:', err);
             return callback(err, null);
         }
-        console.log('Blog counts:', results[0]); // Log the results for debugging
+        console.log('Blog counts:', results[0]); 
         return callback(null, results[0]);
     });
 };
@@ -53,7 +53,7 @@ const getBlogCounts = (callback) => {
 
 // Insert new blog post
 router.post('/post', upload.single('file'), (req, res) => {
-    const filePath = req.file ? `/uploads/images/${req.file.filename}` : 'file.png'; // Correct file path format
+    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
     const { title, message } = req.body;
     const data = { file: filePath, title, message }; // Store the correct file path in the database
 
