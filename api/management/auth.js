@@ -5,8 +5,12 @@ const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
 const flash = require('connect-flash');
 const session=require('session')
+const crypto=require('crypto')
+const nodemailer=require('nodemailer')
+const dotenv=require('dotenv')
+const jwt=require('jsonwebtoken')
+dotenv.config()
 
-router.use(flash());
 const db=mysql.createConnection({
     host: process.env.host,
     user: process.env.username,
@@ -16,16 +20,44 @@ const db=mysql.createConnection({
 })
 
 
-// router.get('/register', (req, res) => {
-//   res.render('register', { successMessage: null, errorMessage: null }); 
-// });
-// router.get('/login', (req, res) => {
-//   res.render('login', { successMessage: null, errorMessage: null }); 
-// });
+const transport=nodemailer.createTransport({
+    service:'gmail',
+    host:process.env.MAIL_HOST,
+    port:process.env.MAIL_PORT,
+    secure:false,
+    auth:{
+        user:process.env.MAIL_USER,
+        pass:process.env.MAIL_PASS, 
+    }
+})
+
+transport.verify(function (error, success) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Server is ready to take our messages");
+    }
+  });
+  function isAuthenticated(req, res, next) {
+    if (req.session && req.session.userId) {
+        return next(); 
+    }
+    res.redirect('/login'); 
+}
+//sessions for admin
+function isAdmin(req, res, next) {
+  if (req.session && req.session.userRole === 'admin') {
+      return next();
+  }
+  res.status(403).render('error', { message: 'Access denied.' }); // Forbidden
+}
 
 router.post('/register', (req, res) => {
   const { username, email, password, confirmpassword } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
+  const verifiedToken = crypto.randomBytes(32).toString('hex');
+  var passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=<>?])[A-Za-z\d!@#$%^&*()_\-+=<>?]{8,20}$/;
+
 
   db.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
     if (err) {
@@ -36,26 +68,51 @@ router.post('/register', (req, res) => {
     if (results.length > 0) {
       return res.render('register', { successMessage: null, errorMessage: 'Email has already been registered' });
     }
+    if(!password.match(passw)){
+      return res.render('register', { successMessage: null, errorMessage: 'Password should contain lower case character,upper character and special character' });}
+
+    if (password.length < 8) {
+      return res.render('register', { successMessage: null, errorMessage: 'Password must be at least 8 characters long' });
+    }
 
     if (password !== confirmpassword) {
       return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
     }
 
-    db.query('INSERT INTO registration SET ?', { username, email, password: hashedPassword }, (err, result) => {
+    db.query('INSERT INTO registration SET ?', { username, email, password: hashedPassword ,verifiedToken}, (err, result) => {
       if (err) {
         console.error('Error inserting user into the database:', err);
         return res.render('register', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
       }
 
-      res.render('login', { successMessage: 'Registration successful! You can now log in.', errorMessage: null });
+      // res.render('login', { successMessage: 'Registration successful!Verify your email to sign in', errorMessage: null });
+      const verificationLink = `http://localhost:3000/verify-email?token=${verifiedToken}`;
+      const mailOptions = {
+          from: 'no-reply@xbase.co.ke',
+          to: email,
+          subject: 'Verify your email',
+          text: `Please verify your email by clicking the following link: ${verificationLink}`,
+          html: `<p>Please verify your email by clicking the following link:</p><a href="${verificationLink}">Verify Email</a>`,
+      };
+  
+      transport.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              console.log(error);
+              return res.render('register', { successMessage: null, errorMessage: 'Could not send verification email. Please try again later.' });
+            }
+
+            return res.render('login', { successMessage: 'Registration successful! Please verify your email.', errorMessage: null });
+        });
     });
   });
 });
 
 
+
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
 
+  
   db.query('SELECT * FROM registration WHERE email = ?', [email], (err, results) => {
     if (err) {
       console.error('Error querying the database:', err);
@@ -67,23 +124,59 @@ router.post('/login', (req, res) => {
     }
 
     const user = results[0];
+    if (user.isVerified !== 1) {
+      return res.render('login', { successMessage: null, errorMessage: 'Verify your your mail' });
+    }
     const passwordMatch = bcrypt.compareSync(password, user.password);
 
     if (!passwordMatch) {
       return res.render('login', { successMessage: null, errorMessage: 'Invalid email or password.' });
     }
+    console.log('User found:', user);
+    if (!req.session) {
+      console.error('Session is not initialized.');
+      console.log('Session:', req.session);
 
-    // If login is successful, you may set a session or redirect to a protected page
-    // req.session.user = user; // Example: setting session data
+      return res.status(500).json({ errorMessage: 'Session initialization error.' });
+  }
+    req.session.userId = user.id;
+
     res.redirect('/?success=1');
+    // res.render('index', { successMessage: 'Login successful!', errorMessage: null,user }); 
+  });
+});
+
+router.post('/forgetpassword', (req, res) => {
+  const { email, password,confirmpassword } = req.body;
+
+  if (password !== confirmpassword) {
+    return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
+  }
+  if (!email || !password) {
+    return res.render('forgetpassword', { successMessage: null, errorMessage: 'Email and new password are required.' });
+  }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  db.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err);
+      return res.render('forgetpassword', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.render('forgetpassword', { successMessage: null, errorMessage: 'No user found with that email address.' });
+    }
+
+    res.render('login', { successMessage: 'Password updated successfully. You can now log in.', errorMessage: null });
   });
 });
 
 
-// router.get('/logout', (req, res) => {
-//       req.session.destroy(err => {
-//         if (err) throw err;
-//         res.redirect('/login');
-//       });
-//     });
+router.get('/logout', (req, res) => {
+      req.session.destroy(err => {
+        if (err) throw err;
+        res.redirect('/login');
+      });
+    });
 module.exports=router

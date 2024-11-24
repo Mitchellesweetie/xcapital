@@ -116,8 +116,8 @@
                 <div class="card-body">
                 <!-- <small style="float: right;">Created at: <%= new Date(blog.create_at).toLocaleString() %></small> -->
                 <!-- <small style="float: right;">Updated at: <%= new Date(blog.updated_at).toLocaleString() %></small> -->
+                <img src="<%= blog.file %>" style="width: 300px; height: 300px; margin-right: 20px;">
 
-                  <h2><%= blog.title %></h2>
                   <p><%= blog.message %></p>                                             
               </div>
                   <hr>
@@ -137,6 +137,8 @@
               <!-- <small style="float: right;">Created at: <%= new Date(blog.create_at).toLocaleString() %></small> -->
               <!-- <small style="float: right;">Updated at: <%= new Date(blog.updated_at).toLocaleString() %></small> -->
                 <h2><%= blog.title %></h2>
+                <img src="<%= blog.file %>" style="width: 300px; height: 300px; margin-right: 20px;">
+
                 <p><%= blog.message %></p>                                           
             </div>
                 <hr>
