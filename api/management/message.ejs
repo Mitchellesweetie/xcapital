@@ -1,0 +1,100 @@
+<p id="blog-content-<%= blog.id %>"
+    data-truncated="<%- blog.truncatedContent %>"
+    data-full="<%- blog.fullContent %>"
+    data-is-full-content="false" style="flex: 1; position: relative;">
+    
+    <%- blog.truncatedContent %> <!-- Initially show truncated content -->
+ 
+    <a href="javascript:void(0);" onclick="toggleReadMore('<%= blog.id %>')"
+       id="read-more-link-<%= blog.id %>" style="color: red;">... Read More</a>
+ </p>
+ <!-- router.get('/pendingblogs',(req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+        if (err || userResults.length === 0) {
+            console.error('Error fetching user data:', err || 'User not found');
+            return res.render('login', {
+                successMessage: null,
+                errorMessage: 'Login to fetch your details',
+                blogs: [],
+            });
+        }
+
+        const username = userResults[0].username;
+    getBlogCounts((err, counts) => {
+        if (err) {
+            return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
+        }
+        let sql='select * from form'
+        db.query(sql,(err,results)=>{
+        if (err) throw err;
+        // const numberOfResults=results.length
+        // const numberOfPages=Math.ceil(numberOfResults/resulPerPage)
+        // let page=req.query.page ? Number(req.query.page):1
+        // if(page>numberOfPages)
+        //     res.redirect('/api/pendingblogs/?page='+ encodeURIComponent(numberOfPages))
+        // else if (page<1){
+        //     res.redirect('/api/pendingblogs/?page='+ encodeURIComponent('1'))
+
+
+        // }
+        // const startingLimit=(page-1)* resulPerPage
+        const numOfResults = results[0].count;
+        const resultsPerPage = 2; // Define how many results per page
+        const numberOfPages = Math.ceil(numOfResults / resultsPerPage);
+        const page = req.query.page ? Math.max(1, Math.min(Number(req.query.page), numberOfPages)) : 1;
+        const startingLimit = (page - 1) * resultsPerPage;
+
+        // Calculate the pagination range
+        const iterator = Math.max(1, page - 5);
+        const endingLink = Math.min(iterator + 9, numberOfPages);
+
+
+        db.query(`SELECT * FROM form ORDER BY create_at DESC LIMIT ${startingLimit},${resulPerPage}`, (err, blogs) => {
+            if (err) {
+                console.error('Error fetching blogs:', err);
+                return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
+            }
+            // let iterator=(page-5)<1?1:page-5
+            // let endingLink=(iterator+9)<=numberOfPages ? (iterator+9) : page +
+            // (numberOfPages-page)
+            // if(endingLink<page+4){
+            //     iterator=(page+4)-numberOfPages
+            // }
+            const blogsWithFullContent = blogs.map(blog => {
+                const truncatedContent = blog.message.slice(0, 50); // Truncate message to 10 characters
+                return {
+                    ...blog,
+                    isFullContent: false, // Initially show truncated content
+                    truncatedContent: truncatedContent, // Truncated message for initial display
+                    fullContent: blog.message, // Full content for later display
+                };
+            });
+          
+
+            // Render the template with the modified blog data
+            res.render('pendingblogs', {
+                blogs: blogsWithFullContent, // Pass the blogs data with full and truncated content
+                totalBlogs: counts.totalBlogs || 0,
+                pendingBlogs: counts.pendingBlogs || 0,
+                approvedBlogs: counts.approvedBlogs || 0,
+                successMessage: null,
+                errorMessage: null,
+                data:results,
+                blogs,
+                page,
+                endingLink,
+                iterator,
+                numberOfPages,
+                username
+                
+            });
+        });
+    });
+});
+})
+}) -->

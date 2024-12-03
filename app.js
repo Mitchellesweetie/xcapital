@@ -5,7 +5,9 @@ const express=require('express')
 const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
 const dotenv=require('dotenv')
-const port=process.env.localport||process.env.port
+const port=process.env.localport
+// const port=process.env.localport||process.env.port
+
 const path=require('path')
 const cors=require('cors')
 const flash = require('connect-flash')
@@ -13,6 +15,8 @@ const nodemailer=require('nodemailer')
 const sanitizeHtml = require('sanitize-html')
 const session=require('express-session')
 // const sanitizedContent = sanitizeHtml(message);
+const resume=require('./api/management/portfolio')
+const categories=require('./api/management/admin')
 
 
 dotenv.config()
@@ -37,14 +41,24 @@ app.use(session({
 app.use('/ckeditor', express.static(path.join(__dirname, 'node_modules/@ckeditor/ckeditor5-build-classic/build')));
 app.use('/api',require('./api/management/blogs'))
 app.use('/auth',require('./api/management/auth'))
+app.use(resume)
+app.use(categories)
+
+
 
 app.use('/uploads/images',express.static(path.join(__dirname, 'uploads/images')));
 
-  function isAuthenticated(req, res, next) {
+function isAuthenticated(req, res, next) {
     if (req.session && req.session.userId) {
         return next(); 
     }
     res.redirect('/login'); 
+}
+function isAdmin(req, res, next) {
+  if (req.session && req.session.userRole === 'admin') {
+      return next();
+  }
+  res.status(403).render('error', { message: 'Access denied.' }); 
 }
 const db=mysql.createConnection({
     host: process.env.host,
@@ -61,7 +75,35 @@ db.connect((err)=>{
 })
 
 
+app.get('/dashboard',(req,res)=>{
+    db.query('select * from form ',(err,result)=>{
+        if (err){
+            console.error('Error in blogs blog:', err);
+            return res.render('/xbase0dashboard');
+        } 
+        return res.render('portfolio/xbase0dashboard',{
+            blogs:result
+        })
+    })
 
+})
+app.get('/portfolio_view',(req,res)=>{
+
+    res.render('portfolio/resume')
+})
+app.get('/personal_details',isAuthenticated,(req,res)=>{
+
+    res.render('portfolio/portfolio_view_form')
+})
+
+app.get('/portfolio_view_experience',(req,res)=>{
+
+    res.render('portfolio/experience')
+})
+app.get('/portfolio_view_references',(req,res)=>{
+
+    res.render('portfolio/refrences')
+})
 app.get('/verify-email', (req, res) => {
     const { token } = req.query;
   
@@ -226,6 +268,8 @@ app.get('/form',(req,res)=>{
 })
 
 
-app.listen(process.env.port,()=>{
+app.listen(process.env.localport,()=>{
     console.log('listening at port  http://localhost:'+`${port}`)
+    // console.log('listening at port  http://localhost:')
+
 })

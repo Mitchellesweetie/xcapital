@@ -4,6 +4,7 @@ const mysql = require('mysql');
 const dotenv = require('dotenv');
 const multer = require('multer');
 const path = require('path');
+const resulPerPage=2
 
 dotenv.config();
 const db = mysql.createConnection({
@@ -56,7 +57,7 @@ function isAuthenticated(req, res, next) {
     res.redirect('/login'); 
 }
 
-// Insert new blog post
+
 router.post('/post',isAuthenticated, upload.single('file'), (req, res) => {
     const userId = req.session.userId;
 
@@ -78,17 +79,23 @@ router.post('/post',isAuthenticated, upload.single('file'), (req, res) => {
                 return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
             }
 
-            res.render('index', {
-                successMessage: 'Blog created successfully waiting for Approval!',
-                errorMessage: null,
-                totalBlogs: counts.totalBlogs || 0,
-                pendingBlogs: counts.pendingBlogs || 0,
-                approvedBlogs: counts.approvedBlogs || 0,
-            });
+            // res.render('index', {
+            //     successMessage: 'Blog created successfully waiting for Approval!',
+            //     errorMessage: null,
+            //     totalBlogs: counts.totalBlogs || 0,
+            //     pendingBlogs: counts.pendingBlogs || 0,
+            //     approvedBlogs: counts.approvedBlogs || 0,
+            // });
+            res.redirect('/?success=1')
         });
+        
     });
 });
 //getting blogs
+
+
+
+
 router.get('/pendingblogs', isAuthenticated,(req, res) => {
     const userId = req.session.userId;
 
@@ -110,46 +117,91 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-
-        db.query('SELECT * FROM form ORDER BY create_at DESC', (err, blogs) => {
+        db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
             if (err) {
-                console.error('Error fetching blogs:', err);
-                return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
+                console.error('Error fetching blog count:', err);
+                return res.render('pendingblogs', {
+                    successMessage: null,
+                    errorMessage: 'Error fetching blogs',
+                    blogs: [],
+                    username,
+                });
             }
 
-            // Process blogs to add truncated and full content
-            const blogsWithFullContent = blogs.map(blog => {
-                const truncatedContent = blog.message.slice(0, 500); // Truncate message to 50 characters
-                return {
-                    ...blog,
-                    isFullContent: false, // Initially show truncated content
-                    truncatedContent: truncatedContent, // Truncated message for initial display
-                    fullContent: blog.message, // Full content for later display
-                };
-            });
+            const numOfResults = results[0].count;
+            const resultsPerPage = 2; // Define how many results per page
+            const numberOfPages = Math.ceil(numOfResults / resultsPerPage);
+            const page = req.query.page ? Math.max(1, Math.min(Number(req.query.page), numberOfPages)) : 1;
+            const startingLimit = (page - 1) * resultsPerPage;
 
-            // Render the template with the modified blog data
+            // Calculate the pagination range
+            const iterator = Math.max(1, page - 5);
+            const endingLink = Math.min(iterator + 9, numberOfPages);
+
+        db.query('SELECT  * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
+                [startingLimit, resultsPerPage], (err, blogs) => {
+            if (err) {
+                console.error('Error fetching approved blogs:', err);
+                return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching approved blogs', blogs: [] });
+            }
+            // const blogsWithFullContent = blogs.map(blog => {
+            //     const truncatedContent = blog.message.slice(0, 500); // Truncate message to 10 characters
+            //     // console.log('This is a function',blog)
+                
+            //     return {
+            //         ...blog,
+            //         isFullContent: false, // Initially show truncated content
+            //         truncatedContent: truncatedContent, // Truncated message for initial display
+            //         fullContent: blog.message, // Full content for later display
+            //     };
+            // });
             res.render('pendingblogs', {
-                blogs: blogsWithFullContent, // Pass the blogs data with full and truncated content
+                blogs,
                 totalBlogs: counts.totalBlogs || 0,
                 pendingBlogs: counts.pendingBlogs || 0,
                 approvedBlogs: counts.approvedBlogs || 0,
                 successMessage: null,
                 errorMessage: null,
-                username
+                numberOfPages,
+                page,
+                iterator,
+                endingLink,
+                username,
             });
+            console.log(blogs)
+
+        })
         });
+        
     });
 });
 })
-//PENDING AGAIN
+
+
 // router.get('/pendingblogs', (req, res) => {
+//     const userId = req.session.userId;
+
+//     if (!userId) {
+//       return res.redirect('/login');
+//     }
+//     db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+//         if (err || userResults.length === 0) {
+//             console.error('Error fetching user data:', err || 'User not found');
+//             return res.render('login', {
+//                 successMessage: null,
+//                 errorMessage: 'Login to fetch your details',
+//                 blogs: [],
+//             });
+//         }
+
+//     const username = userResults[0].username;
 //     getBlogCounts((err, counts) => {
 //         if (err) {
 //             return res.render('pendingblogs', {
 //                 successMessage: null,
 //                 errorMessage: 'Error fetching blog counts',
 //                 blogs: [],
+                
 //             });
 //         }
 
@@ -160,6 +212,7 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 //                     successMessage: null,
 //                     errorMessage: 'Error fetching blogs',
 //                     blogs: [],
+                    
 //                 });
 //             }
 
@@ -195,9 +248,11 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 //                             fullContent: blog.message, // Full content for later display
 //                         };
 //                     });
-
-//                     res.render('pendingblogs', {
+                      
+//         console.log("Blogs after deduplication:", blogsWithFullContent); // Check after deduplication
+//                             res.render('pendingblogs', {
 //                         blogs: blogsWithFullContent,
+//                         // blogs:blogs,
 //                         totalBlogs: counts.totalBlogs || 0,
 //                         pendingBlogs: counts.pendingBlogs || 0,
 //                         approvedBlogs: counts.approvedBlogs || 0,
@@ -207,6 +262,7 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 //                         page,
 //                         iterator,
 //                         endingLink,
+//                         username
 //                     });
 //                 }
 //             );
@@ -214,20 +270,34 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 //     });
 // });
 
+// })
 
 
-// Get pending blogs
 
 
 
-// Get specific blog by ID
+
+
 router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
+    const blogId = req.params.id;
     const userId = req.session.userId;
+
 
     if (!userId) {
       return res.redirect('/login');
     }
-    const blogId = req.params.id;
+    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+        if (err || userResults.length === 0) {
+            console.error('Error fetching user data:', err || 'User not found');
+            return res.render('login', {
+                successMessage: null,
+                errorMessage: 'Login to fetch your details',
+                blogs: [],
+                username
+            });
+        }
+
+    const username = userResults[0].username;
     getBlogCounts((err, counts) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
@@ -243,7 +313,8 @@ router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
                 return res.render('pendingeditview', {
                     blog: blog[0],
                     successMessage: null,
-                    errorMessage: null
+                    errorMessage: null,
+                    username
                 });
             }
 
@@ -254,16 +325,34 @@ router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
                 totalBlogs: counts.totalBlogs || 0,
                 pendingBlogs: counts.pendingBlogs || 0,
                 approvedBlogs: counts.approvedBlogs || 0,
+                username
             });
         });
     });
 });
-
+})
 // Update the blog
 router.post('/update/:id',isAuthenticated, (req, res) => {
     const blogId = req.params.id
     const data = req.body
+    const userId = req.session.userId;
 
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+        if (err || userResults.length === 0) {
+            console.error('Error fetching user data:', err || 'User not found');
+            return res.render('login', {
+                successMessage: null,
+                errorMessage: 'Login to fetch your details',
+                blogs: [],
+                username
+            });
+        }
+
+    const username = userResults[0].username;
    
         getBlogCounts((err, counts) => {
         if (err) {
@@ -289,7 +378,8 @@ router.post('/update/:id',isAuthenticated, (req, res) => {
                     totalBlogs: counts.totalBlogs || 0,
                     pendingBlogs: counts.pendingBlogs || 0,
                     approvedBlogs: counts.approvedBlogs || 0,
-                });
+                    username
+                });})
             });
         });
         
@@ -394,7 +484,7 @@ router.post('/approve/:id', isAuthenticated,(req, res) => {
                     return res.render('index', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
                 }
                 const page = req.query.page || 1;
-                res.redirect(`/pendingblogs?page=${page}`);
+                res.redirect(`/api/pendingblogs?page=${page}`);
                 
                 });
             
@@ -428,6 +518,7 @@ router.get('/search',isAuthenticated,(req,res)=>{
     })
 
 })
+
 
 
 

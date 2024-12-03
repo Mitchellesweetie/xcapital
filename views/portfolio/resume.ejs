@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume</title>
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+  <style>
+    /* General Styles */
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f9;
+  color: #333;
+}
+
+.resume-container {
+  width: 800px;
+  margin: 20px auto;
+  background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background-color: #0056b3;
+  color: #ffffff;
+  padding: 20px;
+}
+
+.header .profile-picture img {
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.header .name-title h1 {
+  font-size: 2rem;
+  margin: 0;
+}
+
+section {
+  margin-bottom: 20px;
+}
+
+section h2 {
+  font-size: 1.5rem;
+  color: #0056b3;
+  border-bottom: 2px solid #0056b3;
+  padding-bottom: 5px;
+}
+
+.contact p, .education p, .languages p, .skills p {
+  margin: 5px 0;
+}
+
+.experience .job h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.experience .job p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.experience ul {
+  margin: 10px 0 0 20px;
+  padding: 0;
+  list-style-type: disc;
+}
+
+.experience ul li {
+  margin-bottom: 5px;
+}
+     
+.container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+        }
+.post {
+            margin-bottom: 40px;
+        }
+.comment-section {
+            margin-top: 40px;
+        }
+.comment {
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .comment h4 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #333;
+        }
+        .comment p {
+            font-size: 1em;
+            color: #555;
+        }
+        .comment-form input, .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .comment-form button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .comment-form button:hover {
+            background-color: #0056b3;
+        }
+    
+  </style>
+</head>
+
+<body>
+  <div class="resume-container">
+    <header class="header">
+      <div class="profile-picture">
+        <!-- Use an actual image here -->
+        <img src="profile.jpg" alt="Profile Picture">
+      </div>
+      <div class="name-title">
+        <h1>Maurice Veronneau</h1>
+      </div>
+    </header>
+
+    <section class="contact">
+      <h2>Contact</h2>
+      <p><strong>Address:</strong> 177 Great Portland Street, London W5W 6PQ</p>
+      <p><strong>Telephone:</strong> +44 (0)20 7666 8555</p>
+      <p><strong>Email:</strong> christoper.morgane@gmail.com</p>
+    </section>
+
+    <section class="experience">
+      <h2>Experience</h2>
+      <div class="job">
+        <h3>Web Developer</h3>
+        <p><strong>09/2015 to 05/2019</strong> - Luna Web Design, Paris</p>
+        <ul>
+          <li>Work with designers to create clean interfaces and simple, intuitive interactions and experiences.</li>
+          <li>Develop project concepts and maintain optimal workflow.</li>
+          <li>Work with lead developer to manage large complex design projects for client companies.</li>
+          <li>Perform QA testing to uncover errors and optimize usability.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="education">
+      <h2>Education</h2>
+      <p><strong>Master in Computer Engineering</strong>, University of Paris (2014-2016)</p>
+      <p><strong>Degree in Computer Science</strong>, University of Nice (2011-2014)</p>
+    </section>
+
+    <section class="languages">
+      <h2>Languages</h2>
+      <p>Spanish – C2</p>
+      <p>Chinese – A1</p>
+    </section>
+
+    <section class="skills">
+      <h2>Skills</h2>
+      <p>PHP framework (certificate): Zend, Codeigniter, Symfony</p>
+      <p>Languages: JavaScript, HTML5, PHP OOP, CSS, SQL, MySQL</p>
+    </section>
+  </div>
+</body>
+</html>

@@ -85,12 +85,29 @@
              <div class="accordion-body">
                <ul class="navbar-nav">
                  <li class="nav-item">
-                   <a class="nav-link " aria-current="page" href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Users</a>
+                   <a class="nav-link " aria-current="page" href="/add_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Users</a>
                 
                </ul>
            </div>
            </div>
          </div>
+         <div class="accordion-item" style="border: none;">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseXI" aria-expanded="false" aria-controls="collapseXI">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg> Categories
+            
+            </button>
+          </h2>
+          <div id="collapseXI" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link " aria-current="page" href="/categories"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Categories</a>
+               
+              </ul>
+          </div>
+          </div>
+        </div>
          <div class="accordion-item" style="border: none;">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
@@ -446,6 +463,10 @@
               <p>No blogs available.</p>
             <% } %>
           </div>
+
+
+
+    
           <!-- /.card-->
           
             
@@ -477,41 +498,40 @@
           
           <!-- /.row-->
           <div class="break"></div>
+         
           <nav aria-label="Page navigation example" style="bottom: 0;">
             <ul class="pagination justify-content-center">
                 <% if (page > 1) { %>
                     <li class="page-item">
-                        <a class="page-link" href="/api/ page - 1 %>">Previous</a>
+                        <a class="page-link" href="/api/approvedblogs page - 1 %>">Previous</a>
                     </li>
                 <% } %>
         
                 <% for (let i = iterator; i <= endingLink; i++) { %>
                     <% if (i === page) { %>
                         <li class="page-item active">
-                            <a class="page-link" href="/api/pendingblogs?page=<%= i %>"><%= i %></a>
+                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
                         </li>
                     <% } else { %>
                         <li class="page-item">
-                            <a class="page-link" href="/api//pendingblogs?page=<%= i %>"><%= i %></a>
+                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
                         </li>
                     <% } %>
                 <% } %>
         
                 <% if (page < numberOfPages) { %>
                     <li class="page-item">
-                        <a class="page-link" href="/api/pendingblogs?page=<%= page + 1 %>">Next</a>
+                        <a class="page-link" href="/api/approvedblogs?page=<%= page + 1 %>">Next</a>
                     </li>
                 <% } %>
             </ul>
         </nav>
-        
-        
              
          
       
-          <footer class="footer px-9" style="bottom: 0;">
-            <div><a href="#">Ngoli&copy; 2024</a></div>
-      </footer>
+        <footer class="footer px-9" style="position: fixed; bottom: 0; width: 100%; text-align: center;">
+          <h style="color: grey; text-align: center;">Xcapital&copy; 2024</h>
+    </footer>
   
     <!-- CoreUI and necessary plugins-->
     <script src="node_modules/@coreui/coreui/dist/js/coreui.bundle.min.js"></script>

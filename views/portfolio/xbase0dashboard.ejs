@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="/css/profil.css" rel="stylesheet">  <title>Profile</title>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h3 class="mb-4">Xbase</h3></a>
+            <a href="http://localhost:3000/portfolio_view"><img src="img/hero/h1_hero1.jpg" style="height: 100px; width: 100px; border-radius: 90px;">
+              <p>Welcome, Dummy</p>
+
+        </div>
+
+        <ul class="list-unstyled components">
+
+         
+          
+        </ul>
+        <ul class="list-unstyled components">
+          <a href="/logout">Logout</a>
+
+         
+          
+        </ul>
+
+        
+    </nav>
+
+    <!-- Page Content  -->
+    <div id="content">
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid" >
+
+                <button type="button" id="sidebarCollapse" class="btn">
+                  <img src="img/hero/h1_hero1.jpg" style="height: 50px; width: 50px; border-radius: 90px;">
+                </button>
+                <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-align-justify"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent" style="padding-left: 30px;">
+                  <!-- <nav class="navbar bg-body-tertiary"> -->
+                    <!-- <div class="container-fluid"> -->
+                      <form class="d-flex" role="search">
+                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                      </form>
+                    <!-- </div> -->
+                  <!-- </nav> -->
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/></svg>
+            </div>
+        </nav>
+
+        <div class="container">
+          <div class="row">
+              <!-- Blog entries-->
+              <div class="col-lg-8">
+                  <!-- Featured blog post-->
+                  
+                  <div class="card mb-4">
+                    <% if (blogs.length > 0) { %>
+                      <% blogs.forEach(blog => { %>
+                        <div class="card-body"style="padding: 30px; margin: 10px;">
+                          <div class="card-body">
+                            <h2 style="font-size: 40px;"><%= blog.title %></h2>
+                            <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
+                  
+                            <div class="d-flex" style="flex-wrap: wrap;">
+                              <!-- Image on the left -->
+                              <img src="<%= blog.file %>" style="width: 600px; height: 400px; margin-right: 20px;">
+                              
+                              <p id="blog-content-<%= blog.id %>" 
+                                data-truncated="<%- blog.truncatedContent %>" 
+                                data-full="<%- blog.fullContent %>" 
+                                data-is-full-content="false">
+                                
+                                 <%= blog.truncatedContent %> <!-- Initially show truncated content -->
+                                 
+                                 <a href="javascript:void(0);" onclick="toggleReadMore('<%= blog.id %>')" 
+                                    id="read-more-link-<%= blog.id %>">... Read More</a>
+                             </p>                           
+                            </div>
+                  
+                            
+                          </div>
+                          <hr>
+                        </div>
+                      <% }); %>
+                    <% } else { %>
+                      <p>No blogs available.</p>
+                    <% } %>
+                  </div>
+                  
+                  
+                  <!-- Pagination-->
+                  <!-- <nav aria-label="Pagination">
+                      <hr class="my-0" />
+                      <ul class="pagination justify-content-center my-4">
+                          <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+                          <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#!">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#!">3</a></li>
+                          <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+                          <li class="page-item"><a class="page-link" href="#!">15</a></li>
+                          <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+                      </ul>
+                  </nav> -->
+              </div>
+              <!-- Side widgets-->
+              <div class="col-lg-4">
+                  <!-- Search widget-->
+                  <div class="card mb-4">
+                      <div class="card-header">News</div>
+                      <div class="card-body">
+                          <div class="input-group">
+                              <input class="form-control" type="email" placeholder="Enter email" aria-label="Enter search term..." aria-describedby="button-search" />
+                              <button class="btn btn-primary" id="button-search" type="button">subscribe</button>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Categories widget-->
+                  <div class="card mb-4">
+                      <div class="card-header">Categories</div>
+                      <div class="card-body">
+                          <div class="row">
+                              <div class="col-sm-6">
+                                  <ul class="list-unstyled mb-0">
+                                      <li><a href="#!">Web Design</a></li>
+                                      <li><a href="#!">HTML</a></li>
+                                      <li><a href="#!">Freebies</a></li>
+                                  </ul>
+                              </div>
+                              <div class="col-sm-6">
+                                  <ul class="list-unstyled mb-0">
+                                      <li><a href="#!">JavaScript</a></li>
+                                      <li><a href="#!">CSS</a></li>
+                                      <li><a href="#!">Tutorials</a></li>
+                                  </ul>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <!-- Side widget-->
+                  
+              </div>
+          </div>
+      </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('sidebarCollapse').addEventListener('click', function () {
+          document.getElementById('sidebar').classList.toggle('active');
+      });
+  });
+</script>
+
+<script>
+  function toggleReadMore(blogId) {
+      const blogContent = document.getElementById('blog-content-' + blogId);
+      const isFullContent = blogContent.getAttribute('data-is-full-content') === 'true';
+
+      if (isFullContent) {
+          // If already showing full content, truncate it
+          blogContent.innerHTML = blogContent.getAttribute('data-truncated') + 
+                                  '<a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" ' +
+                                  'id="read-more-link-' + blogId + '">... Read More</a>';
+          blogContent.setAttribute('data-is-full-content', 'false');
+      } else {
+          // Otherwise, show full content
+          blogContent.innerHTML = blogContent.getAttribute('data-full') + 
+                                  '<a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" ' +
+                                  'id="read-more-link-' + blogId + '">... Show Less</a>';
+          blogContent.setAttribute('data-is-full-content', 'true');
+      }
+  }
+</script>
+
+</body>
+
+</html>
