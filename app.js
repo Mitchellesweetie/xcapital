@@ -17,6 +17,7 @@ const session=require('express-session')
 // const sanitizedContent = sanitizeHtml(message);
 const resume=require('./api/management/portfolio')
 const categories=require('./api/management/admin')
+const student_blog=require('./api/management/student_blogs')
 
 
 dotenv.config()
@@ -43,6 +44,7 @@ app.use('/api',require('./api/management/blogs'))
 app.use('/auth',require('./api/management/auth'))
 app.use(resume)
 app.use(categories)
+app.use('/student_blog',student_blog)
 
 
 

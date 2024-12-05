@@ -58,42 +58,123 @@ function isAuthenticated(req, res, next) {
 }
 
 
-router.post('/post',isAuthenticated, upload.single('file'), (req, res) => {
+// router.post('/post',isAuthenticated, upload.single('file'), (req, res) => {
+//     const userId = req.session.userId;
+
+//     if (!userId) {
+//       return res.redirect('/login');
+//     }
+//     const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
+//     const { title, message } = req.body;
+//     const data = { file: filePath, title, message }; 
+
+//     getBlogCounts((err, counts) => {
+//         if (err) {
+//             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
+//         }
+
+//         db.query('INSERT INTO form SET ?', data, (err, result) => {
+//             if (err) {
+//                 console.error('Database error:', err);
+//                 return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
+//             }
+
+//             // res.render('index', {
+//             //     successMessage: 'Blog created successfully waiting for Approval!',
+//             //     errorMessage: null,
+//             //     totalBlogs: counts.totalBlogs || 0,
+//             //     pendingBlogs: counts.pendingBlogs || 0,
+//             //     approvedBlogs: counts.approvedBlogs || 0,
+//             // });
+//             res.redirect('/?success=1')
+//         });
+        
+//     });
+// });
+//getting blogs
+
+router.post('/post', isAuthenticated, upload.single('file'), (req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
-      return res.redirect('/login');
+        return res.redirect('/login');
     }
-    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
-    const { title, message } = req.body;
-    const data = { file: filePath, title, message }; 
 
-    getBlogCounts((err, counts) => {
+    // Get the file path if a file was uploaded
+    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null;
+    const { title, message } = req.body;
+
+    // Start a transaction to ensure data consistency
+    db.beginTransaction((err) => {
         if (err) {
-            return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
+            console.error('Error starting transaction:', err);
+            return res.render('form', { 
+                successMessage: null, 
+                errorMessage: 'Error occurred during submission.' 
+            });
         }
 
-        db.query('INSERT INTO form SET ?', data, (err, result) => {
+        // First, insert into the parent table (form)
+        const formData = {
+            file: filePath,
+            title: title,
+            message: message,
+            status: 'pending',
+            user_id: userId  // Assuming you want to track who created it
+        };
+
+        db.query('INSERT INTO form SET ?', formData, (err, formResult) => {
             if (err) {
-                console.error('Database error:', err);
-                return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
+                return db.rollback(() => {
+                    console.error('Error inserting into form table:', err);
+                    res.render('form', { 
+                        successMessage: null, 
+                        errorMessage: 'Error occurred during submission.' 
+                    });
+                });
             }
 
-            // res.render('index', {
-            //     successMessage: 'Blog created successfully waiting for Approval!',
-            //     errorMessage: null,
-            //     totalBlogs: counts.totalBlogs || 0,
-            //     pendingBlogs: counts.pendingBlogs || 0,
-            //     approvedBlogs: counts.approvedBlogs || 0,
-            // });
-            res.redirect('/?success=1')
+            // Get the ID of the newly inserted form record
+            const formId = formResult.insertId;
+
+            // Insert into the child table (form_content)
+            const contentData = {
+                id: formId,  // Foreign key reference
+                title:title,
+                content: message,
+                // created_at: new Date()
+            };
+
+            db.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
+                if (err) {
+                    return db.rollback(() => {
+                        console.error('Error inserting into form_content table:', err);
+                        res.render('form', { 
+                            successMessage: null, 
+                            errorMessage: 'Error occurred during submission.' 
+                        });
+                    });
+                }
+
+                // Commit the transaction
+                db.commit((err) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            console.error('Error committing transaction:', err);
+                            res.render('form', { 
+                                successMessage: null, 
+                                errorMessage: 'Error occurred during submission.' 
+                            });
+                        });
+                    }
+
+                    // Redirect on success
+                    res.redirect('/?success=1');
+                });
+            });
         });
-        
     });
 });
-//getting blogs
-
-
 
 
 router.get('/pendingblogs', isAuthenticated,(req, res) => {

@@ -54,7 +54,7 @@
   <body>
     <style>
        .ck-editor__editable {
-            min-height: 500px;
+            min-height: 100px;
         }
     </style>
     <div class="sidebar sidebar-dark sidebar-fixed border-end" id="sidebar">
@@ -250,7 +250,7 @@
                       </div>
                     <% } %>
                    
-                    <div class="form">
+                    <div class="form" style="overflow: scroll;">
                       <form action="/api/update/<%= blog.id %>" method="post" class="form-control">
                         
                         <div class="mb-3">
@@ -259,10 +259,12 @@
                         </div>
                         <div class="mb-3">
                             <label for="message" class="form-label">Blog</label>
-                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" name="message" required><%= blog.message %></textarea>
+                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="8" name="message" required><%= blog.message %></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Update</button>
+
                     </form>
+
                     
                     
                    </div>

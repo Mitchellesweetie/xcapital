@@ -81,6 +81,76 @@ router.get('/create_users',(req,res)=>{
     res.render('admin/create_admin', { successMessage: null, errorMessage: null })
 
 })
+router.get('/edit_categories/:id', (req, res) => {
+  const categoryId = req.params.id; // Get the category ID from URL parameter
+  const userId = req.session.userId; // Check if the user is logged in
+
+  // Redirect to login if the user is not logged in
+  if (!userId) {
+      return res.redirect('/login');
+  }
+
+  // Query the database to fetch the category data
+  db.query('SELECT * FROM categories WHERE id = ?', [categoryId], (err, result) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.render('admin/create_categories', {
+              successMessage: null,
+              errorMessage: 'Error occurred during fetching category data.'
+          });
+      }
+
+      // If no category is found, redirect or show an error message
+      if (result.length === 0) {
+          return res.redirect('/categories'); // Or show a 'Category not found' message
+      }
+
+      const category = result[0]; // Assuming the query returns a single category
+
+      // Render the edit form with the fetched category data
+      res.render('admin/edit_categories', {
+          successMessage: 'Edit view',
+          errorMessage: null,
+          category: category // Pass the category data to the view
+      });
+  });
+});
+
+router.get('/edit_admin/:id', (req, res) => {
+  const adminId = req.params.id; // Get the category ID from URL parameter
+  const userId = req.session.userId; // Check if the user is logged in
+
+  // Redirect to login if the user is not logged in
+  if (!userId) {
+      return res.redirect('/login');
+  }
+
+  // Query the database to fetch the category data
+  db.query('SELECT * FROM registration WHERE id = ?', [adminId], (err, result) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.render('admin/admin', {
+              successMessage: null,
+              errorMessage: 'Error occurred during fetching category data.'
+          });
+      }
+
+      // If no category is found, redirect or show an error message
+      if (result.length === 0) {
+          return res.redirect('/'); // Or show a 'Category not found' message
+      }
+
+      const admin = result[0]; // Assuming the query returns a single category
+
+      // Render the edit form with the fetched category data
+      res.render('admin/edit_admin', {
+          successMessage: 'Edit view',
+          errorMessage: null,
+          admin: admin // Pass the category data to the view
+      });
+  });
+});
+
 
 router.post('/add_categories', (req, res) => {
   // Ensure statu is either 'active' or 'inactive'
@@ -132,40 +202,7 @@ router.post('/delete_categories/:id', (req, res) => {
       });
   });
 });
-router.get('/edit_categories/:id', (req, res) => {
-  const categoryId = req.params.id; // Get the category ID from URL parameter
-  const userId = req.session.userId; // Check if the user is logged in
 
-  // Redirect to login if the user is not logged in
-  if (!userId) {
-      return res.redirect('/login');
-  }
-
-  // Query the database to fetch the category data
-  db.query('SELECT * FROM categories WHERE id = ?', [categoryId], (err, result) => {
-      if (err) {
-          console.error('Database error:', err);
-          return res.render('admin/create_categories', {
-              successMessage: null,
-              errorMessage: 'Error occurred during fetching category data.'
-          });
-      }
-
-      // If no category is found, redirect or show an error message
-      if (result.length === 0) {
-          return res.redirect('/categories'); // Or show a 'Category not found' message
-      }
-
-      const category = result[0]; // Assuming the query returns a single category
-
-      // Render the edit form with the fetched category data
-      res.render('admin/edit_categories', {
-          successMessage: 'Edit view',
-          errorMessage: null,
-          category: category // Pass the category data to the view
-      });
-  });
-});
 
 router.post('/edit_categories/:id', (req, res) => {
   const categoryId = req.params.id;  // Category ID to be updated
@@ -200,7 +237,30 @@ router.post('/edit_categories/:id', (req, res) => {
   );
 });
 
+router.post('/delete_user/:id', (req, res) => {
+  const user = req.params.id;
 
+  const userId = req.session.userId;
+
+  if (!userId) {
+      return res.redirect('/login');
+  }
+
+  // Insert the category data into the database
+  db.query('delete from user where id=?', [user], (err, result) => {
+      if (err) {
+          console.error('Database error:', err);
+          return res.render('admin/admin', { successMessage: null, errorMessage: 'Error occurred during submission.' });
+      }
+
+      res.render('admin/admin', {
+          successMessage: 'Category delected successfully',
+          errorMessage: null,
+          admin:result
+          
+      });
+  });
+});
 router.post('/register', (req, res) => {
     const { username, email,phone,role, password, confirmpassword } = req.body;
     

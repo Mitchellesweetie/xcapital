@@ -55,7 +55,17 @@
           font-optical-sizing: auto;
           font-weight: 30px;
           font-style: normal;
-        }
+                  }
+          .blog-content .blog-message {
+            overflow: hidden;
+            max-height: 100px;
+            transition: max-height 0.3s ease-out;
+          }
+
+          .blog-content.expanded .blog-message {
+            max-height: none;
+          }
+
     </style>
   </head>
   <body>
@@ -439,27 +449,24 @@
                     <div class="card-body">
                       <% if (blogs.length > 0) { %>
                         <% blogs.forEach(blog => { %>
-                          <div class="card"style="padding: 30px; margin: 10px;">
+                          <div class="card" style="padding: 30px; margin: 10px;">
                             <div class="card-body">
                               <h2 style="font-size: 40px;"><%= blog.title %></h2>
                               <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
                     
                               <div class="d-flex" style="flex-wrap: wrap;">
                                 <!-- Image on the left -->
-                                <img src="<%= blog.file %>" style="width: 600px; height: 400px; margin-right: 20px;">
+                                <img src="<%= blog.file %>" style="width: 200px; height: 200px; margin-right: 20px;">
                                 
-                                <!-- Paragraph on the right -->
-                                <p id="blog-content-<%= blog.id %>"
-                                  data-truncated="<%- blog.truncatedContent %>"
-                                  data-full="<%- blog.message.slice(0,500)%>"
-                                  data-is-full-content="false" style="flex: 1; position: relative;">
-                                  
-                                  <%- blog.truncatedContent %> <!-- Initially show truncated content -->
-                               
-                                  <a href="javascript:void(0);" onclick="toggleReadMore('<%= blog.id %>')"
-                                     id="read-more-link-<%= blog.id %>" style="color: red;">... Read More</a>
-                               </p>
-                               
+                                <!-- Content container -->
+                                <div class="content-wrapper" style="flex: 1;">
+                                  <div id="blog-content-<%= blog.id %>" class="blog-content">
+                                    <div class="blog-message"><%- blog.message %></div>
+                                    <button onclick="toggleReadMore('<%= blog.id %>')" 
+                                            class="btn btn-link text-danger"
+                                            style="padding: 0;">Read More</button>
+                                  </div>
+                                </div>
                               </div>
                     
                               <p>Status: <%= blog.status %></p>
@@ -472,15 +479,12 @@
                                 <span class="badge badge-success">Approved</span>
                               <% } %>
                             </div>
-                            <hr>
                           </div>
                         <% }); %>
                       <% } else { %>
                         <p>No blogs available.</p>
                       <% } %>
                     </div>
-                    
-                    
                    
             
           <!-- /.card -->
@@ -555,30 +559,19 @@
       });
       
     </script>
-    <script>
-      //read more and less
-     
-      
-      function toggleReadMore(blogId) {
-  const blogContentElement = document.getElementById('blog-content-' + blogId);
-  const isFullContent = blogContentElement.getAttribute('data-is-full-content') === 'true';
-
-  if (isFullContent) {
-    // Show truncated content
-    blogContentElement.innerHTML = blogContentElement.getAttribute('data-truncated') + 
-      ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '" style="color: red;">... Read More</a>';
-    blogContentElement.setAttribute('data-is-full-content', 'false');
-  } else {
-    // Show full content
-    blogContentElement.innerHTML = blogContentElement.getAttribute('data-full') + 
-      ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '" style="color: red;">... Read Less</a>';
-    blogContentElement.setAttribute('data-is-full-content', 'true');
-  }
-}
-
+ <script>
+  function toggleReadMore(blogId) {
+    const contentElement = document.getElementById(`blog-content-${blogId}`);
+    const button = contentElement.querySelector('button');
     
-
-
+    if (contentElement.classList.contains('expanded')) {
+      contentElement.classList.remove('expanded');
+      button.textContent = 'Read More';
+    } else {
+      contentElement.classList.add('expanded');
+      button.textContent = 'Read Less';
+    }
+  }
   </script>
   
     <!-- Plugins and scripts required by this view-->
