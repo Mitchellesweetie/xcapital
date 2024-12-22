@@ -1,13 +1,12 @@
-//images,video ,audio
-// Approval routes
-// Form search
+
 const express=require('express')
 const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
 const dotenv=require('dotenv')
 const port=process.env.localport
 // const port=process.env.localport||process.env.port
-
+const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 const path=require('path')
 const cors=require('cors')
 const flash = require('connect-flash')
@@ -33,18 +32,26 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({limit: '20mb',extend:true}))
 app.use(express.json({limit: '20mb'}))
+app.use(cookieParser());
 app.use(session({
     secret: 'mysecretkey',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false, maxAge: 1000 * 60 * 30 }
+    cookie: { 
+        secure: process.env.NODE_ENV ? process.env.NODE_ENV === 'production' : false,
+        // httpOnly: true,
+        maxAge: 24* 60 * 60 * 1000 }
 }));
+app.use(morgan('combined'))
 app.use('/ckeditor', express.static(path.join(__dirname, 'node_modules/@ckeditor/ckeditor5-build-classic/build')));
 app.use('/api',require('./api/management/blogs'))
-app.use('/auth',require('./api/management/auth'))
+// app.use('/auth',require('./api/management/auth'))
 app.use(resume)
-app.use(categories)
+app.use('/',categories)
 app.use('/student_blog',student_blog)
+app.use(require('./api/management/admin_auth'))
+app.use(require('./api/management/publicroutes'))
+app.use(require('./api/management/student_auth'))
 
 
 
@@ -70,90 +77,42 @@ const db=mysql.createConnection({
 
 })
 db.connect((err)=>{
-    if(!err){
-        console.log('Connect')
+    if(err){
+        // console.log('Connect')
+        console.log(err)
     }
+
     
 })
 
 
-app.get('/dashboard',(req,res)=>{
-    db.query('select * from form ',(err,result)=>{
-        if (err){
-            console.error('Error in blogs blog:', err);
-            return res.render('/xbase0dashboard');
-        } 
-        return res.render('portfolio/xbase0dashboard',{
-            blogs:result
-        })
-    })
+app.get('/student_blog',(req,res)=>{
 
+    res.redirect('/student_blog/home')
 })
-app.get('/portfolio_view',(req,res)=>{
+app.get('/api',(req,res)=>{
 
-    res.render('portfolio/resume')
-})
-app.get('/personal_details',isAuthenticated,(req,res)=>{
-
-    res.render('portfolio/portfolio_view_form')
+    res.redirect('/')
 })
 
-app.get('/portfolio_view_experience',(req,res)=>{
 
-    res.render('portfolio/experience')
-})
-app.get('/portfolio_view_references',(req,res)=>{
+app.get('/',(req, res) => {
+    // const userId = req.session.userId;
 
-    res.render('portfolio/refrences')
-})
-app.get('/verify-email', (req, res) => {
-    const { token } = req.query;
-  
-    if (!token) {
-        return res.render('register', { errorMessage: 'Invalid or missing token.',successMessage:null });
-    }
-  
-    db.query('SELECT * FROM registration WHERE verifiedToken = ?', [token], (err, results) => {
-        if (err) {
-            console.error('Error querying the database:', err);
-            return res.render('error', { message: 'An error occurred. Please try again later.' });
-        }
-  
-        if (results.length === 0) {
-            return res.render('register', { errorMessage: 'Invalid or expired token,kindly contact the administrator',successMessage:null });
-        }
-  
-        db.query('UPDATE registration SET isVerified = 1, verifiedToken = NULL WHERE verifiedToken = ?', [token], (updateErr) => {
-            if (updateErr) {
-                console.error('Error updating user verification:', updateErr);
-                return res.render('register', { successMessage:null,errorMessage:'An error occurred. Please try again later.' });
-            }
-  
-            return res.render('login', { successMessage: 'Email verified successfully! You can now log in.', errorMessage: null });
-        });
-    });
-  });
-  
+    // if (!userId) {
+    //   return res.redirect('/login');
+    // }
+    // db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    //     if (err || userResults.length === 0) {
+    //         console.error('Error fetching user data:', err || 'User not found');
+    //         return res.render('login', {
+    //             successMessage: null,
+    //             errorMessage: 'Login to fetch your details',
+    //             blogs: [],
+    //         });
+    //     }
 
-
-
-app.get('/',isAuthenticated,(req, res) => {
-    const userId = req.session.userId;
-
-    if (!userId) {
-      return res.redirect('/login');
-    }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
-        if (err || userResults.length === 0) {
-            console.error('Error fetching user data:', err || 'User not found');
-            return res.render('login', {
-                successMessage: null,
-                errorMessage: 'Login to fetch your details',
-                blogs: [],
-            });
-        }
-
-        const username = userResults[0].username;
+    //     const username = userResults[0].username;
    
     db.query('SELECT COUNT(*) AS totalBlogs FROM form', (err, results) => {
         if (err) {
@@ -185,24 +144,26 @@ app.get('/',isAuthenticated,(req, res) => {
                     approvedBlogs: approvedBlogs,
                     successMessage: null,
                     errorMessage: null,
-                    username
+                    // username
                 });
             });
         });
     });
 });
-})
+
+
 app.get('/register', (req, res) => {
     res.render('register', { successMessage: null, errorMessage: null }); 
   });
 app.get('/login', (req, res) => {
     res.render('login', { successMessage: null, errorMessage: null }); 
   });
-app.get('/form',isAuthenticated,(req,res)=>{
+app.get('/form',(req,res)=>{
 
     res.render('form', { successMessage: null, errorMessage: null }); 
 
 })
+
 
 app.get('/single',(req,res)=>{
     res.render('single')
@@ -217,11 +178,7 @@ app.get('/home',(req,res)=>{
     res.render('index1')
 })
 
-app.get('/login_blog',(req,res)=>{
-    res.render('login1')
 
-
-})
 app.get('/forgetpassword',(req,res)=>{
     res.render('forgetpassword', { successMessage: null, errorMessage: null }); 
 
@@ -232,21 +189,9 @@ app.get('/contact',(req,res)=>{
 
 
 })
-app.get('/ejournal',(req,res)=>{
-    res.render('ejournal')
 
 
-})
-app.get('/register_blog',(req,res)=>{
-    res.render('register1')
 
-
-})
-app.get('/blog_details',(req,res)=>{
-    res.render('blog_details')
-
-
-})
 app.get('/blog',(req,res)=>{
 
         db.query('SELECT * FROM form', (err, results) => {
@@ -263,12 +208,34 @@ app.get('/blog',(req,res)=>{
     });
 
 
-
-
-app.get('/form',(req,res)=>{
-    res.render('form')
-})
-
+app.get('/verify-email', (req, res) => {
+    const { token } = req.query;
+  
+    if (!token) {
+        return res.render('Login/register1', { errorMessage: 'Invalid or missing token.',successMessage:null });
+    }
+  
+    db.query('SELECT * FROM registration WHERE verifiedToken = ?', [token], (err, results) => {
+        if (err) {
+            console.error('Error querying the database:', err);
+            return res.render('error', { message: 'An error occurred. Please try again later.' });
+        }
+  
+        if (results.length === 0) {
+            return res.render('Login/register1', { errorMessage: 'Invalid or expired token,kindly contact the administrator',successMessage:null });
+        }
+  
+        db.query('UPDATE registration SET isVerified = 1, verifiedToken = NULL WHERE verifiedToken = ?', [token], (updateErr) => {
+            if (updateErr) {
+                console.error('Error updating user verification:', updateErr);
+                return res.render('Login/register1', { successMessage:null,errorMessage:'An error occurred. Please try again later.' });
+            }
+  
+            return res.render('Login/login', { successMessage: 'Email verified successfully! You can now log in.', errorMessage: null });
+        });
+    });
+  });
+  
 
 app.listen(process.env.localport,()=>{
     console.log('listening at port  http://localhost:'+`${port}`)

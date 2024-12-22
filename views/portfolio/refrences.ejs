@@ -64,7 +64,7 @@
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Certificate</button>
+          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Reference</button>
         </div>
 
        
@@ -89,16 +89,20 @@
         educationGroup.classList.add('card', 'card-body', 'mb-3');
         educationGroup.innerHTML = `
           <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Degree</label>
-            <input type="text" class="form-control" id="degree${educationIndex}" name="degree[]" placeholder="E.g., Bachelor of Science">
+            <label for="degree${educationIndex}" class="form-label">Name</label>
+            <input type="text" class="form-control" id="degree${educationIndex}" name="username">
           </div>
           <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Institution</label>
-            <input type="text" class="form-control" id="institution${educationIndex}" name="institution[]" placeholder="E.g., University of XYZ">
+            <label for="institution${educationIndex}" class="form-label">Organisation</label>
+            <input type="text" class="form-control" id="institution${educationIndex}" name="organisation" >
+          </div>
+           <div class="mb-3">
+            <label for="degree${educationIndex}" class="form-label">Email</label>
+            <input type="text" class="form-control" id="degree${educationIndex}" name="email">
           </div>
           <div class="mb-3">
-            <label for="year${educationIndex}" class="form-label">Year of Graduation</label>
-            <input type="text" class="form-control" id="year${educationIndex}" name="year[]" placeholder="E.g., 2024">
+            <label for="year${educationIndex}" class="form-label">Phone</label>
+            <input type="number" class="form-control" id="year${educationIndex}" name="phone" ">
           </div>
         `;
         educationContainer.appendChild(educationGroup);

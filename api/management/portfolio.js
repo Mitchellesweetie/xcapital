@@ -16,144 +16,264 @@ function isAuthenticated(req, res, next) {
     if (req.session && req.session.userId) {
         return next(); 
     }
-    res.redirect('/login'); 
+    res.redirect('/login_blog'); 
 }
 
-router.get('/portfolio_view_education',(req,res)=>{
+
+
+
+
+//whole portfolio
+router.get('/myportfolio',isAuthenticated,(req,res)=>{
+
+
+    res.render('portfolio/resume')
+})
+function redirectBasedOnProgress(req, res, next) {
+    const userId = req.session.userId;
+
+    db.query('SELECT * FROM profile_status WHERE user_id = ?', [userId], (err, profileStatus) => {
+        if (err || profileStatus.length === 0) {
+            console.error('Error fetching profile status:', err || 'No profile status found');
+            return res.redirect('/education');
+        }
+
+        const { education_completed, experience_completed, references_completed } = profileStatus[0];
+
+        if (!education_completed) {
+            return res.redirect('/personal_details');
+        } else if (!experience_completed) {
+            return res.redirect('/portfolio_view_experience');
+        } else if (!references_completed) {
+            return res.redirect('/portfolio_view_references');
+        }
+
+        next(); 
+    });
+}
+
+//personal details
+
+router.get('/personal_details',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+    console.log(userId)
+
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+
+
+    res.render('portfolio/portfolio_form',{successMessage: null,errorMessage:null})
+})
+router.post('/auth/personal_details', isAuthenticated, (req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+    const data = req.body;
+    const { salutation, fullname, gender, gmail, number_,
+        dob, ethnicity, religion, nationality} = data;
+
+        const completeData = {
+            salutation,
+            fullname,
+            gender,
+            gmail,
+            number_,
+            dob,
+            ethnicity,
+            religion,
+            nationality,
+            user_id: userId, 
+        };
+
+   
+
+        db.query('INSERT INTO personal_details SET ?', completeData, (err, result) => {
+            if (err) {
+                console.error('Error inserting personal details:', err);
+                return res.redirect('/portfolio_view_education');
+            }
+            console.log(result);
+            db.query('UPDATE registration SET profile_status = 1 WHERE user_id = ?', [userId], (err) => {
+                if (err) {
+                    console.error('Error updating profile status:', err);
+                }
+                res.redirect('/portfolio_view_education?sucess1');
+            });
+
+        });
+    });
+
+//education
+router.get('/portfolio_view_education',isAuthenticated ,(req,res)=>{
+    const userId = req.session.userId;
+    console.log(userId)
+
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
 
     res.render('portfolio/education')
 })
-router.post('/auth/personal_details',isAuthenticated,(req,res)=>{
 
-    const data=req.body
+router.post('/auth/education_details', isAuthenticated,(req, res) => {
+    const data = req.body;
+
     const userId = req.session.userId;
 
 
     if (!userId) {
-      return res.redirect('/login');
+        return res.redirect('/login_blog');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
-        if (err || userResults.length === 0) {
-            console.error('Error fetching user data:', err || 'User not found');
-            return res.render('login', {
-                successMessage: null,
-                errorMessage: 'Login to fetch your details',
-                blogs: [],
-                username
-            });
+
+    const { degree, institution, start, end,current } = data;
+    const length = degree.length;
+
+    
+ 
+
+    for (let i = 0; i < length; i++) {
+        const finalEnd = current[i] === 'on' ? 'CURRENT' : end[i];
+
+        const completeData = {
+            degree: degree[i],
+            institution: institution[i],
+            start: start[i],
+            end: end,
+            current: finalEnd[i],
+            user_id: userId
+        };
+
+
+
+
+    db.query('INSERT INTO education SET ?', completeData, (err, result) => {
+        if (err) {
+            console.error('Error inserting education details:', err);
+            return res.redirect('/portfolio_view_education?error=true');
         }
 
-    const username = userResults[0].username;
+        console.log('Education record inserted successfully:', result);
 
-    db.query('insert into  personal_details set ?',data,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
-            return res.redirect('/portfolio_view_education');
-        }
-        console.log(result)
+        db.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
+            if (err) {
+                console.error('Error updating profile status:', err);
+                return res.redirect('/portfolio_view_education?error=profile_update_failed');
+            }
 
-        return res.redirect('/portfolio_view_education')
-
-    })})
-})
-
-router.post('/auth/education_details',(req,res)=>{
-    const data=req.body
-    const userId = req.session.userId;
-
-
-    if (!userId) {
-      return res.redirect('/login');
-    }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
-        if (err || userResults.length === 0) {
-            console.error('Error fetching user data:', err || 'User not found');
-            return res.render('login', {
-                successMessage: null,
-                errorMessage: 'Login to fetch your details',
-                blogs: [],
-                username
-            });
-        }
-
-    const username = userResults[0].username;
-
-    db.query('insert into  education set ?',data,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
-            return res.redirect('/portfolio_view_education');
-        }
-        console.log(result)
-
-        return res.redirect('/portfolio_view_experience')
-
-    })})
-
-})
-router.post('/auth/experience',(req,res)=>{
-    const data=req.body
-    const userId = req.session.userId;
-
-
-    if (!userId) {
-      return res.redirect('/login');
-    }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
-        if (err || userResults.length === 0) {
-            console.error('Error fetching user data:', err || 'User not found');
-            return res.render('login', {
-                successMessage: null,
-                errorMessage: 'Login to fetch your details',
-                blogs: [],
-                username
-            });
-        }
-
-    const username = userResults[0].username;
-
-    db.query('insert into  experience set ?',data,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
             return res.redirect('/portfolio_view_experience');
-        }
-        console.log(result)
+        });
+    });
+}
+});
 
-        return res.redirect('/portfolio_view_references')
+//experience
+router.post('/auth/experience', (req, res) => {
+    const data = req.body;
+    const userId = req.session.userId;
 
-    })})
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
 
+    const { position, organisation, start, end, current } = data;
+    const length = position.length;
+
+    for (let i = 0; i < length; i++) {
+        const finalEnd = current[i] === 'on' ? 'CURRENT' : end[i];
+
+        const startDate = start[i] ? start[i] : null; 
+        const endDate = finalEnd ? finalEnd : null; 
+
+        const completeData = {
+            position: position[i],
+            organisation: organisation[i],
+            start: startDate,
+            end: endDate,
+            current: current[i] === 'on' ? 'CURRENT' : null, 
+            user_id: userId
+        };
+
+        db.query('INSERT INTO experience SET ?', completeData, (err, result) => {
+            if (err) {
+                console.error('Error inserting experience details:', err);
+                return res.redirect('/portfolio_view_experience?error=true');
+            }
+
+            console.log('Experience record inserted successfully:', result);
+
+            if (i === length - 1) { // Ensure this only happens once after all records are inserted
+                db.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
+                    if (err) {
+                        console.error('Error updating profile status:', err);
+                        return res.redirect('/portfolio_view_experience?error=profile_update_failed');
+                    }
+
+                    return res.redirect('/portfolio_view_references');
+                });
+            }
+        });
+    }
+});
+
+
+//references
+router.get('/portfolio_view_references',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+    console.log(userId)
+
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+    res.render('portfolio/refrences')
 })
 router.post('/auth/references',(req,res)=>{
     const data=req.body
     const userId = req.session.userId;
 
+    const{username,organisation,email,phone}=data
+
 
     if (!userId) {
-      return res.redirect('/login');
+      return res.redirect('/login_blog');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
-        if (err || userResults.length === 0) {
-            console.error('Error fetching user data:', err || 'User not found');
-            return res.render('login', {
-                successMessage: null,
-                errorMessage: 'Login to fetch your details',
-                blogs: [],
-                username
-            });
-        }
+    const length = username.length;
+    for (let i = 0; i < length; i++) {
+        const reference = {
+            username: username[i],
+            organisation: organisation[i],
+            email: email[i],
+            phone: phone[i],
+            user_id: userId 
+        };
+  
 
-    const username = userResults[0].username;
-
-    db.query('insert into  user_references set ?',data,(err,result)=>{
+    db.query('insert into  user_references set ?',reference,(err,result)=>{
         if (err){
             console.error('Error approving blog:', err);
             return res.redirect('/portfolio_view_references');
         }
         console.log(result)
+       if (i === length - 1) {  // This ensures the update happens only after the last insert
+        db.query('UPDATE registration SET profile_status = 4 WHERE user_id = ?', [userId], (err) => {
+            if (err) {
+                console.error('Error updating profile status:', err);
+                return res.redirect('/portfolio_view_references?error=profile_update_failed');
+            }
 
-        return res.redirect('/dashboard')
-
-    })})
+            return res.redirect('/portfolio_view_success');
+        });
+    }
+})
+}
 
 })
 router.get('/blog/:id', (req, res) => {
@@ -177,7 +297,6 @@ router.get('/blog/:id', (req, res) => {
             return res.status(404).send('Blog post not found');
         }
 
-        // Pass the blog post data to the EJS template
         const blogPost = result[0];
         res.render('blog', { blog: blogPost });
     });

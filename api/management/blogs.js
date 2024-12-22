@@ -32,6 +32,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage, limits: { fileSize: 50 * 1024 * 1024 } });
 
+function isAdmin(req, res, next) {
+    if (!req.session.admin)
+         {        return next();
+    }
+    return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
+  }
+
 // function to get blog counts
 const getBlogCounts = (callback) => {
     const countsQuery = `
@@ -58,142 +65,161 @@ function isAuthenticated(req, res, next) {
 }
 
 
-// router.post('/post',isAuthenticated, upload.single('file'), (req, res) => {
-//     const userId = req.session.userId;
-
-//     if (!userId) {
-//       return res.redirect('/login');
-//     }
-//     const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
-//     const { title, message } = req.body;
-//     const data = { file: filePath, title, message }; 
-
-//     getBlogCounts((err, counts) => {
-//         if (err) {
-//             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
-//         }
-
-//         db.query('INSERT INTO form SET ?', data, (err, result) => {
-//             if (err) {
-//                 console.error('Database error:', err);
-//                 return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
-//             }
-
-//             // res.render('index', {
-//             //     successMessage: 'Blog created successfully waiting for Approval!',
-//             //     errorMessage: null,
-//             //     totalBlogs: counts.totalBlogs || 0,
-//             //     pendingBlogs: counts.pendingBlogs || 0,
-//             //     approvedBlogs: counts.approvedBlogs || 0,
-//             // });
-//             res.redirect('/?success=1')
-//         });
-        
-//     });
-// });
-//getting blogs
-
-router.post('/post', isAuthenticated, upload.single('file'), (req, res) => {
-    const userId = req.session.userId;
-
-    if (!userId) {
-        return res.redirect('/login');
-    }
-
-    // Get the file path if a file was uploaded
-    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null;
-    const { title, message } = req.body;
-
-    // Start a transaction to ensure data consistency
-    db.beginTransaction((err) => {
-        if (err) {
-            console.error('Error starting transaction:', err);
-            return res.render('form', { 
-                successMessage: null, 
-                errorMessage: 'Error occurred during submission.' 
-            });
-        }
-
-        // First, insert into the parent table (form)
-        const formData = {
-            file: filePath,
-            title: title,
-            message: message,
-            status: 'pending',
-            user_id: userId  // Assuming you want to track who created it
-        };
-
-        db.query('INSERT INTO form SET ?', formData, (err, formResult) => {
-            if (err) {
-                return db.rollback(() => {
-                    console.error('Error inserting into form table:', err);
-                    res.render('form', { 
-                        successMessage: null, 
-                        errorMessage: 'Error occurred during submission.' 
-                    });
-                });
-            }
-
-            // Get the ID of the newly inserted form record
-            const formId = formResult.insertId;
-
-            // Insert into the child table (form_content)
-            const contentData = {
-                id: formId,  // Foreign key reference
-                title:title,
-                content: message,
-                // created_at: new Date()
-            };
-
-            db.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
-                if (err) {
-                    return db.rollback(() => {
-                        console.error('Error inserting into form_content table:', err);
-                        res.render('form', { 
-                            successMessage: null, 
-                            errorMessage: 'Error occurred during submission.' 
-                        });
-                    });
-                }
-
-                // Commit the transaction
-                db.commit((err) => {
-                    if (err) {
-                        return db.rollback(() => {
-                            console.error('Error committing transaction:', err);
-                            res.render('form', { 
-                                successMessage: null, 
-                                errorMessage: 'Error occurred during submission.' 
-                            });
-                        });
-                    }
-
-                    // Redirect on success
-                    res.redirect('/?success=1');
-                });
-            });
-        });
-    });
-});
-
-
-router.get('/pendingblogs', isAuthenticated,(req, res) => {
+router.post('/post', upload.single('file'), (req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
+    const { categoryId,title, message } = req.body;
+    const data = { categoryId,title, message,file: filePath,  }; 
+
+    getBlogCounts((err, counts) => {
+        if (err) {
+            return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
+        }
+
+        db.query('INSERT INTO form SET ?', data, (err, result) => {
+            if (err) {
+                console.error('Database error:', err);
+                return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
+            }
+
+            res.render('index', {
+                successMessage: 'Blog created successfully waiting for Approval!',
+                errorMessage: null,
+                totalBlogs: counts.totalBlogs || 0,
+                pendingBlogs: counts.pendingBlogs || 0,
+                approvedBlogs: counts.approvedBlogs || 0,
+            });
+            // res.redirect('/?success=1')
+        });
+        
+    });
+});
+//getting blogs
+
+// router.post('/post',isAdmin,  upload.single('file'), (req, res) => {
+//     const userId = req.session.userId;
+
+//     if (!userId) {
+//         return res.redirect('/login');
+//     }
+
+//     // Get the file path if a file was uploaded
+//     const filePath = req.file ? `/uploads/images/${req.file.filename}` : null;
+//     const { title, message,categoryId } = req.body;
+
+//     // Start a transaction to ensure data consistency
+//     db.beginTransaction((err) => {
+//         if (err) {
+//             console.error('Error starting transaction:', err);
+//             return res.render('form', { 
+//                 successMessage: null, 
+//                 errorMessage: 'Error occurred during submission.' 
+//             });
+//         }
+
+//         // First, insert into the parent table (form)
+//         const formData = {
+//             file: filePath,
+//             title: title,
+//             message: message,
+//             status: 'pending',
+//             user_id: userId ,
+//             categoryId:categoryId,
+//         };
+//         db.query('select * from categories',(err,categories)=>{
+//             if (err)
+//                 return db.rollback(() => {
+//                     console.error('Error inserting into form table:', err);
+//                     res.render('form', { 
+//                         successMessage: null, 
+//                         errorMessage: 'Error occurred during submission.' 
+//                     });
+//                 });
+
+        
+      
+
+//         db.query('INSERT INTO form SET ?', formData, (err, formResult) => {
+//             if (err) {
+//                 return db.rollback(() => {
+//                     console.error('Error inserting into form table:', err);
+//                     res.render('form', { 
+//                         successMessage: null, 
+//                         errorMessage: 'Error occurred during submission.' 
+//                     });
+//                 });
+//             }
+
+//             // Get the ID of the newly inserted form record
+
+//             const formId = formResult.insertId;
+
+//             // Insert into the child table (form_content)
+//             const contentData = {
+//                 id: formId,  // Foreign key reference
+//                 title:title,
+//                 content: message,
+//                 // created_at: new Date()
+//             };
+
+//             db.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
+//                 if (err) {
+//                     return db.rollback(() => {
+//                         console.error('Error inserting into form_content table:', err);
+//                         res.render('form', { 
+//                             successMessage: null, 
+//                             errorMessage: 'Error occurred during submission.' 
+//                         });
+//                     });
+//                 }
+
+//                 // Commit the transaction
+//                 db.commit((err) => {
+//                     if (err) {
+//                         return db.rollback(() => {
+//                             console.error('Error committing transaction:', err);
+//                             res.render('form', { 
+//                                 successMessage: null, 
+//                                 errorMessage: 'Error occurred during submission.' 
+//                             });
+//                         });
+//                     }
+
+//                     // Redirect on success
+//                     res.render('pendingblogs',
+//                         {successMessage:'Post Successful Waiting to be Approved',errorMessage:null,
+//                             categories:categories
+
+//                         });
+//                 });
+//             });
+//         });
+//     });
+// });  })
+
+
+router.get('/pendingblogs',isAdmin,(req, res) => {
+    const userId = req.session.userId;
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
                 successMessage: null,
-                errorMessage: 'Login to fetch your details',
+                errorMessage: 'Failed to fetch your details',
                 blogs: [],
             });
         }
 
-        const username = userResults[0].username;
+    const username = userResults[0].username;
     getBlogCounts((err, counts) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
@@ -225,6 +251,15 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
                 console.error('Error fetching approved blogs:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching approved blogs', blogs: [] });
             }
+            db.query('select * from categories',(err,categories)=>{
+                if (err)
+                    return db.rollback(() => {
+                        console.error('Error inserting into form table:', err);
+                        res.render('form', { 
+                            successMessage: null, 
+                            errorMessage: 'Error occurred during submission.' 
+                        });
+                    });
             // const blogsWithFullContent = blogs.map(blog => {
             //     const truncatedContent = blog.message.slice(0, 500); // Truncate message to 10 characters
             //     // console.log('This is a function',blog)
@@ -248,11 +283,11 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
                 iterator,
                 endingLink,
                 username,
+                categories:categories
             });
-            console.log(blogs)
 
         })
-        });
+        });})
         
     });
 });
@@ -265,7 +300,7 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 //     if (!userId) {
 //       return res.redirect('/login');
 //     }
-//     db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+//     db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
 //         if (err || userResults.length === 0) {
 //             console.error('Error fetching user data:', err || 'User not found');
 //             return res.render('login', {
@@ -359,7 +394,7 @@ router.get('/pendingblogs', isAuthenticated,(req, res) => {
 
 
 
-router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
+router.get('/pendingblogs/:id',isAdmin,(req, res) => {
     const blogId = req.params.id;
     const userId = req.session.userId;
 
@@ -367,7 +402,7 @@ router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -413,7 +448,7 @@ router.get('/pendingblogs/:id', isAuthenticated,(req, res) => {
 });
 })
 // Update the blog
-router.post('/update/:id',isAuthenticated, (req, res) => {
+router.post('/update/:id',isAdmin, (req, res) => {
     const blogId = req.params.id
     const data = req.body
     const userId = req.session.userId;
@@ -422,7 +457,7 @@ router.post('/update/:id',isAuthenticated, (req, res) => {
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -468,13 +503,13 @@ router.post('/update/:id',isAuthenticated, (req, res) => {
 });
 
 // Get all approved blogs
-router.get('/approvedblogs', isAuthenticated,(req, res) => {
+router.get('/approvedblogs',isAdmin,(req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -516,17 +551,17 @@ router.get('/approvedblogs', isAuthenticated,(req, res) => {
                 console.error('Error fetching approved blogs:', err);
                 return res.render('approvedblogs', { successMessage: null, errorMessage: 'Error fetching approved blogs', blogs: [] });
             }
-            const blogsWithFullContent = blogs.map(blog => {
-                const truncatedContent = blog.message.slice(0, 50); // Truncate message to 10 characters
-                return {
-                    ...blog,
-                    isFullContent: false, // Initially show truncated content
-                    truncatedContent: truncatedContent, // Truncated message for initial display
-                    fullContent: blog.message, // Full content for later display
-                };
-            });
+            // const blogsWithFullContent = blogs.map(blog => {
+            //     const truncatedContent = blog.message.slice(0, 50); // Truncate message to 10 characters
+            //     return {
+            //         ...blog,
+            //         isFullContent: false, // Initially show truncated content
+            //         truncatedContent: truncatedContent, // Truncated message for initial display
+            //         fullContent: blog.message, // Full content for later display
+            //     };
+            // });
             res.render('approvedblogs', {
-                blogs: blogsWithFullContent,
+                blogs:blogs,
                 totalBlogs: counts.totalBlogs || 0,
                 pendingBlogs: counts.pendingBlogs || 0,
                 approvedBlogs: counts.approvedBlogs || 0,
@@ -545,7 +580,7 @@ router.get('/approvedblogs', isAuthenticated,(req, res) => {
 });
 })
 
-router.post('/approve/:id', isAuthenticated,(req, res) => {
+router.post('/approve/:id',isAdmin, (req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -570,19 +605,26 @@ router.post('/approve/:id', isAuthenticated,(req, res) => {
                 });
             
         } else {
-            res.render('pendingblogs', {
+            res.render('approveblogs', {
+                blogs:result,
+                totalBlogs: counts.totalBlogs || 0,
+                pendingBlogs: counts.pendingBlogs || 0,
+                approvedBlogs: counts.approvedBlogs || 0,
                 successMessage: null,
-                errorMessage: 'Error while approving the blog',
-                blogs: [],
-                totalBlogs: 0,
-                pendingBlogs: 0,
-                approvedBlogs: 0
+                errorMessage: null,
+                numberOfPages,
+                page,
+                iterator,
+                endingLink,
+                username,
+                categories:categories
+            
             });
         }
     });
 });
 
-router.get('/search',isAuthenticated,(req,res)=>{
+router.get('/search',(req,res)=>{
     const userId = req.session.userId;
 
     if (!userId) {
@@ -599,6 +641,9 @@ router.get('/search',isAuthenticated,(req,res)=>{
     })
 
 })
+
+
+
 
 
 

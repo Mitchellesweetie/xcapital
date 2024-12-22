@@ -24,18 +24,15 @@ db.connect((err) => {
         console.log('Connected to the database');
     }
 });
-function isAuthenticated(req, res, next) {
-    if (req.session && req.session.userId) {
-        return next(); 
-    }
-    res.redirect('/login'); 
-}
+
 function isAdmin(req, res, next) {
-  if (req.session && req.session.userRole === 'admin') {
+  // Check if session exists and role is admin
+  if (req.session && req.session.role === 'admin') {
       return next();
   }
-  res.status(403).render('error', { message: 'Access denied.' }); 
-}  
+  return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
+}
+
 
 router.get('/categories', (req, res) => {
   db.query('SELECT * FROM categories', (err, result) => {
@@ -81,17 +78,12 @@ router.get('/create_users',(req,res)=>{
     res.render('admin/create_admin', { successMessage: null, errorMessage: null })
 
 })
-router.get('/edit_categories/:id', (req, res) => {
-  const categoryId = req.params.id; // Get the category ID from URL parameter
-  const userId = req.session.userId; // Check if the user is logged in
-
-  // Redirect to login if the user is not logged in
-  if (!userId) {
-      return res.redirect('/login');
-  }
+router.get('/edit_categories/:id',(req, res) => {
+  const categoryId = req.params.id;
+  
 
   // Query the database to fetch the category data
-  db.query('SELECT * FROM categories WHERE id = ?', [categoryId], (err, result) => {
+  db.query('SELECT * FROM categories WHERE categoryId = ? ', [categoryId], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/create_categories', {
@@ -116,41 +108,32 @@ router.get('/edit_categories/:id', (req, res) => {
   });
 });
 
-router.get('/edit_admin/:id', (req, res) => {
-  const adminId = req.params.id; // Get the category ID from URL parameter
-  const userId = req.session.userId; // Check if the user is logged in
+router.get('/edit_admin/:id',(req, res) => {
+  const user_id = req.params.id;
+  
 
-  // Redirect to login if the user is not logged in
-  if (!userId) {
-      return res.redirect('/login');
-  }
-
-  // Query the database to fetch the category data
-  db.query('SELECT * FROM registration WHERE id = ?', [adminId], (err, result) => {
+  db.query('SELECT * FROM registration WHERE user_id = ? ', [user_id], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/admin', {
               successMessage: null,
-              errorMessage: 'Error occurred during fetching category data.'
+              errorMessage: 'Error occurred during fetching admin data.'
           });
       }
 
-      // If no category is found, redirect or show an error message
       if (result.length === 0) {
-          return res.redirect('/'); // Or show a 'Category not found' message
+          return res.redirect('/add_users'); 
       }
 
-      const admin = result[0]; // Assuming the query returns a single category
+      const admin = result[0]; 
 
-      // Render the edit form with the fetched category data
       res.render('admin/edit_admin', {
           successMessage: 'Edit view',
           errorMessage: null,
-          admin: admin // Pass the category data to the view
+          admin:admin 
       });
   });
 });
-
 
 router.post('/add_categories', (req, res) => {
   // Ensure statu is either 'active' or 'inactive'
@@ -159,13 +142,7 @@ router.post('/add_categories', (req, res) => {
   
   // Prepare the data to insert into the database
   const data = { category, statu, descriptio };
-  const userId = req.session.userId;
-
-  if (!userId) {
-      return res.redirect('/login');
-  }
-
-  // Insert the category data into the database
+ 
   db.query('INSERT INTO categories SET ?', data, (err, result) => {
       if (err) {
           console.error('Database error:', err);
@@ -182,44 +159,31 @@ router.post('/add_categories', (req, res) => {
 router.post('/delete_categories/:id', (req, res) => {
   const category = req.params.id;
 
-  const userId = req.session.userId;
-
-  if (!userId) {
-      return res.redirect('/login');
-  }
-
-  // Insert the category data into the database
-  db.query('delete from categories where id=?', [category], (err, result) => {
+  db.query('delete from categories where categoryId=?', [category], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/create_categories', { successMessage: null, errorMessage: 'Error occurred during submission.' });
       }
 
-      res.render('admin/create_categories', {
-          successMessage: 'Category delected successfully',
+      res.render('admin/categories', {
+          successMessage: 'Category deleted successfully',
           errorMessage: null,
+          categories:result
           
       });
   });
 });
 
 
-router.post('/edit_categories/:id', (req, res) => {
-  const categoryId = req.params.id;  // Category ID to be updated
+router.post('/edit_categories/:id',(req, res) => {
+  const categoryId = req.params.id; 
   const { category, statu, descriptio } = req.body;  // Extract data from the form submission
 
-  const userId = req.session.userId;
-
-  if (!userId) {
-      return res.redirect('/login');
-  }
-
-  // Set status to 'inactive' if it's not 'active'
   const status = statu === 'active' ? 'active' : 'inactive';
 
   // Update the category in the database
   db.query(
-    'UPDATE categories SET category = ?, statu = ?, descriptio = ? WHERE id = ?',
+    'UPDATE categories SET category = ?, statu = ?, descriptio = ? WHERE categoryId = ?',
     [category, status, descriptio, categoryId],
     (err, result) => {
       if (err) {
@@ -237,85 +201,29 @@ router.post('/edit_categories/:id', (req, res) => {
   );
 });
 
+
 router.post('/delete_user/:id', (req, res) => {
-  const user = req.params.id;
+  const userId = req.params.id; // Get user ID from URL parameters
+  console.log('Attempting to delete user with ID:', userId);
 
-  const userId = req.session.userId;
+  db.query('DELETE FROM registration WHERE user_id = ?', [userId], (err, result) => {
+    if (err) {
+      console.error('Database error:', err.message);
+      return res.redirect('/admin/admin?error=Failed to delete user. Please try again.');
+    }
 
-  if (!userId) {
-      return res.redirect('/login');
-  }
+    if (result.affectedRows === 0) {
+      console.log(`User with ID ${userId} not found.`);
+      return res.redirect('/admin/admin?error=User not found.');
+    }
 
-  // Insert the category data into the database
-  db.query('delete from user where id=?', [user], (err, result) => {
-      if (err) {
-          console.error('Database error:', err);
-          return res.render('admin/admin', { successMessage: null, errorMessage: 'Error occurred during submission.' });
-      }
-
-      res.render('admin/admin', {
-          successMessage: 'Category delected successfully',
-          errorMessage: null,
-          admin:result
-          
-      });
+    console.log(`User with ID ${userId} deleted successfully.`);
+    res.redirect('/admin/admin?success=User deleted successfully.');
   });
 });
-router.post('/register', (req, res) => {
-    const { username, email,phone,role, password, confirmpassword } = req.body;
-    
 
-    const hashedPassword = bcrypt.hashSync(password, 10);
-    const verifiedToken = crypto.randomBytes(32).toString('hex');
-    var passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=<>?])[A-Za-z\d!@#$%^&*()_\-+=<>?]{8,20}$/;
-  
-  
-    db.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
-      if (err) {
-        console.error('Error querying the database:', err);
-        return res.render('admin/create_admin', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
-      }
-  
-      if (results.length > 0) {
-        return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Email has already been registered' });
-      }
-      if(!password.match(passw)){
-        return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Password should contain lower case character,upper character and special character' });}
-  
-      if (password.length < 8) {
-        return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Password must be at least 8 characters long' });
-      }
-  
-      if (password !== confirmpassword) {
-        return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Passwords do not match' });
-      }
-  
-      db.query('INSERT INTO registration SET ?', { username, email,phone,role, password: hashedPassword ,verifiedToken}, (err, result) => {
-        if (err) {
-          console.error('Error inserting user into the database:', err);
-          return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
-        }
-  
-        // res.render('login', { successMessage: 'Registration successful!Verify your email to sign in', errorMessage: null });
-        // const verificationLink = `http://localhost:3000/verify-email?token=${verifiedToken}`;
-        // const mailOptions = {
-        //     from: 'no-reply@xbase.co.ke',
-        //     to: email,
-        //     subject: 'Verify your email',
-        //     text: `Please verify your email by clicking the following link: ${verificationLink}`,
-        //     html: `<p>Please verify your email by clicking the following link:</p><a href="${verificationLink}">Verify Email</a>`,
-        // };
-    
-        // transport.sendMail(mailOptions, (error, info) => {
-        //     if (error) {
-        //         console.log(error);
-        //         return res.render('register', { successMessage: null, errorMessage: 'Could not send verification email. Please try again later.' });
-        //       }
-  
-              return res.render('admin/create_admin', { successMessage: 'Registration successful!', errorMessage: null });
-          });
-      });
-    });
-  
 
+
+
+    
 module.exports = router;

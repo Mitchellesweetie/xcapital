@@ -1,0 +1,18 @@
+<div class="single-slider">
+    <% if (form && form.length > 0) { %> 
+        <% form.forEach(blog => { %> 
+            <div class="trending-top mb-30">
+                <div class="trend-top-img">
+                    <img src="<%= blog.file || '/path/to/default-image.jpg' %>" alt="">
+                    <div class="trend-top-cap">
+                        <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms"><%= blog.category %></span>
+                        <h2><a href="/student_blog/latest_news" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms"><%= blog.title %></a></h2>
+                        <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms"><%= new Date(blog.create_at).toLocaleDateString('en-US') %></p>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    <% } else { %>
+        <p>No blogs available.</p>
+    <% } %>
+</div>

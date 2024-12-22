@@ -432,31 +432,29 @@
           <div class="card-body">
             <% if (blogs.length > 0) { %>
               <% blogs.forEach(blog => { %>
-                <div class="card"style="padding: 30px; margin: 10px;">
+                <div class="card" style="padding: 30px; margin: 10px;">
                   <div class="card-body">
                     <h2 style="font-size: 40px;"><%= blog.title %></h2>
                     <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
           
                     <div class="d-flex" style="flex-wrap: wrap;">
-                      <img src="<%= blog.file %>" style="width: 400px; height: 300px; margin-right: 20px;">
+                      <!-- Image on the left -->
+                      <img src="<%= blog.file %>" style="width: 200px; height: 200px; margin-right: 20px;">
                       
-                      <p  id="blog-content-<%= blog.id %>"
-                        data-truncated="<%- blog.truncatedContent %>"
-                        data-full="<%- blog.fullContent %>"
-                        data-is-full-content="false" style="flex: 1; position: relative;">
-                        
-                        <%- blog.truncatedContent %>
-                     
-                        <a href="javascript:void(0);" onclick="toggleReadMore('<%= blog.id %>')"
-                           id="read-more-link-<%= blog.id %>" style="color: red;">... Read More</a>
-                     </p>
-                     
+                      <!-- Content container -->
+                      <div class="content-wrapper" style="flex: 1;">
+                        <div id="blog-content-<%= blog.id %>" class="blog-content">
+                          <div class="blog-message"><%- blog.message %></div>
+                          <button onclick="toggleReadMore('<%= blog.id %>')" 
+                                  class="btn btn-link text-danger"
+                                  style="padding: 0;">Read More</button>
+                        </div>
+                      </div>
                     </div>
           
                     <p>Status: <%= blog.status %></p>
                    
                   </div>
-                  <hr>
                 </div>
               <% }); %>
             <% } else { %>
@@ -546,29 +544,20 @@
       });
       
     </script>
-        <script>
-          //read more and less
-         
-     function toggleReadMore(blogId) {
-      const blogContentElement = document.getElementById('blog-content-' + blogId);
-      const isFullContent = blogContentElement.getAttribute('data-is-full-content') === 'true';
-    
-      if (isFullContent) {
-        // Show truncated content (10 characters)
-        blogContentElement.innerHTML = blogContentElement.getAttribute('data-truncated') + 
-          ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '">... Read More</a>';
-        blogContentElement.setAttribute('data-is-full-content', 'false');
+  <script>
+    function toggleReadMore(blogId) {
+      const contentElement = document.getElementById(`blog-content-${blogId}`);
+      const button = contentElement.querySelector('button');
+      
+      if (contentElement.classList.contains('expanded')) {
+        contentElement.classList.remove('expanded');
+        button.textContent = 'Read More';
       } else {
-        // Show full content
-        blogContentElement.innerHTML = blogContentElement.getAttribute('data-full') + 
-          ' <a href="javascript:void(0);" onclick="toggleReadMore(' + blogId + ')" id="read-more-link-' + blogId + '">... Read Less</a>';
-        blogContentElement.setAttribute('data-is-full-content', 'true');
+        contentElement.classList.add('expanded');
+        button.textContent = 'Read Less';
       }
     }
-    
-    
-    
-      </script>
+    </script>
     <!-- Plugins and scripts required by this view-->
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="node_modules/@coreui/chartjs/dist/js/coreui-chartjs.js"></script>

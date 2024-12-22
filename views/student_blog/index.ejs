@@ -108,13 +108,14 @@
                         <div class="col-xl-4 col-lg-4 col-md-4">
                             <div class="header-right f-right d-none d-lg-block">
                                 <!-- Heder social -->
-                                <ul class="header-social">    
+                                <!-- <ul class="header-social">    
                                     <li><a href="https://www.fb.com/sai4ull"><i class="fab fa-facebook-f"></i></a></li>
                                     <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fab fa-instagram"></i></a></li>
                                     <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
-                                </ul>
+                                </ul> -->
                                 <!-- Search Nav -->
+                                 <button type="button" style="height: 50px;width: 100px; color: black ;border-radius: 30px;"><a href="/login_blog">Login</a></button>
                                 <div class="nav-search search-switch">
                                     <i class="fa fa-search"></i>
                                 </div>
@@ -141,20 +142,40 @@
                         <!-- Trending Top -->
                         <div class="slider-active">
                             <!-- Single -->
-                            <div class="single-slider">
-                                <div class="trending-top mb-30">
-                                    <div class="trend-top-img">
-                                        <img src="/blog/img/trending/trending_top2.jpg" alt="">
-                                        <div class="trend-top-cap">
-                                            <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">Business</span>
-                                            <h2><a href="/student_blog/latest_news" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">Anna Lora Stuns In White At Her Australian Premiere</a></h2>
-                                            <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">by Alice cloe   -   Jun 19, 2020</p>
+                            <% if (blogs && blogs.length > 0) { %>
+                                <% blogs.forEach(blog => { %>   
+                               
+                                    <div class="single-slider">
+                                        <div class="trending-top mb-30">
+                                            <div class="trend-top-img">
+                                                <img src="<%= blog.imageUrl || '/blog/img/trending/trending_top02.jpg' %>" alt="">
+                                                <div class="trend-top-cap">
+                                                    <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">
+                                                        <%= blog.category %>
+                                                    </span>
+                                                    <h2>
+                                                        <a href="/student_blog/latest_news/<%= blog.id %>" data-animation="fadeInUp" data-delay=".4s" data-duration="1000ms">
+                                                            <%= blog.title %>
+                                                        </a>
+                                                    </h2>
+                                                    <p data-animation="fadeInUp" data-delay=".6s" data-duration="1000ms">
+                                                        <%= new Date(blog.create_at).toLocaleDateString('en-US') %>
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                <% }) %>
+                            <% } else { %>
+                                <p>No blogs available.</p>
+                            <% } %>
+                            
+
+
                             <!-- Single -->
                             <div class="single-slider">
+                              
+    
                                 <div class="trending-top mb-30">
                                     <div class="trend-top-img">
                                         <img src="/blog/img/trending/trending_top02.jpg" alt="">
@@ -233,15 +254,22 @@
                         <div class="col-xl-8 col-md-9">
                             <div class="properties__button">
                                 <!--Nav Button  -->                                            
-                                <nav>                                                 
+                                <nav>      
+                                    
+                                       
+
                                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                                        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Lifestyle</a>
-                                        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Travel</a>
-                                        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Fashion</a>
-                                        <a class="nav-item nav-link" id="nav-last-tab" data-toggle="tab" href="#nav-last" role="tab" aria-controls="nav-contact" aria-selected="false">Sports</a>
-                                        <a class="nav-item nav-link" id="nav-Sports" data-toggle="tab" href="#nav-nav-Sport" role="tab" aria-controls="nav-contact" aria-selected="false">Technology</a>
+                                        <% if (categoryblogs.length > 0) { %>
+                                            <% categoryblogs.forEach(category => { %>
+                                                <a class="nav-item nav-link" id="nav-<%= category.id %>-tab" data-toggle="tab" href="#nav-<%= category.categoryId %>" role="tab" aria-controls="nav-<%= category.categoryId %>" aria-selected="false"><%= category.category %></a>
+                                            <% }) %>
+                                        <% } else { %>
+                                          <p>No categories available.</p>
+                                        <% } %>
+
                                     </div>
                                 </nav>
+                                
                                 <!--End Nav Button  -->
                             </div>
                         </div>
@@ -272,18 +300,12 @@
                                             <div class="row">
                                                 <!-- single -->
                                                 <div class="col-xl-12 col-lg-6 col-md-6 col-sm-10">
-                                                    <div class="whats-right-single mb-20">
-                                                        <div class="whats-right-img">
-                                                            <img src="/blog/img/gallery/whats_right_img1.png" alt="">
-                                                        </div>
-                                                        <div class="whats-right-cap">
-                                                            <span class="colorb">FASHION</span>
-                                                            <h4><a href="/student_blog/latest_news">Portrait of group of friends ting eat. market in.</a></h4>
-                                                            <p>Jun 19, 2020</p> 
-                                                        </div>
-                                                    </div>
+                                                       
+                                                          
+                   
+            
+                                                   
                                                 </div>
-                                                <div class="col-xl-12 col-lg-6 col-md-6 col-sm-10">
                                                     <div class="whats-right-single mb-20">
                                                         <div class="whats-right-img">
                                                             <img src="/blog/img/gallery/whats_right_img2.png" alt="">
@@ -318,9 +340,10 @@
                                                             <p>Jun 19, 2020</p> 
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </div> 
                                             </div>
-                                        </div>
+                                        </div> 
+                                        
                                     </div>
                                 </div>
                                 <!-- Card two -->
@@ -802,6 +825,7 @@
                     <div class="col-12">
                         <div class="recent-active dot-style d-flex dot-style">
                             <!-- Single -->
+                           
                             <div class="single-recent">
                                 <div class="what-img">
                                     <img src="/blog/img/gallery/tranding1.png" alt="">
@@ -959,15 +983,29 @@
                             <div class="row">
                                 <div class="col-lg-12">
                                     <div class="weekly3-news-active dot-style d-flex">
+                                        <% if (categoryblogs && categoryblogs.length > 0) { %>
+                                            <% categoryblogs.forEach(function(blog) { %>
+                                       
+                                           
                                         <div class="weekly3-single">
-                                            <div class="weekly3-img">
-                                                <img src="/blog/img/gallery/weekly2News1.png" alt="">
-                                            </div>
-                                            <div class="weekly3-caption">
-                                                <h4><a href="/student_blog/latest_news">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                                <p>19 Jan 2020</p>
-                                            </div>
-                                        </div> 
+                                            
+                                                    <div class="weekly3-img">
+                                                        <img src="<%= blog.imageUrl %>" alt="<%= blog.title %>">
+                                                    </div>
+                                                    <div class="weekly3-caption">
+                                                        <h4><a href="/student_blog/<%= blog.id %>"><%= blog.title %></a></h4>
+                                                        <p>    
+                                                            <%= new Date(blog.create_at).toLocaleDateString('en-US') %>
+                                                        </p>
+
+                                                    </div>
+                                              
+                                        </div>
+                                        <% }); %>
+                                        <% } else { %>
+                                            <p>No blogs available.</p>
+                                        <% } %>
+                                         
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
                                                 <img src="/blog/img/gallery/weekly2News2.png" alt="">

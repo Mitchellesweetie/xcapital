@@ -44,23 +44,29 @@
             <!-- Initial Education Group -->
             <div class="card card-body mb-3">
               <div class="mb-3">
-                <label for="degree1" class="form-label">Degree</label>
-                <input type="text" class="form-control" id="degree1" name="degree[]" placeholder="E.g., Bachelor of Science">
+                <label for="degree1" class="form-label">Position</label>
+                <input type="text" class="form-control" id="degree1" name="position">
               </div>
               <div class="mb-3">
-                <label for="institution1" class="form-label">Institution</label>
-                <input type="text" class="form-control" id="institution1" name="institution[]" placeholder="E.g., University of XYZ">
+                <label for="institution1" class="form-label">Organisation</label>
+                <input type="text" class="form-control" id="institution1" name="organisation" >
               </div>
               <div class="mb-3">
-                <label for="year1" class="form-label">Year of Graduation</label>
-                <input type="text" class="form-control" id="year1" name="year[]" placeholder="E.g., 2024">
+                <label for="year1" class="form-label">Start</label>
+                <input type="date" class="form-control" id="start1" name="start">
+              </div>
+              <div class="mb-3">
+                <label for="end1" class="form-label">End</label>
+                <input type="date" class="form-control" id="end1" name="end">
+              </div>
+              <div class="mb-3">
+                <label for="current1" class="form-label">Current</label>
+                <input type="checkbox" id="current1" name="current" onchange="toggleCurrent(this)">
               </div>
             </div>
           </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Certificate</button>
+          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Experience</button>
         </div>
-
-     
 
         <!-- Submit Button -->
         <div class="text-center">

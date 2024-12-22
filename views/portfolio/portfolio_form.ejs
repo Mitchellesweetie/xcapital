@@ -34,49 +34,66 @@
 </head>
 <body>
   <div class="container">
+    <% if (errorMessage) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><%= errorMessage %><strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
+    <% if (successMessage) { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong><%= successMessage %><strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
     <div class="form-container">
       <h1 class="form-title text-center">Personal Details</h1>
-      <form>
+     
+      <form method="post" action="/auth/personal_details">
         <!-- Personal Information -->
-        <div class="mb-3">
-            <label for="fullName" class="form-label">Salutation</label>
-            <input type="text" class="form-control" id="fullName" >
-          </div>
-        <div class="mb-3">
-          <label for="fullName" class="form-label">Full Name</label>
-          <input type="text" class="form-control" id="fullName" placeholder="Enter your full name">
+         <!-- Personal Information -->
+         <div class="mb-3">
+          <label for="fullName" class="form-label">Salutation</label>
+          <input type="text" class="form-control" id="fullName" name="salutation">
+        </div>
+      <div class="mb-3">
+        <label for="fullName" class="form-label">Full Name</label>
+        <input type="text" class="form-control" id="fullName"   name="fullName"  placeholder="Enter your full name">
+      </div>
+      <div class="mb-3">
+          <label for="fullName" class="form-label">Gender</label>
+          <input type="text" class="form-control" id="gender" name="gender">
+        </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" placeholder="Enter your email" name="gmail">
+      </div>
+      <div class="mb-3">
+        <label for="phone" class="form-label">Phone Number</label>
+        <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number" name="number_">
+      </div>
+      <div class="mb-3">
+          <label for="fullName" class="form-label">Date of birth</label>
+          <input type="date" class="form-control" id="dob" name="dob" >
         </div>
         <div class="mb-3">
-            <label for="fullName" class="form-label">Gender</label>
-            <input type="text" class="form-control" id="gender">
-          </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input type="email" class="form-control" id="email" placeholder="Enter your email">
+          <label for="fullName" class="form-label">Ethnicity</label>
+          <input type="text" class="form-control" id="fullName"  name="ethnicity">
         </div>
         <div class="mb-3">
-          <label for="phone" class="form-label">Phone Number</label>
-          <input type="tel" class="form-control" id="phone" placeholder="Enter your phone number">
+          <label for="fullName" class="form-label">Religion</label>
+          <input type="text" class="form-control" id="fullName" name="religion">
         </div>
         <div class="mb-3">
-            <label for="fullName" class="form-label">Date of birth</label>
-            <input type="text" class="form-control" id="dob" >
-          </div>
-          <div class="mb-3">
-            <label for="fullName" class="form-label">Ethnicity</label>
-            <input type="text" class="form-control" id="fullName" >
-          </div>
-          <div class="mb-3">
-            <label for="fullName" class="form-label">Religion</label>
-            <input type="text" class="form-control" id="fullName" >
-          </div>
-          <div class="mb-3">
-            <label for="fullName" class="form-label">Nationality</label>
-            <input type="text" class="form-control" id="fullName" >
-          </div>
-          <div class="text-center">
-            <button type="submit" class="btn btn-custom">Submit</button>
-          </div>
+          <label for="fullName" class="form-label">Nationality</label>
+          <input type="text" class="form-control" id="fullName" name="nationality">
+        </div>
+        <div class="text-center">
+          <button type="submit" class="btn btn-custom">Submit</button>
+        </div>
+
+     
 
        
 

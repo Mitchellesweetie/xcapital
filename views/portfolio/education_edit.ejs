@@ -36,10 +36,7 @@
   <div class="container">
     <div class="form-container">
       <h1 class="form-title text-center">Education Details</h1>
-      <form id="cvForm">
-        <!-- Personal Information -->
-       
-
+      <form id="cvForm" method="post" action="/auth/education_details">
         <!-- Education Section -->
         <div class="mb-3">
           <label class="form-label">Education</label>
@@ -48,22 +45,28 @@
             <div class="card card-body mb-3">
               <div class="mb-3">
                 <label for="degree1" class="form-label">Degree</label>
-                <input type="text" class="form-control" id="degree1" name="degree[]" placeholder="E.g., Bachelor of Science">
+                <input type="text" class="form-control" id="degree1" name="degree" placeholder="E.g., Bachelor of Science">
               </div>
               <div class="mb-3">
                 <label for="institution1" class="form-label">Institution</label>
-                <input type="text" class="form-control" id="institution1" name="institution[]" placeholder="E.g., University of XYZ">
+                <input type="text" class="form-control" id="institution1" name="institution" placeholder="E.g., University of XYZ">
               </div>
               <div class="mb-3">
-                <label for="year1" class="form-label">Year of Graduation</label>
-                <input type="text" class="form-control" id="year1" name="year[]" placeholder="E.g., 2024">
+                <label for="year1" class="form-label">Start</label>
+                <input type="date" class="form-control" id="start1" name="start" >
+              </div>
+              <div class="mb-3">
+                <label for="end1" class="form-label">End</label>
+                <input type="date" class="form-control" id="end1" name="end">
+              </div>
+              <div class="mb-3">
+                <label for="current1" class="form-label">Current</label>
+                <input type="checkbox" id="current1" name="end" onchange="toggleCurrent(this)">
               </div>
             </div>
           </div>
           <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Certificate</button>
         </div>
-
-       
 
         <!-- Submit Button -->
         <div class="text-center">
