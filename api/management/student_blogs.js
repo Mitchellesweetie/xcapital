@@ -41,116 +41,136 @@ function isAuthenticated(req, res, next) {
     }
 
 // Express Route for /home
+// router.get('/home', (req, res) => {
+//     const categoryId = req.query.categoryId;  // Get categoryId from query params
+
+//     // Fetch categories first
+//     db.query('SELECT * FROM categories', (err, categories) => {
+//         if (err) {
+//             console.error('Database error:', err);
+//             return res.render('student_blog/index', {
+//                 successMessage: null,
+//                 errorMessage: 'Error occurred during fetching categories',
+//                 categories: [],
+//                 blogs: []  // No blogs if categories can't be fetched
+//             });
+//         }
+
+//         // Fetch blogs based on categoryId if provided, otherwise fetch all blogs
+//         const blogQuery = categoryId
+//             ? `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
+//                FROM form
+//                LEFT JOIN categories ON form.categoryId = categories.categoryId
+//                LEFT JOIN registration ON form.user_id = registration.user_id
+//                WHERE categories.categoryId = ?`
+//             : `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
+//                FROM form
+//                LEFT JOIN categories ON form.categoryId = categories.categoryId
+//                LEFT JOIN registration ON form.user_id = registration.user_id`;
+
+//         // Query based on categoryId
+//         db.query(blogQuery, categoryId ? [categoryId] : [], (err, blogs) => {
+//             if (err) {
+//                 console.error('Database error:', err);
+//                 return res.render('student_blog/index', {
+//                     successMessage: null,
+//                     errorMessage: 'Error occurred during fetching blogs',
+//                     categories: categories || [],
+//                     blogs: []  // Fallback to empty blogs array if error occurs
+//                 });
+//             }
+//             // const blogs=Array.isArray(blogs)? blogs:[]
+
+//             // Render the page with the blogs and categories
+//             res.render('student_blog/index', {
+//                 categories: categories || [],
+//                 blogs: blogs || [],
+//                 categoryblogs: []  // We don't need to pass this anymore
+//             });
+//         });
+//     });
+// });
+
 router.get('/home', (req, res) => {
-    const categoryId = req.query.categoryId;  // Get categoryId from query params
+    const { categoryId } = req.query;  // Fetch categoryId from query string
 
-    // Fetch categories first
-    db.query('SELECT * FROM categories', (err, categories) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.render('student_blog/index', {
-                successMessage: null,
-                errorMessage: 'Error occurred during fetching categories',
-                categories: [],
-                blogs: []  // No blogs if categories can't be fetched
-            });
-        }
-
-        // Fetch blogs based on categoryId if provided, otherwise fetch all blogs
-        const blogQuery = categoryId
-            ? `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
-               FROM form
-               LEFT JOIN categories ON form.categoryId = categories.categoryId
-               LEFT JOIN registration ON form.user_id = registration.user_id
-               WHERE categories.categoryId = ?`
-            : `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
-               FROM form
-               LEFT JOIN categories ON form.categoryId = categories.categoryId
-               LEFT JOIN registration ON form.user_id = registration.user_id`;
-
-        // Query based on categoryId
-        db.query(blogQuery, categoryId ? [categoryId] : [], (err, blogs) => {
-            if (err) {
-                console.error('Database error:', err);
-                return res.render('student_blog/index', {
-                    successMessage: null,
-                    errorMessage: 'Error occurred during fetching blogs',
-                    categories: categories || [],
-                    blogs: []  // Fallback to empty blogs array if error occurs
-                });
-            }
-            // const blogs=Array.isArray(blogs)? blogs:[]
-
-            // Render the page with the blogs and categories
-            res.render('student_blog/index', {
-                categories: categories || [],
-                blogs: blogs || [],
-                categoryblogs: []  // We don't need to pass this anymore
-            });
-        });
-    });
-});
-
-router.get('/home', (req, res) => {
-
-    categoryId=req.params.id
-    db.query(`SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
-              FROM form
-              LEFT JOIN categories ON form.categoryId = categories.categoryId
-              LEFT JOIN registration ON form.user_id = registration.user_id`
-           ,
-    (err, result) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.render('student_blog/index', { 
-                successMessage: null, 
-                errorMessage: 'Error occurred during fetching blogs',
-                blogs: []  // Fallback to an empty array on error
-            });
-        }
-
-        console.log("Query Result:", result); 
-
-        db.query('SELECT * FROM categories', (err, category) => {
+    // Fetch blogs
+    db.query(
+        `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
+         FROM form
+         LEFT JOIN categories ON form.categoryId = categories.categoryId
+         LEFT JOIN registration ON form.user_id = registration.user_id`,
+        (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.render('student_blog/index', { 
                     successMessage: null, 
-                    errorMessage: 'Error occurred during fetching categories',
-                    category: [] 
+                    errorMessage: 'Error occurred during fetching blogs',
+                    blogs: [], 
+                  
                 });
             }
 
-            console.log("Categories:", category);
-
-            db.query(
-               ` SELECT form.title ,form.message,categories.category FROM categories LEFT JOIN form ON form.categoryId = categories.categoryId
-                GROUP BY categories.category`,  
-                 (err, categoryblogs) => {
-                    if (err) {
-                        console.error('Database error:', err);
-                        return res.render('student_blog/index', { 
-                            successMessage: null, 
-                            errorMessage: 'Error occurred during fetching blogs for SPD category',
-                            categoryblogs: []  // Fallback to an empty array on error
-                        });
-
-                    }
             const blogs = Array.isArray(result) ? result : [];
-   
-            const cateblog = Array.isArray(categoryblogs) ? categoryblogs : [];
-            console.log('helo',cateblog)
- 
+            console.log("Blogs:", blogs);
 
-            res.render('student_blog/index', { 
-                blogs: blogs || [],
-                category: category || [] ,
-                categoryblogs:cateblog||[],
+            // Fetch categories
+            db.query('SELECT * FROM categories', (err, categories) => {
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.render('student_blog/index', { 
+                        successMessage: null, 
+                        errorMessage: 'Error occurred during fetching categories',
+                        blogs, 
+                        categories: [], 
+                    });
+                }
+
+                console.log("Categories:", categories);
+
+                // Fetch category-specific blogs if categoryId is provided
+                    console.log("Fetching blogs for categoryId:", categoryId);  // Log the categoryId
+                    db.query(`SELECT categories.categoryId, categories.category, form.id, form.title, form.message, form.create_at
+                    FROM categories
+                    LEFT JOIN form ON categories.categoryId = form.categoryId
+                    WHERE categories.categoryId = ?`,
+                        [categoryId],
+                        (err, categoryblogs) => {
+                            if (err) {
+                                console.error('Database error:', err);
+                                return res.render('student_blog/index', { 
+                                    successMessage: null, 
+                                    errorMessage: 'Error occurred during fetching blogs for category',
+                                    blogs, 
+                                    categories,
+                                    categoryblogs: []
+                                });
+                            }
+
+                            const categoryblog = Array.isArray(categoryblogs) ? categoryblogs : [];
+                            console.log("Category Blogs:", categoryblog);  
+                            console.log("Category Blog ID:", categoryId);  
+
+
+                            return res.render('student_blog/index', { 
+                                blogs,
+                                categories,
+                                categoryblogs: categoryblog,  // Use the filtered category blogs
+                                currentCategoryId: categoryId
+                            });
+                        });
+                
+                    // If no categoryId is provided, render the page without category-specific blogs
+
+                  
+                    });
+
+                
             });
-        })
         });
-    })
-    });  
+
+
+
 
 
 router.get('/student_blogform',(req,res)=>{

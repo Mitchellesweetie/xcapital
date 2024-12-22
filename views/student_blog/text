@@ -1,0 +1,111 @@
+ <div class="tab-content" id="nav-tabContent">
+                                    <% categories.forEach(category => { %>
+                                        <% 
+                                            // Log category and categoryblogs to verify their structure
+                                            console.log('Category:', category);
+                                            console.log('Categoryblogs:', categoryblogs);
+                                
+                                            let categoryBlogsForThisTab = categoryblogs.filter(blog => {
+                                                console.log('Blog categoryId:', blog.categoryId, 'Category categoryId:', category.categoryId);
+                                                return parseInt(blog.categoryId) === parseInt(category.categoryId);
+                                            }); 
+                                            console.log('Filtered blogs for category', category.categoryId, ':', categoryBlogsForThisTab);
+                                        %>
+                                        
+                                        <div class="tab-pane fade <%= category.categoryId == currentCategoryId ? 'show active' : '' %>" 
+                                            id="nav-<%= category.categoryId %>" 
+                                            role="tabpanel" 
+                                            aria-labelledby="nav-<%= category.categoryId %>-tab">
+                                            <div class="row">
+                                                <% if (categoryBlogsForThisTab && categoryBlogsForThisTab.length > 0) { %>
+                                                    <!-- Display blogs for this category -->
+                                                    <% categoryBlogsForThisTab.forEach(blog => { %>
+                                                        <div class="col-xl-6 col-lg-12">
+                                                            <div class="whats-news-single mb-40">
+                                                                <div class="whates-img">
+                                                                    <img src="assets/img/gallery/whats_news_details1.png" alt="">
+                                                                </div>
+                                                                <div class="whates-caption">
+                                                                    <h4><a href="/blogs/<%= blog.id %>"><%= blog.title %></a></h4>
+                                                                    <span>by <%= blog.username %> - <%= new Date(blog.create_at).toLocaleDateString('en-US') %></span>
+                                                                    <p><%= blog.message %></p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    <% }) %>
+                                                <% } else { %>
+                                                    <p>No blogs available in this category. (Category ID: <%= category.categoryId %>)</p>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+
+
+
+
+
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <!-- Nav Card -->
+                                            <div class="tab-content" id="nav-tabContent">
+                                                <% categories.forEach(category => { %>
+                                                    <div class="tab-pane fade <%= category.categoryId == currentCategoryId ? 'show active' : '' %>" 
+                                                         id="nav-<%= category.categoryId %>" 
+                                                         role="tabpanel" 
+                                                         aria-labelledby="nav-<%= category.categoryId %>-tab">
+                                                        <div class="row">
+                                                            <% 
+                                                                let categoryBlogsForThisTab = categoryblogs.filter(blog => 
+                                                                    blog.categoryId == category.categoryId
+                                                                ); 
+                                                            %>
+                                                                        console.log('Filtered blogs for category', category.categoryId, ':', categoryBlogsForThisTab);
+                                                            
+                                                            <% if (categoryBlogsForThisTab && categoryBlogsForThisTab.length > 0) { %>
+                                                                <!-- Display first blog featured -->
+                                                                <div class="col-xl-6 col-lg-12">
+                                                                    <div class="whats-news-single mb-40">
+                                                                        <div class="whates-img">
+                                                                            <img src="/blog/img/gallery/whats_news_details1.png" alt="">
+                                                                        </div>
+                                                                        <div class="whates-caption">
+                                                                            <h4><a href="/blogs/<%= categoryBlogsForThisTab[0].id %>">
+                                                                                <%= categoryBlogsForThisTab[0].title %>
+                                                                            </a></h4>
+                                                                            <span>by <%= categoryBlogsForThisTab[0].username %> - 
+                                                                                <%= new Date(categoryBlogsForThisTab[0].create_at).toLocaleDateString('en-US') %>
+                                                                            </span>
+                                                                            <p><%= categoryBlogsForThisTab[0].message %></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                            
+                                                                <!-- Other blogs -->
+                                                                <div class="col-xl-6 col-lg-12">
+                                                                    <div class="row">
+                                                                        <% categoryBlogsForThisTab.slice(1).forEach(blog => { %>
+                                                                            <div class="col-xl-12 col-lg-6 col-md-6 col-sm-10">
+                                                                                <div class="whats-right-single mb-20">
+                                                                                    <div class="whats-right-img">
+                                                                                        <img src="/blog/img/gallery/default-img.png" alt="">
+                                                                                    </div>
+                                                                                    <div class="whats-right-cap">
+                                                                                        <span class="colorb"><%= blog.category %></span>
+                                                                                        <h4><a href="/blogs/<%= blog.id %>"><%= blog.title %></a></h4>
+                                                                                        <p><%= new Date(blog.create_at).toDateString() %></p> 
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        <% }) %>
+                                                                    </div>
+                                                                </div>
+                                                            <% } else { %>
+                                                                <p>No blogs available in this category.</p>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                        <!-- End Nav Card -->
+                                        </div>
+                                    </div>
