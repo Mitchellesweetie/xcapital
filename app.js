@@ -95,6 +95,47 @@ app.get('/api',(req,res)=>{
     res.redirect('/')
 })
 
+app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
+    const blogId = req.params.id;
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+    const { comment_text, username, email, subjects } = req.body;
+
+    db.query(
+        `INSERT INTO comments (comment_text, username, email, subjects, blog_id, user_id) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [comment_text, username, email, subjects, blogId, userId],
+        (err, results) => {
+            if (err) {
+                console.error('Error creating comment:', err);
+                return res.render('student_blog/latest_news', { 
+                    successMessage: null, 
+                    errorMessage: 'Error creating comment', 
+                    results: [] 
+                });
+            }
+
+            db.query('SELECT * FROM comments WHERE blog_id = ?', [blogId], (err, comments) => {
+                if (err) {
+                    console.error('Error fetching comments:', err);
+                    return res.render('student_blog/home', {
+                        successMessage: null,
+                        errorMessage: 'Error loading comments',
+                    });
+                }
+
+                res.render('student_blog/home', {
+                    blog: results,
+                    comments: comments,
+                });
+            });
+        }
+    );
+});
 
 app.get('/',(req, res) => {
     // const userId = req.session.userId;

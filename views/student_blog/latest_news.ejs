@@ -23,6 +23,57 @@
     <link rel="stylesheet" href="/blog/css/nice-select.css">
     <link rel="stylesheet" href="/blog/css/style.css">
 </head>
+<style>
+    /* Comment Section Styles */
+.comment-section {
+    width: 90%;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.comment-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.comment {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #777;
+}
+
+.comment-username {
+    font-weight: bold;
+    color: #333;
+}
+
+.comment-body {
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.comment-footer {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #aaa;
+}
+</style>
     
 <body>
 <!-- Preloader Start -->
@@ -90,34 +141,21 @@
                                 <nav>                  
                                     <ul id="navigation">
                                         <li><a href="/student_blog/home">Home</a></li>
-                                        <li><a href="about.html">about</a></li>
-                                        <li><a href="categori.html">Category</a></li>
-                                        <li><a href="/student_blog/latest_news">Latest News</a></li>
-                                        <li><a href="#">Pages</a>
-                                            <ul class="submenu">
-                                                <li><a href="blog.html">Blog</a></li>
-                                                <li><a href="blog_details.html">Blog Details</a></li>
-                                                <li><a href="elements.html">Element</a></li>
-                                            </ul>
-                                        </li>
-                                        <li><a href="contact.html">Contact</a></li>
+                                        
                                     </ul>
                                 </nav>
                             </div>
                         </div>             
-                        <div class="col-xl-4 col-lg-4 col-md-4">
-                            <div class="header-right f-right d-none d-lg-block">
+                        <div class="col-xl-4 col-lg-4 col-md-4" style="float: right; border: 1px solid black;">
+                            <div class="header-right f-right d-none d-lg-block"  style="float: right; border: 1px solid black;">
+                                <button  style="text-align: center; margin: auto;"><a href="/login_blog">LOGIN</a></button>
+
                                 <!-- Heder social -->
                                 <ul class="header-social">    
-                                    <li><a href="https://www.fb.com/sai4ull"><i class="fab fa-facebook-f"></i></a></li>
-                                    <li><a href="#"><i class="fab fa-twitter"></i></a></li>
-                                    <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-                                    <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
+                                  
                                 </ul>
                                 <!-- Search Nav -->
-                                <div class="nav-search search-switch">
-                                    <i class="fa fa-search"></i>
-                                </div>
+                             
                             </div>
                         </div>
                         <!-- Mobile Menu -->
@@ -149,6 +187,28 @@
                                 <%- blog.message %>
                                                   
                                 </div>
+
+
+
+                                <div class="comment-section">
+                                    <h2 class="comment-title">Comments</h2>
+                                    
+                                    <% comments.forEach(comment => { %>
+                                        <div class="comment">
+                                            <div class="comment-header">
+                                                <strong class="comment-username"><%= comment.username %></strong>
+                                                <!-- <span class="comment-email"><%= comment.email %></span> -->
+                                            </div>
+                                            <div class="comment-body">
+                                                <p class="comment-text"><%= comment.comment_text %></p>
+                                            </div>
+                                            <div class="comment-footer">
+                                                <span class="comment-date">Posted on: <%= comment.created_at %></span>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                                
                             <!-- <div class="social-share pt-30">
                                 <div class="section-tittle">
                                     <h3 class="mr-20">Share:</h3>
@@ -161,11 +221,16 @@
                                 </div>
                             </div>
                         </div> -->
+
+
+
+                       
+                        </ul>
                         <!-- From -->
                         <div class="row">
                             <div class="col-lg-8">
                                 <!-- comment section -->
-                                <form class="form-contact contact_form mb-80" action="/student_blog/comment" method="post" id="contactForm" >
+                                <form class="form-contact contact_form mb-80" action="/student_blog/blogs/<%= blog.id %>/comment" method="post" id="contactForm" >
                                     <div class="row">
                                         <div class="col-12">
                                             <div class="form-group">
@@ -189,10 +254,16 @@
                                         </div>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <button type="submit" name="submit">Send</button>
+                                        <button type="submit"  class="button button-contactForm boxed-btn boxed-btn2 " name="submit">Send</button>
                                         <!-- class="button button-contactForm boxed-btn boxed-btn2 -->
                                     </div>
                                 </form>
+                              <script>
+                                    document.getElementById('testForm').addEventListener('submit', function(event) {
+                                        event.preventDefault();
+                                        console.log('Test form submitted!');
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -374,8 +445,8 @@
     <script src="/blog/js/jquery.sticky.js"></script>
     
     <!-- contact js -->
-    <script src="/blog/js/contact.js"></script>
-    <script src="/blog/js/jquery.form.js"></script>
+    <!-- <script src="/blog/js/contact.js"></script> -->
+    <!-- <script src="/blog/js/jquery.form.js"></script> -->
     <script src="/blog/js/jquery.validate.min.js"></script>
     <script src="/blog/js/mail-script.js"></script>
     <script src="/blog/js/jquery.ajaxchimp.min.js"></script>
@@ -383,6 +454,7 @@
     <!-- Jquery Plugins, main Jquery -->	
     <script src="/blog/js/plugins.js"></script>
     <script src="/blog/js/main.js"></script>
+    
     
 </body>
 </html>
