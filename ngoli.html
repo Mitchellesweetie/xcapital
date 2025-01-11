@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mitchelle N. Mwachoo - CV</title>
+    <style>
+        :root {
+            --primary-orange: #FF5722;
+            --light-orange: #FFE0D6;
+            --dark-grey: #333333;
+            --medium-grey: #666666;
+            --light-grey: #F5F5F5;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            line-height: 1.4;
+            color: var(--dark-grey);
+            background: var(--light-grey);
+            padding: 40px;
+        }
+
+        .cv-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 65% 35%;
+            gap: 40px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .left-column, .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .name {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            grid-column: 1 / -1;
+            color: var(--primary-orange);
+            border-bottom: 3px solid var(--light-orange);
+            padding-bottom: 10px;
+        }
+
+        .summary {
+            margin-bottom: 15px;
+            line-height: 1.6;
+            grid-column: 1 / -1;
+            color: var(--medium-grey);
+            padding: 15px;
+            background: var(--light-grey);
+            border-radius: 5px;
+        }
+
+        .contact-info {
+            margin-bottom: 25px;
+            grid-column: 1 / -1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: var(--white);
+        }
+
+        .contact-info p {
+            margin: 2px 0;
+            padding: 5px 15px;
+            background: var(--light-grey);
+            border-radius: 20px;
+            color: var(--medium-grey);
+        }
+
+        .section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--primary-orange);
+            border-bottom: 2px solid var(--light-orange);
+            padding-bottom: 5px;
+        }
+
+        .experience-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--light-grey);
+            border-radius: 5px;
+        }
+
+        .job-title {
+            font-weight: bold;
+            color: var(--dark-grey);
+            margin-bottom: 5px;
+        }
+
+        .date {
+            font-style: italic;
+            color: var(--primary-orange);
+            margin-bottom: 10px;
+        }
+
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 5px;
+            color: var(--medium-grey);
+        }
+
+        .skill-category {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: var(--light-grey);
+            border-radius: 5px;
+        }
+
+        .skill-title {
+            font-weight: bold;
+            color: var(--primary-orange);
+            margin-bottom: 5px;
+        }
+
+        .right-column .section {
+            background: var(--white);
+        }
+
+        .right-column .skill-category {
+            border-left: 3px solid var(--primary-orange);
+        }
+
+        @media (max-width: 768px) {
+            .cv-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            body {
+                padding: 20px;
+            }
+
+            .name {
+                font-size: 24px;
+            }
+        }
+
+        /* Hover Effects */
+        .experience-item:hover {
+            transform: translateX(5px);
+            transition: transform 0.3s ease;
+        }
+
+        .skill-category:hover {
+            background: var(--light-orange);
+            transition: background 0.3s ease;
+        }
+
+        .contact-info p:hover {
+            background: var(--light-orange);
+            transition: background 0.3s ease;
+        }
+    </style>
+</head>
+<!-- HTML content remains the same as previous version -->
+<body>
+    <div class="cv-container">
+       
+       
+
+        <!-- Left Column -->
+        <div class="left-column">
+            <div class="section">
+                <div class="name">Mitchelle N. Mwachoo</div>
+        
+                <div class="summary">
+                    Motivated backend developer striving to become a full-stack developer, with a strong passion for Node.js/Express and Python/Django. Enthusiastic about learning new technologies and continuously enhancing my skill set
+                </div>
+        
+                
+                <div class="section-title">EXPERIENCE</div>
+                
+                <div class="experience-item">
+                    <div class="job-title">USAID DigiHealth KE, Mombasa-Intern</div>
+                    <div class="date">NOVEMBER 2024 - PRESENT</div>
+                    <ul>
+                        <li>Physical and Remote TA support to all assigned facilities.</li>
+                        <li>Deployment and Training of 3.x KenyaEMR Facility Wide.</li>
+                        <li>Effective teamwork with supporting partners.</li>
+                        <li>Database management.</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="job-title">USAID HealthIT Project, Mombasa — Intern</div>
+                    <div class="date">FEBRUARY 2024 - OCTOBER 2024</div>
+                    <ul>
+                        <li>Deployment and Training of 2.x KenyaEMR Palladium, 2.x facility wide KenyaEMR plus and 3.x KenyaEMR Facility Wide.</li>
+                        <li>Support on CHP registry.</li>
+                        <li>Documentation of bugs of Health Information Systems.</li>
+                        <li>Data Collection and analysis using KoboToolbox.</li>
+                        <li>Physical and Remote TA support to all assigned facilities</li>
+                        <li>Database management.</li>
+                        <li>Effective teamwork with supporting partners.</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="job-title">Nairobi County, Nairobi — Attache</div>
+                    <div class="date">MAY 2021 - JULY 2021</div>
+                    <ul>
+                        <li>OS Installation and Network configuration</li>
+                        <li>Hard Disk slaving and Database management</li>
+                        <li>Cleaning and maintenance of hardware</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="job-title">Kenya National Bureau of Statistic, Voi- Enumerator</div>
+                    <div class="date">AUGUST 2019</div>
+                    <ul>
+                        <li>Data Collection through questionnaires, interviews and observation.</li>
+                        <li>Verification of data-Ensuring that the information collected is complete, consistent, and accurate.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">EDUCATION</div>
+                <div class="experience-item">
+                    <div class="job-title">Masinde Muliro University of Science and Technology, Kakamega —Bachelor of Science(Computer Science)</div>
+                    <div class="date">AUGUST, 2019 -DECEMBER, 2023</div>
+                    <div>Second Class Honours (Lower Division)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="right-column">
+            <div class="section">
+                <div class="contact-info">
+                    <p>82231-80100, Mikindani</p>
+                    <p>Jomvu, MOMBASA</p>
+                    <p>+254708607402</p>
+                    <p>ngolimwachoo@gmail.com</p>
+                    <p>https://www.linkedin.com/in/mitchelle-ngoli-134243211/</p>
+                </div>
+                <div class="section-title">SKILLS</div>
+                
+                <div class="skill-category">
+                    <div class="skill-title">Backend</div>
+                    <div>Languages: Python/Django, Nodejs/Express</div>
+                </div>
+                
+                <div class="skill-category">
+                    <div class="skill-title">Frontend</div>
+                    <div>Languages: Reactjs, HTML, CSS Bootstrap, Bootswatch</div>
+                </div>
+                
+                <div class="skill-category">
+                    <div class="skill-title">Databases</div>
+                    <div>Postgresql, Mongodb, Mysql</div>
+                </div>
+
+                <div class="skill-category">
+                    <div class="skill-title">Content Management System</div>
+                    <div>Wordpress, Figma</div>
+                </div>
+
+                <div class="skill-category">
+                    <div>Version Control System: Git</div>
+                    <div>OS: ChromeOS, Linux, Windows</div>
+                    <div>API Development: Postman, Thunder Client</div>
+                </div>
+
+                <div class="skill-category">
+                    <div>Communication</div>
+                    <div>Team-Work Oriented</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">AWARDS & CERTIFICATION</div>
+                <ul>
+                    <li>KenyaEMR I</li>
+                    <li>KenyaEMR II</li>
+                    <li>Electronic Community Health Information System level 1</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <div class="section-title">LANGUAGES</div>
+                <ul>
+                    <li>Taita</li>
+                    <li>Kiswahili</li>
+                    <li>English</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

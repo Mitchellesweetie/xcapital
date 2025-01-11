@@ -45,23 +45,23 @@
             <div class="card card-body mb-3">
               <div class="mb-3">
                 <label for="degree1" class="form-label">Position</label>
-                <input type="text" class="form-control" id="degree1" name="position">
+                <input type="text" class="form-control" id="degree1" name="position" required>
               </div>
               <div class="mb-3">
                 <label for="institution1" class="form-label">Organisation</label>
-                <input type="text" class="form-control" id="institution1" name="organisation" >
+                <input type="text" class="form-control" id="institution1" name="organisation" required >
               </div>
               <div class="mb-3">
                 <label for="year1" class="form-label">Start</label>
-                <input type="date" class="form-control" id="start1" name="start">
+                <input type="month" class="form-control" id="start1" name="start" required>
               </div>
               <div class="mb-3">
                 <label for="end1" class="form-label">End</label>
-                <input type="date" class="form-control" id="end1" name="end">
+                <input type="month" class="form-control" id="end1" name="end" required>
               </div>
               <div class="mb-3">
                 <label for="current1" class="form-label">Current</label>
-                <input type="checkbox" id="current1" name="current" onchange="toggleCurrent(this)">
+                <input type="checkbox" id="current1" name="end" onchange="toggleCurrent(this)" >
               </div>
             </div>
           </div>
@@ -88,24 +88,24 @@
         educationGroup.classList.add('card', 'card-body', 'mb-3');
         educationGroup.innerHTML = `
           <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Degree</label>
-            <input type="text" class="form-control" id="degree${educationIndex}" name="degree[]" placeholder="E.g., Bachelor of Science">
+            <label for="degree${educationIndex}" class="form-label">Position</label>
+            <input type="text" class="form-control" id="degree${educationIndex}" name="position"  required>
           </div>
           <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Institution</label>
-            <input type="text" class="form-control" id="institution${educationIndex}" name="institution[]" placeholder="E.g., University of XYZ">
+            <label for="institution${educationIndex}" class="form-label">Organisation</label>
+            <input type="text" class="form-control" id="institution${educationIndex}" name="organisation" required>
           </div>
           <div class="mb-3">
             <label for="start${educationIndex}" class="form-label">Start</label>
-            <input type="date" class="form-control" id="start${educationIndex}" name="year[]" placeholder="E.g., 2024">
+            <input type="month" class="form-control" id="start${educationIndex}" name="start" placeholder="E.g., 2024"required>
           </div>
           <div class="mb-3">
             <label for="end${educationIndex}" class="form-label">End</label>
-            <input type="date" class="form-control" id="end${educationIndex}" name="end[]" placeholder="E.g., 2024">
+            <input type="month" class="form-control" id="end${educationIndex}" name="end" placeholder="E.g., 2024" required>
           </div>
           <div class="mb-3">
             <label for="current${educationIndex}" class="form-label">Current</label>
-            <input type="checkbox" id="current${educationIndex}" name="current[]" onchange="toggleCurrent(this)">
+            <input type="checkbox" id="current${educationIndex}" name="end" onchange="toggleCurrent(this)" >
           </div>
         `;
         educationContainer.appendChild(educationGroup);

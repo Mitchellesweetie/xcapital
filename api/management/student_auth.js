@@ -108,41 +108,7 @@ router.post('/student_register', (req, res) => {
 
 
 
-// router.post('/student_login', (req, res) => {
-//   const { email, password } = req.body;
 
-  
-//   db.query('SELECT * FROM registration WHERE email = ?', [email], (err, results) => {
-//     if (err) {
-//       console.error('Error querying the database:', err);
-//       return res.render('Login/login', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
-//     }
-//     console.log('Database results:', results);
-//     if (results.length === 0) {
-//       return res.render('Login/login', { successMessage: null, errorMessage: 'Kindly register your details' });
-//     }
-//     const user = results[0];
-//     if (user.isVerified !== 1 ) {
-//       return res.render('Login/login', { successMessage: null, errorMessage: 'Verify your your mail' });
-//     }
-//     const passwordMatch = bcrypt.compareSync(password, user.password);
-
-//     if (!passwordMatch) {
-//       return res.render('Login/login', { successMessage: null, errorMessage: 'Invalid email or password.' });
-//     }
-//     console.log('User found:', user);
-//     if (!req.session) {
-//       console.error('Session is not initialized.');
-//       console.log('Session:', req.session);
-
-//       return res.status(500).json({ errorMessage: 'Session initialization error.' });
-//   }
-//     req.session.userId = user.id;
-
-//     res.redirect('/personal_details');
-//     // res.render('index', { successMessage: 'Login successful!', errorMessage: null,user }); 
-//   });
-// });
 const query = (sql, params) => {
   return new Promise((resolve, reject) => {
       db.query(sql, params, (err, results) => {
@@ -154,7 +120,7 @@ const query = (sql, params) => {
 
 // Define the login 
 router.post('/student_login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password ,remember_me} = req.body;
 
   try {
       const results = await query('SELECT * FROM registration WHERE email = ?', [email]);
@@ -176,13 +142,17 @@ router.post('/student_login', async (req, res) => {
 
       console.log('User found:', user);
 
-      // Save user information in session
       req.session.userId = user.user_id;
       req.session.username = user.username;
 
+     if (remember_me) {
+            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; 
+        } else {
+            req.session.cookie.maxAge = 24 * 60 * 60 * 1000; 
+        }
+
       const status = user.profile_status; 
 
-      // Redirect based on profile status
       if (status === 0) {
           res.redirect('/personal_details');
       } else if (status === 1) {
@@ -191,11 +161,20 @@ router.post('/student_login', async (req, res) => {
           res.redirect('/portfolio_view_experience');
       } else if (status === 3) {
           res.redirect('/portfolio_view_references');
-      } else {
+      } else if (status === 4) {
+        res.redirect('/portfolio_view_skills');
+        } 
+        else if (status === 5) {
+          res.redirect('/portfolio_view_awards');
+      } 
+      else if (status === 6) {
+        res.redirect('/portfolio_view_languages');
+    } 
+          
+      else {
           res.redirect('/student_blog');
       }
 
-      // Save session before redirect
       req.session.save((err) => {
           if (err) {
               console.error('Session save error:', err);

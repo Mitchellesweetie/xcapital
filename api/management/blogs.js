@@ -38,7 +38,12 @@ function isAdmin(req, res, next) {
     }
     return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
   }
-
+  function isAuthenticated(req, res, next) {
+    if (req.session && req.session.userId) {
+        return next(); 
+    }
+    res.redirect('/login_blog'); 
+}
 // function to get blog counts
 const getBlogCounts = (callback) => {
     const countsQuery = `
@@ -65,7 +70,7 @@ function isAuthenticated(req, res, next) {
 }
 
 
-router.post('/post', upload.single('file'), (req, res) => {
+router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -202,7 +207,7 @@ router.post('/post', upload.single('file'), (req, res) => {
 // });  })
 
 
-router.get('/pendingblogs',isAdmin,(req, res) => {
+router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -394,7 +399,7 @@ router.get('/pendingblogs',isAdmin,(req, res) => {
 
 
 
-router.get('/pendingblogs/:id',isAdmin,(req, res) => {
+router.get('/pendingblogs/:id',isAdmin,isAuthenticated,(req, res) => {
     const blogId = req.params.id;
     const userId = req.session.userId;
 
@@ -448,7 +453,7 @@ router.get('/pendingblogs/:id',isAdmin,(req, res) => {
 });
 })
 // Update the blog
-router.post('/update/:id',isAdmin, (req, res) => {
+router.post('/update/:id',isAdmin, isAuthenticated,(req, res) => {
     const blogId = req.params.id
     const data = req.body
     const userId = req.session.userId;
@@ -503,7 +508,7 @@ router.post('/update/:id',isAdmin, (req, res) => {
 });
 
 // Get all approved blogs
-router.get('/approvedblogs',isAdmin,(req, res) => {
+router.get('/approvedblogs',isAdmin,isAuthenticated,(req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -580,7 +585,7 @@ router.get('/approvedblogs',isAdmin,(req, res) => {
 });
 })
 
-router.post('/approve/:id',isAdmin, (req, res) => {
+router.post('/approve/:id',isAdmin,isAuthenticated, (req, res) => {
     const userId = req.session.userId;
 
     if (!userId) {
@@ -624,7 +629,7 @@ router.post('/approve/:id',isAdmin, (req, res) => {
     });
 });
 
-router.get('/search',(req,res)=>{
+router.get('/search',isAdmin,isAuthenticated,(req,res)=>{
     const userId = req.session.userId;
 
     if (!userId) {

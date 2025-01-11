@@ -26,15 +26,20 @@ db.connect((err) => {
 });
 
 function isAdmin(req, res, next) {
-  // Check if session exists and role is admin
-  if (req.session && req.session.role === 'admin') {
-      return next();
+  if (!req.session.admin)
+       {        return next();
   }
   return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
 }
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.userId) {
+      return next(); 
+  }
+  res.redirect('/login'); 
+}
 
 
-router.get('/categories', (req, res) => {
+router.get('/categories',isAuthenticated,isAdmin, (req, res) => {
   db.query('SELECT * FROM categories', (err, result) => {
     if (err) {
       console.error('Database error:', err);
@@ -52,14 +57,14 @@ router.get('/categories', (req, res) => {
     });
   });
 });
-router.get('/add_categories',(req,res)=>{
+router.get('/add_categories',isAuthenticated,isAdmin,(req,res)=>{
  
 
   res.render('admin/create_categories', { successMessage: null, errorMessage: null
   })
 
 })
-router.get('/add_users',(req,res)=>{
+router.get('/add_users',isAuthenticated,isAdmin,(req,res)=>{
   db.query('SELECT * FROM registration where role="admin" ', (err, result) => {
     if (err) {
       console.error('Database error:', err);
@@ -78,7 +83,7 @@ router.get('/create_users',(req,res)=>{
     res.render('admin/create_admin', { successMessage: null, errorMessage: null })
 
 })
-router.get('/edit_categories/:id',(req, res) => {
+router.get('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
   const categoryId = req.params.id;
   
 
@@ -108,7 +113,7 @@ router.get('/edit_categories/:id',(req, res) => {
   });
 });
 
-router.get('/edit_admin/:id',(req, res) => {
+router.get('/edit_admin/:id',isAuthenticated,isAdmin,(req, res) => {
   const user_id = req.params.id;
   
 
@@ -135,7 +140,7 @@ router.get('/edit_admin/:id',(req, res) => {
   });
 });
 
-router.post('/add_categories', (req, res) => {
+router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
   // Ensure statu is either 'active' or 'inactive'
   const statu = req.body.statu === 'active' ? 'active' : 'inactive';
   const { category, descriptio } = req.body;
@@ -156,7 +161,7 @@ router.post('/add_categories', (req, res) => {
       });
   });
 });
-router.post('/delete_categories/:id', (req, res) => {
+router.post('/delete_categories/:id', isAuthenticated,isAdmin,(req, res) => {
   const category = req.params.id;
 
   db.query('delete from categories where categoryId=?', [category], (err, result) => {
@@ -175,7 +180,7 @@ router.post('/delete_categories/:id', (req, res) => {
 });
 
 
-router.post('/edit_categories/:id',(req, res) => {
+router.post('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
   const categoryId = req.params.id; 
   const { category, statu, descriptio } = req.body;  // Extract data from the form submission
 
@@ -202,7 +207,7 @@ router.post('/edit_categories/:id',(req, res) => {
 });
 
 
-router.post('/delete_user/:id', (req, res) => {
+router.post('/delete_user/:id',isAuthenticated,isAdmin, (req, res) => {
   const userId = req.params.id; // Get user ID from URL parameters
   console.log('Attempting to delete user with ID:', userId);
 

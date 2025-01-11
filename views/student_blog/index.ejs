@@ -22,6 +22,85 @@
     <link rel="stylesheet" href="/blog/css/slick.css">
     <link rel="stylesheet" href="/blog/css/nice-select.css">
     <link rel="stylesheet" href="/blog/css/style.css">
+    <style>
+    /* .login-container {
+    position: absolute;
+    top: 0;
+    right: 20px;
+  } */
+
+  
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 200px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-top: 8px;
+        z-index: 1001;
+    }
+
+    /* Show dropdown when parent has dropdown-open class */
+    .login-container.dropdown-open .dropdown {
+        display: block;
+    }
+
+    .dropdown a {
+        display: block;
+        padding: 12px 16px;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .dropdown a:hover {
+        background: #f0f2f5;
+    }
+
+    .dropdown .logout {
+        color: #ed4141;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .login-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 50px;
+        background: #ed4141;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(237, 65, 65, 0.3);
+    }
+
+    .user-profile img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    </style>
 </head>
 
 <body>
@@ -66,7 +145,7 @@
                         <!-- Logo -->
                         <div class="col-xl-3 col-lg-3 col-md-3 d-none d-md-block">
                             <div class="logo">
-                                <a href="index.html"><img src="/blog/img/logo/logo.png" alt=""></a>
+                                <a href="/student_blog"><img src="/blog/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-xl-9 col-lg-9 col-md-9">
@@ -90,17 +169,13 @@
                                 <nav>                  
                                     <ul id="navigation">
                                         <li><a href="/student_blog/home">Home</a></li>
-                                        <li><a href="/student_blog/about">about</a></li>
-                                        <li><a href="/student_blog/categories">Category</a></li>
-                                        <li><a href="/student_blog/latest_news">Latest News</a></li>
+                                        <li><a href="#">about</a></li>
+                                        <li><a href="#">Category</a></li>
+                                        <li><a href="#">Latest News</a></li>
                                         <li><a href="#">Pages</a>
-                                            <ul class="submenu">
-                                                <li><a href="blog.html">Blog</a></li>
-                                                <li><a href="blog_details.html">Blog Details</a></li>
-                                                <li><a href="elements.html">Element</a></li>
-                                            </ul>
+                                            
                                         </li>
-                                        <li><a href="/student_blog/contact">Contact</a></li>
+                                        <li><a href="#">Contact</a></li>
                                     </ul>
                                 </nav>
                             </div>
@@ -115,10 +190,36 @@
                                     <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
                                 </ul> -->
                                 <!-- Search Nav -->
-                                 <button type="button" style="height: 50px;width: 100px; color: black ;border-radius: 30px;"><a href="/login_blog">Login</a></button>
-                                <div class="nav-search search-switch">
-                                    <i class="fa fa-search"></i>
+                                <div class="login-container">
+                                    <% if (username) { %>
+                                        <!-- User Profile -->
+                                        <div class="user-profile">
+                                            <img src="/blog/img/loggedin.png" alt="User Avatar">
+                                            <span class="user-name"><%= username %></span>
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M6 9l6 6 6-6"/>
+                                            </svg>
+                                        </div>
+                                        <!-- Dropdown Menu -->
+                                        <div class="dropdown">
+                                            <a href="/myportfolio">Profile</a>
+                                            <a href="/download-cv">download portfolio</a>
+
+                                            <a href="/logout" class="logout">Logout</a>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Login Link -->
+                                        <a href="/login_blog" class="login-btn">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                                            </svg>
+                                            Login
+                                        </a>
+                                    <% } %>
                                 </div>
+                                  
+                                                              
+                                
                             </div>
                         </div>
                         <!-- Mobile Menu -->
@@ -148,7 +249,9 @@
                                     <div class="single-slider">
                                         <div class="trending-top mb-30">
                                             <div class="trend-top-img">
-                                                <img src="<%= blog.imageUrl || '/blog/img/trending/trending_top02.jpg' %>" alt="">
+                                                <%   console.log('this is my image',blogs.file) %>
+
+                                                <img src="<%= blog.file  %>" alt="">
                                                 <div class="trend-top-cap">
                                                     <span class="bgr" data-animation="fadeInUp" data-delay=".2s" data-duration="1000ms">
                                                         <%= blog.category %>
@@ -402,45 +505,23 @@
                                 <div class="col-lg-12">
                                     <div class="weekly2-news-active d-flex">
                                         <!-- Single -->
+                                        <% mostpopula.forEach(most=>{ %>
+                                            
+
                                         <div class="weekly2-single">
                                             <div class="weekly2-img">
-                                                <img src="/blog/img/gallery/weeklyNews1.png" alt="">
+                                                <img src="<%= most.file %>" alt="">
                                             </div>
+
                                             <div class="weekly2-caption">
-                                                <h4><a href="#">Scarlett’s disappointment at latest accolade</a></h4>
-                                                <p>Jhon  |  2 hours ago</p>
+                                                <h4><a href="#"><%= most.title %></a></h4>
+                                                <p><%= most.create_at %></p>
                                             </div>
+
                                         </div> 
-                                        <!-- Single -->
-                                        <div class="weekly2-single">
-                                            <div class="weekly2-img">
-                                                <img src="/blog/img/gallery/weeklyNews2.png" alt="">
-                                            </div>
-                                            <div class="weekly2-caption">
-                                                <h4><a href="#">Scarlett’s disappointment at latest accolade</a></h4>
-                                                <p>Jhon  |  2 hours ago</p>
-                                            </div>
-                                        </div> 
-                                        <!-- Single -->
-                                        <div class="weekly2-single">
-                                            <div class="weekly2-img">
-                                                <img src="/blog/img/gallery/weeklyNews3.png" alt="">
-                                            </div>
-                                            <div class="weekly2-caption">
-                                                <h4><a href="#">Scarlett’s disappointment at latest accolade</a></h4>
-                                                <p>Jhon  |  2 hours ago</p>
-                                            </div>
-                                        </div> 
-                                        <!-- Single -->
-                                        <div class="weekly2-single">
-                                            <div class="weekly2-img">
-                                                <img src="/blog/img/gallery/weeklyNews2.png" alt="">
-                                            </div>
-                                            <div class="weekly2-caption">
-                                                <h4><a href="#">Scarlett’s disappointment at latest accolade</a></h4>
-                                                <p>Jhon  |  2 hours ago</p>
-                                            </div>
-                                        </div> 
+                                        <% }) %>
+
+                                       
                                     </div>
                                 </div>
                             </div>
@@ -472,24 +553,28 @@
                                     <img src="/blog/img/gallery/tranding1.png" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="#" > <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4></a></h4>
+                                    <h4><a href="#" > <h4><a href="/student_blog/latest_news/">What to Expect From the 2020 Oscar Nomin ations</a></h4></a></h4>
                                     <P>Jun 19, 2020</P>
-                                    <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a>
+                                    <!-- <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                     
                                 </div>
                             </div>
                             <!-- Single -->
-                            <!-- <div class="single-recent">
+
+                             <div class="single-recent">
+                                <% trendingblog.forEach(trend=>{ %>
+
                                 <div class="what-img">
-                                    <img src="/blog/img/gallery/tranding2.png" alt="">
+                                    <img src="<%= trend.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
+                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4>
                                     <P>Jun 19, 2020</P>
-                                    <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a>
                                 </div>
+                                <% }) %>
+
                             </div>
-                            <-- Single -->
+                            <!-- Single -->
                             <div class="single-recent">
                                 <div class="what-img">
                                     <img src="/blog/img/gallery/tranding1.png" alt="">
@@ -497,7 +582,7 @@
                                 <div class="what-cap">
                                     <h4><a href="latest_news.html"> <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4></a></h4>
                                     <P>Jun 19, 2020</P>
-                                    <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a>
+                                    <!-- <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                 </div>
                             </div>
                             <!-- Single -->
@@ -508,7 +593,7 @@
                                 <div class="what-cap">
                                     <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
                                     <P>Jun 19, 2020</P>
-                                    <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a>
+                                    <!-- <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                 </div>
                             </div> 
                         </div>
@@ -810,6 +895,38 @@
 <!-- Jquery Plugins, main Jquery -->	
 <script src="/blog/js/plugins.js"></script>
 <script src="/blog/js/main.js"></script>
-    
+<script>
+
+    function toggleDropdown() {
+        document.querySelector('.login-container').classList.toggle('dropdown-open');
+    }
+
+    // Add click event to user profile
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', toggleDropdown);
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const container = document.querySelector('.login-container');
+        if (container && !container.contains(event.target)) {
+            container.classList.remove('dropdown-open');
+        }
+    });
+
+    // Handle logout
+    document.querySelector('.logout')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/logout';
+    });
+
+
+
+
+
+
+
+</script>
 </body>
 </html>

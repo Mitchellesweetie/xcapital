@@ -13,6 +13,8 @@ const flash = require('connect-flash')
 const nodemailer=require('nodemailer')
 const sanitizeHtml = require('sanitize-html')
 const session=require('express-session')
+const puppeteer = require('puppeteer');
+
 // const sanitizedContent = sanitizeHtml(message);
 const resume=require('./api/management/portfolio')
 const categories=require('./api/management/admin')
@@ -63,12 +65,18 @@ function isAuthenticated(req, res, next) {
     }
     res.redirect('/login'); 
 }
+// function isAdmin(req, res, next) {
+//   if (req.session && req.session.userRole === 'admin') {
+//       return next();
+//   }
+//   res.status(403).render('error', { message: 'Access denied.' }); 
+// }
 function isAdmin(req, res, next) {
-  if (req.session && req.session.userRole === 'admin') {
-      return next();
+    if (!req.session.admin)
+         {        return next();
+    }
+    return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
   }
-  res.status(403).render('error', { message: 'Access denied.' }); 
-}
 const db=mysql.createConnection({
     host: process.env.host,
     user: process.env.username,
@@ -90,7 +98,7 @@ app.get('/student_blog',(req,res)=>{
 
     res.redirect('/student_blog/home')
 })
-app.get('/api',(req,res)=>{
+app.get('/api',isAdmin,(req,res)=>{
 
     res.redirect('/')
 })
@@ -137,7 +145,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     );
 });
 
-app.get('/',(req, res) => {
+app.get('/',isAdmin,(req, res) => {
     // const userId = req.session.userId;
 
     // if (!userId) {
@@ -280,6 +288,5 @@ app.get('/verify-email', (req, res) => {
 
 app.listen(process.env.localport,()=>{
     console.log('listening at port  http://localhost:'+`${port}`)
-    // console.log('listening at port  http://localhost:')
 
 })

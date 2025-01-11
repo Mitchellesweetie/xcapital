@@ -25,6 +25,76 @@
 </head>
 <style>
     /* Comment Section Styles */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 200px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-top: 8px;
+        z-index: 1001;
+    }
+
+    /* Show dropdown when parent has dropdown-open class */
+    .login-container.dropdown-open .dropdown {
+        display: block;
+    }
+
+    .dropdown a {
+        display: block;
+        padding: 12px 16px;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .dropdown a:hover {
+        background: #f0f2f5;
+    }
+
+    .dropdown .logout {
+        color: #ed4141;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .login-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 50px;
+        background: #ed4141;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(237, 65, 65, 0.3);
+    }
+
+    .user-profile img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
 .comment-section {
     width: 90%;
     margin: 30px auto;
@@ -72,6 +142,43 @@
     margin-top: 15px;
     font-size: 12px;
     color: #aaa;
+}
+
+.card{
+
+background-color: #fff;
+border: none;
+}
+
+
+
+.c-badge{
+background-color: #ed4141;
+color: white;
+height: 20px;
+font-size: 11px;
+width: 92px;
+border-radius: 5px;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-top: 2px;
+}
+
+.comment-text{
+font-size: 13px;
+}
+
+.wish{
+
+color:#35b69f;
+}
+
+
+.user-feed{
+
+    font-size: 14px;
+    margin-top: 12px;
 }
 </style>
     
@@ -141,21 +248,57 @@
                                 <nav>                  
                                     <ul id="navigation">
                                         <li><a href="/student_blog/home">Home</a></li>
-                                        
+                                        <li><a href="#">about</a></li>
+                                        <li><a href="#">Category</a></li>
+                                        <li><a href="#">Latest News</a></li>
+                                        <li><a href="#">Pages</a>
+                                            
+                                        </li>
+                                        <li><a href="#">Contact</a></li>
                                     </ul>
                                 </nav>
                             </div>
                         </div>             
-                        <div class="col-xl-4 col-lg-4 col-md-4" style="float: right; border: 1px solid black;">
-                            <div class="header-right f-right d-none d-lg-block"  style="float: right; border: 1px solid black;">
-                                <button  style="text-align: center; margin: auto;"><a href="/login_blog">LOGIN</a></button>
-
+                        <div class="col-xl-4 col-lg-4 col-md-4">
+                            <div class="header-right f-right d-none d-lg-block">
                                 <!-- Heder social -->
-                                <ul class="header-social">    
-                                  
-                                </ul>
+                                <!-- <ul class="header-social">    
+                                    <li><a href="https://www.fb.com/sai4ull"><i class="fab fa-facebook-f"></i></a></li>
+                                    <li><a href="#"><i class="fab fa-twitter"></i></a></li>
+                                    <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+                                    <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
+                                </ul> -->
                                 <!-- Search Nav -->
-                             
+                                <div class="login-container">
+                                    <% if (username) { %>
+                                        <!-- User Profile -->
+                                        <div class="user-profile">
+                                            <img src="/blog/img/loggedin.png" alt="User Avatar">
+                                            <span class="user-name"><%= username %></span>
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M6 9l6 6 6-6"/>
+                                            </svg>
+                                        </div>
+                                        <!-- Dropdown Menu -->
+                                        <div class="dropdown">
+                                            <a href="/myportfolio">Profile</a>
+                                            <a href="#">Post</a>
+
+                                            <a href="/logout" class="logout">Logout</a>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Login Link -->
+                                        <a href="/login_blog" class="login-btn">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                                            </svg>
+                                            Login
+                                        </a>
+                                    <% } %>
+                                </div>
+                                  
+                                                              
+                                
                             </div>
                         </div>
                         <!-- Mobile Menu -->
@@ -180,34 +323,84 @@
                             <div class="about-img">
                                 <img src="/blog/img/trending/trending_top.jpg" alt="">
                             </div>
-                            <div class="heading-news mb-30 pt-30">
-                                <h3><%= blog.title %></</h3>
+                            <div class="heading-news mb-10 pt-10">
+                                <h3><%- blog.title %></</h3>
                             </div>
                             <div class="about-prea">
                                 <%- blog.message %>
+                                <span  class="wish"  >
+                                <form action="/student_blog/likes/<%= blog.id %>" method="POST">
+                                    <button type="submit" style="background-color: transparent; border: none;  color: inherit; cursor: pointer; padding: 0; ">
+                                        <i class="fa fa-heartbeat mr-2"></i></a>
+                                    </button>
+                                    <span class="like-count"><%= blog.likes %></span>
+
+                                  </form>
+                            </span>
+                    
+
                                                   
                                 </div>
+                          
 
 
+                                <div class="container mt-5 mb-5">
+                                    <div class="row height d-flex justify-content-center align-items-center">
+                                       <div class="col-md-12">
+                                         <div class="card">
 
-                                <div class="comment-section">
-                                    <h2 class="comment-title">Comments</h2>
-                                    
-                                    <% comments.forEach(comment => { %>
-                                        <div class="comment">
-                                            <div class="comment-header">
-                                                <strong class="comment-username"><%= comment.username %></strong>
-                                                <!-- <span class="comment-email"><%= comment.email %></span> -->
+                                          <div class="p-3">
+                        
+                                            <h6>Comments</h6>                                            
+                                          </div>                                            
+                        
+                                          <div class="mt-2">             
+                                          
+                                            <% comments.forEach(comment => { %>
+
+                        
+                                          <div class="d-flex flex-row p-3">
+                        
+                                              <img src="https://i.imgur.com/agRGhBc.jpg" width="40" height="40" class="rounded-circle mr-3">
+                        
+                                              <div class="w-100">
+                        
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div class="d-flex flex-row align-items-center">
+                                                      <span class="mr-2"><%= comment.username %></span>
+                                                      <small class="c-badge">Top Comment</small>
+                                                    </div>
+                                                    <small>Posted on: <%= comment.created_at %></small>
+                                              </div>
+                        
+                                              <p class="text-justify comment-text mb-0"> <%= comment.comment_text %></p>
+                        
+                                              <div class="d-flex flex-row user-feed">
+                        
+                                                <span class="wish"><i class="fa fa-heartbeat mr-2"></i>54</span>
+                                                <!-- <span class="ml-3"><i class="fa fa-comments-o mr-2"></i>Reply</span> -->
+                        
+                                                
+                                              </div>
+                                              
                                             </div>
-                                            <div class="comment-body">
-                                                <p class="comment-text"><%= comment.comment_text %></p>
-                                            </div>
-                                            <div class="comment-footer">
-                                                <span class="comment-date">Posted on: <%= comment.created_at %></span>
-                                            </div>
+                                            
+                        
+                                          </div>
+                                          <% }); %>
+
                                         </div>
-                                    <% }); %>
-                                </div>
+                                        
+                                      </div>
+                                      
+                                    </div>
+                                    </div>
+                                    
+                                  </div>
+
+
+
+
                                 
                             <!-- <div class="social-share pt-30">
                                 <div class="section-tittle">
@@ -420,6 +613,34 @@
 <!-- Search model end -->
 
 <!-- JS here -->
+<script>
+
+    function toggleDropdown() {
+        document.querySelector('.login-container').classList.toggle('dropdown-open');
+    }
+
+    // Add click event to user profile
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', toggleDropdown);
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const container = document.querySelector('.login-container');
+        if (container && !container.contains(event.target)) {
+            container.classList.remove('dropdown-open');
+        }
+    });
+
+    // Handle logout
+    document.querySelector('.logout')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/logout';
+    });
+
+
+</script>
 
     <script src="/blog/js/vendor/modernizr-3.5.0.min.js"></script>
     <!-- Jquery, Popper, Bootstrap -->
@@ -453,8 +674,7 @@
     
     <!-- Jquery Plugins, main Jquery -->	
     <script src="/blog/js/plugins.js"></script>
-    <script src="/blog/js/main.js"></script>
-    
+   
     
 </body>
 </html>

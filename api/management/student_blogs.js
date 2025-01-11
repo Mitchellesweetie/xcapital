@@ -40,62 +40,32 @@ function isAuthenticated(req, res, next) {
         res.redirect('/login_blog'); 
     }
 
-// Express Route for /home
-// router.get('/home', (req, res) => {
-//     const categoryId = req.query.categoryId;  // Get categoryId from query params
 
-//     // Fetch categories first
-//     db.query('SELECT * FROM categories', (err, categories) => {
-//         if (err) {
-//             console.error('Database error:', err);
-//             return res.render('student_blog/index', {
-//                 successMessage: null,
-//                 errorMessage: 'Error occurred during fetching categories',
-//                 categories: [],
-//                 blogs: []  // No blogs if categories can't be fetched
-//             });
-//         }
 
-//         // Fetch blogs based on categoryId if provided, otherwise fetch all blogs
-//         const blogQuery = categoryId
-//             ? `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
-//                FROM form
-//                LEFT JOIN categories ON form.categoryId = categories.categoryId
-//                LEFT JOIN registration ON form.user_id = registration.user_id
-//                WHERE categories.categoryId = ?`
-//             : `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at
-//                FROM form
-//                LEFT JOIN categories ON form.categoryId = categories.categoryId
-//                LEFT JOIN registration ON form.user_id = registration.user_id`;
-
-//         // Query based on categoryId
-//         db.query(blogQuery, categoryId ? [categoryId] : [], (err, blogs) => {
-//             if (err) {
-//                 console.error('Database error:', err);
-//                 return res.render('student_blog/index', {
-//                     successMessage: null,
-//                     errorMessage: 'Error occurred during fetching blogs',
-//                     categories: categories || [],
-//                     blogs: []  // Fallback to empty blogs array if error occurs
-//                 });
-//             }
-//             // const blogs=Array.isArray(blogs)? blogs:[]
-
-//             // Render the page with the blogs and categories
-//             res.render('student_blog/index', {
-//                 categories: categories || [],
-//                 blogs: blogs || [],
-//                 categoryblogs: []  // We don't need to pass this anymore
-//             });
-//         });
-//     });
-// });
 router.get('/home', (req, res) => {
-    const { categoryId } = req.query;  // Fetch categoryId from query string
+    console.log('Session Username:', req.session.username);
+    const { categoryId } = req.query;  
+    const username = req.session.username; 
+    const mostrecent=`select form.id, form.title,form.file, form.message, categories.category, registration.username, form.create_at, form.status
+                        from form   LEFT JOIN categories ON form.categoryId = categories.categoryId
+                        LEFT JOIN registration ON form.user_id = registration.user_id    where form.status='approved' order by create_at desc limit 5`
+    const liked=`select form.id,form.title,form.file,form.message,form.create_at,count(form.likes)from form limit 5;`
 
-    // Fetch blogs with status 'approved'
+    const mostpopular1=`select form.id,form.title,form.file,form.message,form.status,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId)
+                        from form
+                        left join categories on categories.categoryId=form.categoryId
+                        left join comments on comments.id=form.id where form.status='approved'
+                        group by form.id  order by comments.commentId desc limit 1`
+    const trending=`select form.id,form.title,form.file,form.message,form.create_at,count(form.likes)from form limit 5;`
+
+   
+   const mostpppular=`select form.id,form.title,form.file,form.message,form.status,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId)
+                    from form
+                    left join categories on categories.categoryId=form.categoryId
+                    left join comments on comments.id=form.id where form.status='approved'
+                    group by form.id  order by comments.commentId desc `
     db.query(
-        `SELECT form.id, form.title, form.message, categories.category, registration.username, form.create_at, form.status
+        `SELECT form.id, form.title,form.file, form.message, categories.category, registration.username, form.create_at, form.status
          FROM form
          LEFT JOIN categories ON form.categoryId = categories.categoryId
          LEFT JOIN registration ON form.user_id = registration.user_id
@@ -107,14 +77,81 @@ router.get('/home', (req, res) => {
                     successMessage: null, 
                     errorMessage: 'Error occurred during fetching blogs',
                     blogs: [], 
-                    categories: []  // Always pass an empty array if categories are not fetched
+                    username,
+                    categories: []  
                 });
             }
 
             const blogs = Array.isArray(result) ? result : [];
             console.log("Blogs:", blogs);
 
-            // Fetch categories
+            db.query(mostpppular,(err,mostpopular)=>{
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.render('student_blog/index', { 
+                        successMessage: null, 
+                        errorMessage: 'Error occurred during fetching most popular results',
+                        blogs, 
+                        username,
+                        categories: [] ,
+                        mostpopular:[]
+
+                    });
+                }
+                const mostpopula = Array.isArray(mostpopular) ? mostpopular : [];
+                // console.log('here are the most popular blogs',mostpopular)
+            db.query(trending,(err,trendingblogs)=>{
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.render('student_blog/index', { 
+                        successMessage: null, 
+                        errorMessage: 'Error occurred during fetching most popular results',
+                        blogs, 
+                        username,
+                        categories: [] ,
+                        mostpopular:[],
+                        trendingblog:[]
+
+                    });
+                }
+                const trendingblog = Array.isArray(trendingblogs) ? trendingblogs : [];   
+                db.query(liked,(err,likeone)=>{
+                    if (err) {
+                        console.error('Database error:', err);
+                        return res.render('student_blog/index', { 
+                            successMessage: null, 
+                            errorMessage: 'Error occurred during fetching most popular results',
+                            blogs, 
+                            username,
+                            categories: [] ,
+                            mostpopular:[],
+                            trendingblog:[],
+                            like:[]
+    
+                        });
+                    }
+             const like = Array.isArray(likeone) ? likeone : [];   
+             db.query(mostrecent,(err,recentresults)=>{
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.render('student_blog/index', { 
+                        successMessage: null, 
+                        errorMessage: 'Error occurred during fetching most popular results',
+                        blogs, 
+                        username,
+                        categories: [] ,
+                        mostpopular:[],
+                        trendingblog:[],
+                        like:[]
+
+                    });
+                }
+            const recentblog = Array.isArray(recentresults) ? recentresults : [];           
+
+                           
+    
+                       
+
             db.query('SELECT * FROM categories', (err, categories) => {
                 if (err) {
                     console.error('Database error:', err);
@@ -122,17 +159,20 @@ router.get('/home', (req, res) => {
                         successMessage: null, 
                         errorMessage: 'Error occurred during fetching categories',
                         blogs, 
-                        categories: []  // Always pass an empty array if categories are not fetched
-                    });
+                        username,
+                        categories: [] ,
+                        trendingblog
+                        
+                                        });
                 }
 
-                console.log("Categories:", categories);
 
-                // Fetch category-specific blogs if categoryId is provided
+                // console.log("Categories:", categories);
+
                 if (categoryId) {
                     console.log("Fetching blogs for categoryId:", categoryId);
                     db.query(
-                        `SELECT categories.categoryId, categories.category, form.id, form.title, form.message, form.create_at
+                        `SELECT categories.categoryId, categories.category, form.id, form.title, form.message, form.file,form.create_at
                          FROM categories
                          LEFT JOIN form ON categories.categoryId = form.categoryId
                          WHERE categories.categoryId = ?`,
@@ -144,34 +184,54 @@ router.get('/home', (req, res) => {
                                     successMessage: null, 
                                     errorMessage: 'Error occurred during fetching blogs for category',
                                     blogs, 
+                                    username,
                                     categories,
-                                    categoryblogs: []
+                                    categoryblogs: [],
+                                    mostpopula:mostpopula,
+                                    trendingblog
+
+
                                 });
                             }
 
                             const categoryblog = Array.isArray(categoryblogs) ? categoryblogs : [];
-                            console.log("Category Blogs:", categoryblog);  
-                            console.log("Category Blog ID:", categoryId);
+                            // console.log("Category Blogs:", categoryblog);  
+                            // console.log("Category Blog ID:", categoryId);
 
                             return res.render('student_blog/index', { 
                                 blogs,
                                 categories,
-                                categoryblogs: categoryblog,  // Use the filtered category blogs
-                                currentCategoryId: categoryId
+                                username,
+                                categoryblogs: categoryblog,  
+                                currentCategoryId: categoryId,
+                                mostpopula:mostpopula,
+                                trendingblog,
+                                like:like,
+                                recentblog:recentblog
+
+
+
                             });
                         });
                 } else {
-                    // If no categoryId is provided, render the page without category-specific blogs
                     return res.render('student_blog/index', { 
                         blogs,
-                        categories,  // Pass the categories array here
+                        username,
+                        categories,  
                         categoryblogs: [],
-                        currentCategoryId: null
-                    });
+                        currentCategoryId: null,
+                        mostpopula:mostpopula,
+                        trendingblog,
+                        like:like,
+                        recentblog:recentblog
+
+                    });   
                 }
-            });
+            }); })
+        })
+        })
         });
-});
+});})
 
 
 
@@ -196,33 +256,154 @@ router.get('/student_blogform',(req,res)=>{
 
 
 })
+// router.post('/likes/:id', (req, res) => {
+//     const blogId = req.params.id;
+//     const username = req.session.username;
 
-router.get('/latest_news/:id',(req,res)=>{
+//     // Query to update blog likes
+//     const updateBlogLikes = 'UPDATE form SET likes = likes + 1 WHERE id = ?';
+//     // Query to update comment likes
+//     const updateCommentLikes = 'UPDATE comments SET likes = likes + 1 WHERE id = ?';
+
+//     db.query(updateCommentLikes, [blogId], (err) => {
+//         if (err) {
+//             console.error('Error updating comment likes:', err);
+//             return res.render('student_blog/latest_news', {
+//                 blog: null,
+//                 successMessage: null,
+//                 errorMessage: 'Error updating comment likes',
+//                 comments: [],
+//                 username,
+//                 likes: [],
+//                 likecomments: [],
+//             });
+//         }
+
+//         db.query(updateBlogLikes, [blogId], (err) => {
+//             if (err) {
+//                 console.error('Error updating blog likes:', err);
+//                 return res.render('student_blog/latest_news', {
+//                     blog: null,
+//                     successMessage: null,
+//                     errorMessage: 'Error updating blog likes',
+//                     comments: [],
+//                     username,
+//                     likes: [],
+//                     likecomments: [],
+//                 });
+//             }
+
+//             // Fetch updated blog and comments data
+//             const getBlog = 'SELECT * FROM form WHERE id = ?';
+//             const getComments = 'SELECT * FROM comments WHERE id = ?';
+
+//             db.query(getBlog, [blogId], (err, blog) => {
+//                 if (err || blog.length === 0) {
+//                     console.error('Error fetching blog:', err);
+//                     return res.render('student_blog/latest_news', {
+//                         blog: null,
+//                         successMessage: null,
+//                         errorMessage: 'Error fetching blog',
+//                         comments: [],
+//                         username,
+//                         likes: [],
+//                         likecomments: [],
+//                     });
+//                 }
+
+//                 db.query(getComments, [blogId], (err, comments) => {
+//                     if (err) {
+//                         console.error('Error fetching comments:', err);
+//                         return res.render('student_blog/latest_news', {
+//                             blog: blog[0],
+//                             successMessage: null,
+//                             errorMessage: 'Error fetching comments',
+//                             comments: [],
+//                             username,
+//                             likes: blog[0].likes,
+//                             likecomments: [],
+//                         });
+//                     }
+
+//                     // Render the updated data
+//                     return res.render('student_blog/latest_news', {
+//                         blog: blog[0],
+//                         successMessage: 'Blog liked successfully!',
+//                         errorMessage: null,
+//                         comments,
+//                         username,
+//                         likes: blog[0].likes,
+//                         likecomments: comments.map((comment) => comment.likes),
+//                     });
+//                 });
+//             });
+//         });
+//     });
+// });
+
+
+router.get('/latest_news/:id', (req, res) => {
     const blogId = req.params.id;
-    db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+    const username = req.session.username; 
+
+    // const likeblog=`UPDATE form SET likes=likes+1 where id=1`
+    // const likecomments=`UPDATE comments SET likes=likes+1 where id=1`
+    const trending=`select form.id,form.title,form.message,form.create_at,count(form.likes)from form limit 5;`
+    const mostpppular=`select form.id,form.title,form.message,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId)
+                     from form
+                     left join categories on categories.categoryId=form.categoryId
+                     left join comments on comments.id=form.id 
+                     group by form.id order by comments.commentId desc`
+
+
+    db.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
         if (err) {
-            console.error('Error fetching blog:', err);
+            console.error('Error fetching comments:', err);
             return res.render('student_blog/latest_news', { 
-                blog: null,  // Explicitly set blog to null
-                successMessage: null, 
-                errorMessage: 'Error fetching blog', 
-                blogs: [] 
-            });
-        }
-        if (blog.length > 0) {
-            return res.render('student_blog/latest_news', {
-                blog: blog[0],
+                blog: null, 
                 successMessage: null,
-                errorMessage: null
+                errorMessage: 'Error loading comments', 
+                comments: [], 
+                username ,
+                
             });
         }
-        return res.render('student_blog/latest_news', {
-            blog: null,  // Explicitly set blog to null
-            successMessage: null,
-            errorMessage: null
+
+        db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+            if (err) {
+                console.error('Error fetching blog:', err);
+                return res.render('student_blog/latest_news', { 
+                    blog: null,
+                    successMessage: null, 
+                    errorMessage: 'Blog not found', 
+                    comments, 
+                    username 
+                });
+            }
+            if (!blog || blog.length === 0) {
+                return res.render('student_blog/latest_news', {
+                    blog: null,
+                    successMessage: null,
+                    errorMessage: 'Blog not found',
+                    comments,
+                    username,
+                });
+            }
+            console.log('here are the blogs',blog)
+            
+
+            return res.render('student_blog/latest_news', {
+                blog: blog||[],
+                successMessage: null,
+                errorMessage: null, 
+                comments, 
+                username,
+              
+
+            });  }) })
         });
-    });
-});
+    
+
 router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     const blogId = req.params.id;
     console.log('Received blog ID:', blogId); // Add this for debugging
@@ -256,16 +437,14 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                 });
             }
 
-            // Fetch the blog data after inserting the comment
             db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blogResults) => {
                 if (err || blogResults.length === 0) {
                     console.error('Error fetching blog:', err);
                     return res.status(404).send('Blog not found');
                 }
 
-                const blog = blogResults[0]; // Get the blog data
+                const blog = blogResults[0]; 
 
-                // Fetch all the comments for the blog
                 db.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
                     if (err) {
                         console.error('Error fetching comments:', err);
@@ -274,10 +453,9 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                         });
                     }
 
-                    // Render the blog page with the blog and comments data
                     res.render('student_blog/latest_news', {
-                        blog: blog||[],      // Pass the blog data to the template
-                        comments: comments,  // Pass the comments to the template
+                        blog: blog||[],      
+                        comments: comments,  
                         successMessage: 'Comment added successfully'
                     });
                 });
