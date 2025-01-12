@@ -146,7 +146,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     );
 });
 
-app.get('/',isAdmin,(req, res) => {
+app.get('/admin_dashboard',isAdmin,(req, res) => {
     // const userId = req.session.userId;
 
     // if (!userId) {

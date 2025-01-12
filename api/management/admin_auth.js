@@ -120,7 +120,7 @@ router.post('/register', (req, res) => {
                           errorMessage: 'An error occurred. Please try again later.' 
                       });
                   }
-                  res.redirect('/?success=1');
+                  res.redirect('/admin_dashboard?success=1');
               });
           });
       });

@@ -482,7 +482,7 @@ router.post('/update/:id',isAdmin, isAuthenticated,(req, res) => {
         db.query('UPDATE form SET ? WHERE id = ?', [data,blogId], (err, result) => {
             if (err) {
                 console.error('Error approving blog:', err);
-                return res.redirect('/')
+                return res.redirect('/admin_dashboard')
             }
      
         
