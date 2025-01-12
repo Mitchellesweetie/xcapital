@@ -19,6 +19,7 @@ const puppeteer = require('puppeteer');
 const resume=require('./api/management/portfolio')
 const categories=require('./api/management/admin')
 const student_blog=require('./api/management/student_blogs')
+const xcapital=require('./api/management/xcapital')
 
 
 dotenv.config()
@@ -54,6 +55,7 @@ app.use('/student_blog',student_blog)
 app.use(require('./api/management/admin_auth'))
 app.use(require('./api/management/publicroutes'))
 app.use(require('./api/management/student_auth'))
+app.use(xcapital)
 
 
 
