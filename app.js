@@ -216,18 +216,18 @@ app.get('/form',(req,res)=>{
 })
 
 
-app.get('/single',(req,res)=>{
-    res.render('single')
-})
-app.get('/elearning',(req,res)=>{
-    res.render('elearning')
-})
-app.get('/about',(req,res)=>{
-    res.render('about1')
-})
-app.get('/home',(req,res)=>{
-    res.render('index1')
-})
+// app.get('/single',(req,res)=>{
+//     res.render('single')
+// })
+// app.get('/elearning',(req,res)=>{
+//     res.render('elearning')
+// })
+// app.get('/about',(req,res)=>{
+//     res.render('about1')
+// })
+// app.get('/home',(req,res)=>{
+//     res.render('index1')
+// })
 
 
 app.get('/forgetpassword',(req,res)=>{
