@@ -12,18 +12,21 @@ const jwt=require('jsonwebtoken')
 
 
 dotenv.config();
-const db = mysql.createConnection({
+const pool = mysql.createPool({
+    connectionLimit: 10, // Adjust based on your app's load
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
     database: process.env.database
-});
-
-db.connect((err) => {
-    if (!err) {
-        console.log('Connected to the database');
+  });
+  
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection:', err);
+    } else {
+        console.log('pool connection')
     }
-});
+  });
 
 router.get('/register_blog',(req,res)=>{
     res.render('Login/register1',{successMessage: null,errorMessage: null,})

@@ -78,22 +78,39 @@ function isAdmin(req, res, next) {
     }
     return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
   }
-const db=mysql.createConnection({
+// const db=mysql.createConnection({
+//     host: process.env.host,
+//     user: process.env.username,
+//     password: process.env.password,
+//     database: process.env.database
+
+// })
+const pool = mysql.createPool({
+    connectionLimit: 10, // Adjust based on your app's load
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
     database: process.env.database
-
-})
-db.connect((err)=>{
-    if(err){
-        // console.log('Connect')
-        console.log(err)
+  });
+  
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection:', err);
+    } else {
+        console.log('pool connection')
     }
+  });
+// db.connect((err)=>{
+//     if(err){
+//         // console.log('Connect')
+//         console.log(err)
+//     }
 
     
-})
-
+// })
+// db.on('error', (err) => {
+//     console.error('Database connection error:', err);
+// });
 
 app.get('/student_blog',(req,res)=>{
 

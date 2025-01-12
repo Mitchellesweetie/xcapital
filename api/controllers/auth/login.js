@@ -5,19 +5,21 @@ const dotenv=require('dotenv')
 
 
 dotenv.config()
-const db=mysql.createConnection({
+const pool = mysql.createPool({
+    connectionLimit: 10, // Adjust based on your app's load
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
     database: process.env.database
-
-})
-db.connect((err)=>{
-    if(!err){
-        console.log('Connect')
+  });
+  
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error getting connection:', err);
+    } else {
+        console.log('pool connection')
     }
-    
-})
+  });
 //insert data into the registration table
 router.post('/register',(req,res)=>{
 
