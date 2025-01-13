@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CV Resume Form</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
   <style>
     body {
       background-color: #f8f9fa;
@@ -30,6 +31,15 @@
     .btn-custom:hover {
       background-color: #0056b3;
     }
+    .btn-danger-custom {
+      background-color: #dc3545;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+    }
+    .btn-danger-custom:hover {
+      background-color: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -37,36 +47,44 @@
     <div class="form-container">
       <h1 class="form-title text-center">Experience Details</h1>
       <form id="cvForm" method="post" action="/auth/experience">
-        <!-- Education Section -->
-        <div class="mb-3">
-          <label class="form-label">Experience</label>
-          <div id="educationContainer">
-            <!-- Initial Education Group -->
-            <div class="card card-body mb-3">
+        <!-- Experience Section -->
+        <div class="mb-3" id="educationContainer">
+          <!-- Initial Experience Group -->
+          <div class="card card-body mb-3" id="experience1">
+            <div class="mb-3">
+              <label for="position1" class="form-label">Position</label>
+              <input type="text" class="form-control" id="position1" name="position[0]" required>
+            </div>
+            <div class="mb-3">
+              <label for="organisation1" class="form-label">Organisation</label>
+              <input type="text" class="form-control" id="organisation1" name="organisation[0]" required>
+            </div>
+            <div class="mb-3">
+              <label for="start1" class="form-label">Start</label>
+              <input type="text" class="form-control datepicker" id="start1" name="start[0]" required>
+            </div>
+            <div class="mb-3">
+              <label for="end1" class="form-label">End</label>
+              <input type="text" class="form-control datepicker" id="end1" name="end[0]" required>
+            </div>
+            <div class="mb-3">
+              <label for="current1" class="form-label">Current</label>
+              <input type="checkbox" id="current1" name="current[0]" onchange="toggleCurrent(this)">
+            </div>
+            <div id="responsibilityContainer1">
+              <button type="button" class="btn btn-outline-primary btn-sm" id="addRoleButton1" onclick="addRole(1)">Add Another Role</button>
+
               <div class="mb-3">
-                <label for="degree1" class="form-label">Position</label>
-                <input type="text" class="form-control" id="degree1" name="position" required>
-              </div>
-              <div class="mb-3">
-                <label for="institution1" class="form-label">Organisation</label>
-                <input type="text" class="form-control" id="institution1" name="organisation" required >
-              </div>
-              <div class="mb-3">
-                <label for="year1" class="form-label">Start</label>
-                <input type="month" class="form-control" id="start1" name="start" required>
-              </div>
-              <div class="mb-3">
-                <label for="end1" class="form-label">End</label>
-                <input type="month" class="form-control" id="end1" name="end" required>
-              </div>
-              <div class="mb-3">
-                <label for="current1" class="form-label">Current</label>
-                <input type="checkbox" id="current1" name="end" onchange="toggleCurrent(this)" >
+                <label for="role1" class="form-label">Role</label>
+                <input type="text" class="form-control" id="role1" name="roles[0][]" required>
               </div>
             </div>
+            <button type="button" class="btn btn-danger-custom btn-sm" onclick="deleteExperience(1)" style="float:right;margin-top:10px;">Delete</button>
           </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Experience</button>
         </div>
+
+        <!-- Add Another Experience Button -->
+        <button type="button" class="btn btn-outline-primary btn-sm" id="addExperienceButton">Add Another Experience</button>
 
         <!-- Submit Button -->
         <div class="text-center">
@@ -76,59 +94,106 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+  
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const addEducationButton = document.getElementById('addEducationButton');
+      const addExperienceButton = document.getElementById('addExperienceButton');
       const educationContainer = document.getElementById('educationContainer');
-      let educationIndex = 1;
+      let experienceIndex = 1;
 
-      addEducationButton.addEventListener('click', function () {
-        educationIndex++;
-        const educationGroup = document.createElement('div');
-        educationGroup.classList.add('card', 'card-body', 'mb-3');
-        educationGroup.innerHTML = `
+      addExperienceButton.addEventListener('click', function () {
+        experienceIndex++;
+        const experienceGroup = document.createElement('div');
+        experienceGroup.classList.add('card', 'card-body', 'mb-3');
+        experienceGroup.id = `experience${experienceIndex}`;
+        experienceGroup.innerHTML = `
           <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Position</label>
-            <input type="text" class="form-control" id="degree${educationIndex}" name="position"  required>
+            <label for="position${experienceIndex}" class="form-label">Position</label>
+            <input type="text" class="form-control" id="position${experienceIndex}" name="position[${experienceIndex}]" required>
           </div>
           <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Organisation</label>
-            <input type="text" class="form-control" id="institution${educationIndex}" name="organisation" required>
+            <label for="organisation${experienceIndex}" class="form-label">Organisation</label>
+            <input type="text" class="form-control" id="organisation${experienceIndex}" name="organisation[${experienceIndex}]" required>
           </div>
           <div class="mb-3">
-            <label for="start${educationIndex}" class="form-label">Start</label>
-            <input type="month" class="form-control" id="start${educationIndex}" name="start" placeholder="E.g., 2024"required>
+            <label for="start${experienceIndex}" class="form-label">Start</label>
+            <input type="text" class="form-control datepicker" id="start${experienceIndex}" name="start[${experienceIndex}]" required>
           </div>
           <div class="mb-3">
-            <label for="end${educationIndex}" class="form-label">End</label>
-            <input type="month" class="form-control" id="end${educationIndex}" name="end" placeholder="E.g., 2024" required>
+            <label for="end${experienceIndex}" class="form-label">End</label>
+            <input type="text" class="form-control datepicker" id="end${experienceIndex}" name="end[${experienceIndex}]" required>
           </div>
           <div class="mb-3">
-            <label for="current${educationIndex}" class="form-label">Current</label>
-            <input type="checkbox" id="current${educationIndex}" name="end" onchange="toggleCurrent(this)" >
+            <label for="current${experienceIndex}" class="form-label">Current</label>
+            <input type="checkbox" id="current${experienceIndex}" name="current[${experienceIndex}]" onchange="toggleCurrent(this)">
           </div>
+          <div id="responsibilityContainer${experienceIndex}">
+          <button type="button" class="btn btn-outline-primary btn-sm" id="addRoleButton${experienceIndex}" onclick="addRole(${experienceIndex})">Add Another Role</button>
+
+            <div class="mb-3">
+              <label for="role${experienceIndex}" class="form-label">Role</label>
+              <input type="text" class="form-control" id="role${experienceIndex}" name="roles[${experienceIndex}][]" required>
+            </div>
+          </div>
+          <button type="button" class="btn btn-danger-custom btn-sm" onclick="deleteExperience(${experienceIndex})" style="float:right;margin-top:10px;">Delete</button>
         `;
-        educationContainer.appendChild(educationGroup);
+        educationContainer.appendChild(experienceGroup);
+
+        // Initialize datepickers for newly added fields
+        $('#start' + experienceIndex).datepicker({
+          format: 'yyyy-mm-dd',
+          autoclose: true
+        });
+        $('#end' + experienceIndex).datepicker({
+          format: 'yyyy-mm-dd',
+          autoclose: true
+        });
+      });
+
+      // Initialize datepickers for the first experience fields
+      $('#start1').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
+      });
+      $('#end1').datepicker({
+        format: 'yyyy-mm-dd',
+        autoclose: true
       });
     });
 
-    // Function to handle the logic for the "current" checkbox
-    function toggleCurrent(checkbox) {
-      const educationIndex = checkbox.id.replace('current', ''); // Get index from checkbox id
-      const endDateInput = document.getElementById('end' + educationIndex);
-      
-      if (checkbox.checked) {
-        // Set end date to current date and hide the input
-        const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-        endDateInput.value = currentDate;
-        endDateInput.style.display = 'none';
-      } else {
-        // Show end date input again
-        endDateInput.style.display = 'block';
-        endDateInput.value = ''; // Optionally clear the value
+    // Function to delete an experience section
+    function deleteExperience(experienceIndex) {
+      const experienceGroup = document.getElementById(`experience${experienceIndex}`);
+      if (experienceGroup) {
+        experienceGroup.remove(); // Remove the experience section from the DOM
       }
     }
+
+    function toggleCurrent(checkbox) {
+      const experienceIndex = checkbox.id.replace('current', ''); // Get index from checkbox id
+      const endDateInput = document.getElementById('end' + experienceIndex);
+
+      if (checkbox.checked) {
+        endDateInput.value = ''; // Disable the end date field when current is checked
+        endDateInput.disabled = true;
+      } else {
+        endDateInput.disabled = false;
+      }
+    }
+
+    function addRole(experienceIndex) {
+      const responsibilityContainer = document.getElementById(`responsibilityContainer${experienceIndex}`);
+      const roleCount = responsibilityContainer.getElementsByTagName('input').length / 2;
+      const newRoleInput = document.createElement('div');
+      newRoleInput.classList.add('mb-3');
+      newRoleInput.innerHTML = `
+        <input type="text" class="form-control" id="role${experienceIndex}_${roleCount + 1}" name="roles[${experienceIndex}][]" required>
+      `;
+      responsibilityContainer.appendChild(newRoleInput);
+    }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

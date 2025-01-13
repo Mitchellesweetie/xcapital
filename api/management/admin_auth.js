@@ -13,12 +13,13 @@ const jwt=require('jsonwebtoken')
 
 
 dotenv.config();
-const db = mysql.createConnection({
+const pool = mysql.createPool({
+    connectionLimit: 10, // Adjust based on your app's load
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
     database: process.env.database
-});
+  });
 router.post('/register', (req, res) => {
     const { username, email,phone,role, password, confirmpassword } = req.body;
     
@@ -125,5 +126,40 @@ router.post('/register', (req, res) => {
           });
       });
   });
+  router.post('/admin_forgetpassword', (req, res) => {
+      const { email, password,confirmpassword } = req.body;
+    
+      if (password !== confirmpassword) {
+        return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
+      }
+      if (!email || !password) {
+        return res.render('forgetpassword', { successMessage: null, errorMessage: 'Email and new password are required.' });
+      }
+    
+      const hashedPassword = bcrypt.hashSync(password, 10);
+    
+      pool.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
+        if (err) {
+          console.error('Error querying the database:', err);
+          return res.render('forgetpassword', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
+        }
+    
+        if (results.affectedRows === 0) {
+          return res.render('forgetpassword', { successMessage: null, errorMessage: 'No user found with that email address.' });
+        }
+    
+        res.render('login', { successMessage: 'Password updated successfully. You can now log in.', errorMessage: null });
+      });
+    });
+    
+    
+    router.get('/logout', (req, res) => {
+          req.session.destroy(err => {
+            if (err) throw err;
+            res.redirect('/login');
+          });
+        });
+  
+  
 
     module.exports=router

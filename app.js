@@ -163,7 +163,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     );
 });
 
-app.get('/admin_dashboard',isAdmin,(req, res) => {
+app.get('/admin_dashboard',isAdmin,isAuthenticated,(req, res) => {
     // const userId = req.session.userId;
 
     // if (!userId) {

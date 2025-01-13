@@ -269,7 +269,7 @@ router.post('/auth/personal_details', isAuthenticated, (req, res) => {
         pool.query('INSERT INTO personal_details SET ?', completeData, (err, result) => {
             if (err) {
                 console.error('Error inserting personal details:', err);
-                return res.redirect('/portfolio_view_education');
+                return res.redirect('/personal_details?error=profile_details_failed');
             }
             console.log(result);
             pool.query('UPDATE registration SET profile_status = 1 WHERE user_id = ?', [userId], (err) => {
@@ -295,25 +295,96 @@ router.get('/portfolio_view_education',isAuthenticated ,(req,res)=>{
     res.render('portfolio/education')
 })
 
-router.post('/auth/education_details', isAuthenticated, async (req, res) => {
+router.get('/try',(req,res)=>{
+   
+
+    res.render('portfolio/trying')
+})
+
+
+// Route for handling education details form submission
+// Route for handling education details form submission
+// Route for handling education details form submission
+router.post('/auth/education_detail', async (req, res) => {
+    const { degree = [], institution = [], start = [], end = [], current = [] } = req.body;
+  
+    // Ensure all arrays are the same length
+    const maxLength = Math.max(degree.length, institution.length, start.length, end.length, current.length);
+    degree.length = institution.length = start.length = end.length = current.length = maxLength;
+  
+    // Add indexing to the received data for easier allocation
+    const indexedData = degree.map((deg, i) => ({
+      index: i, // Index for each entry
+      degree: deg,
+      institution: institution[i],
+      start: start[i],
+      end: end[i],
+      current: current[i]
+    }));
+  
+    // Prepare the entries for saving
+    const entries = indexedData.map((data) => {
+      const { degree, institution, start, end, current, index } = data;
+      const isCurrent = current === 'true';
+      let endDate = end;
+  
+      // If the entry is marked as 'current' and the end date is empty, set it to 'present'
+      if (isCurrent && (!endDate || endDate.trim() === '')) {
+        endDate = 'present';
+      }
+  
+      return {
+        index: index, // Include index in the final entry
+        degree: degree,
+        institution: institution,
+        start: start,
+        end: endDate || '', // If endDate is falsy, use an empty string
+        current: isCurrent ? 'true' : 'false'
+      };
+    });
+    console.log(req.body)
+    console.log(entries)
+  
+    // Start a transaction to save the entries into the database
+    
+  });
+  
+  
+// Start the server
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+router.post('/auth/education_details',isAuthenticated, async (req, res) => {
   try {
     const data = req.body;
-    const userId = req.session.userId;
+    const userId = req.session.userId; // Assuming session contains userId
 
     if (!userId) {
       return res.redirect('/login_blog');
     }
 
-    const { degree, institution, start, end } = data;
-
-    const length = Array.isArray(degree) ? degree.length : 1;
+    const { degree, institution, start, end, current } = data;
 
     const entries = Array.isArray(degree)
       ? degree.map((_, i) => ({
           degree: degree[i],
           institution: institution[i],
           start: start[i],
-          end: end[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
+          end: current && current[i] === 'true' ? 'present' : end[i] || null,
           user_id: userId,
         }))
       : [
@@ -321,36 +392,88 @@ router.post('/auth/education_details', isAuthenticated, async (req, res) => {
             degree,
             institution,
             start,
-            end: end === 'on' ? new Date().toISOString().split('T')[0] : end,
+            end: current === 'true' ? 'present' : end || null,
             user_id: userId,
           },
         ];
 
-    await Promise.all(
-      entries.map((entry) =>
-        new Promise((resolve, reject) => {
-          pool.query('INSERT INTO education SET ?', entry, (err, result) => {
-            if (err) return reject(err);
-            console.log('Education record inserted successfully:', result);
-            resolve(result);
-          });
-        })
-      )
-    );
+    for (const entry of entries) {
+      await new Promise((resolve, reject) => {
+        pool.query('INSERT INTO education SET ?', entry, (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
+        });
+      });
+    }
 
-    pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
-      if (err) {
-        console.error('Error updating profile status:', err);
-        return res.redirect('/portfolio_view_education?error=profile_update_failed');
-      }
-
-      return res.redirect('/portfolio_view_experience');
-    });
+    res.redirect('/portfolio_view_education?success');
   } catch (error) {
-    console.error('Error inserting education details:', error);
+    console.error('Error saving education details:', error);
     res.redirect('/portfolio_view_education?error=true');
   }
 });
+
+
+  
+  
+// router.post('/auth/education_details', isAuthenticated, async (req, res) => {
+//   try {
+//     const data = req.body;
+//     const userId = req.session.userId;
+
+//     if (!userId) {
+//       return res.redirect('/login_blog');
+//     }
+
+//     const { degree, institution, start, end ,current} = data;
+
+//     const length = Array.isArray(degree) ? degree.length : 1;
+//     const isCurrent=current==='true'
+//     const endDateValue=isCurrent?null:end
+
+//     const entries = Array.isArray(degree)
+//       ? degree.map((_, i) => ({
+//           degree: degree[i],
+//           institution: institution[i],
+//           start: start[i],
+//           end: endDateValue[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
+//           user_id: userId,
+//         }))
+//       : [
+//           {
+//             degree,
+//             institution,
+//             start,
+//             end: end === 'on' ? new Date().toISOString().split('T')[0] : end,
+//             user_id: userId,
+//           },
+//         ];
+
+//     await Promise.all(
+//       entries.map((entry) =>
+//         new Promise((resolve, reject) => {
+//           pool.query('INSERT INTO education SET ?', entry, (err, result) => {
+//             if (err) return reject(err);
+//             console.log('Education record inserted successfully:', result);
+//             resolve(result);
+//           });
+//         })
+//       )
+//     );
+
+//     pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
+//       if (err) {
+//         console.error('Error updating profile status:', err);
+//         return res.redirect('/portfolio_view_education?error=profile_update_failed');
+//       }
+
+//       return res.redirect('/portfolio_view_experience');
+//     });
+//   } catch (error) {
+//     console.error('Error inserting education details:', error);
+//     res.redirect('/portfolio_view_education?error=true');
+//   }
+// });
 
 
 //experience
@@ -366,51 +489,96 @@ router.get('/portfolio_view_experience',isAuthenticated,(req,res)=>{
 
 
 
-router.post('/auth/experience', (req, res) => {
-    const data = req.body;
-    const userId = req.session.userId;
+// router.post('/auth/experience', (req, res) => {
+//     const data = req.body;
+//     const userId = req.session.userId;
 
-    if (!userId) {
-        return res.redirect('/login_blog');
-    }
+//     if (!userId) {
+//         return res.redirect('/login_blog');
+//     }
 
-    const { position, organisation, start, end } = data;
-    const length = position.length;
+//     const { position, organisation, start, end } = data;
+//     const length = position.length;
 
     
 
-    for (let i = 0; i < length; i++) {
+//     for (let i = 0; i < length; i++) {
        
 
-        const completeData = {
-            position: position[i],
-            organisation: organisation[i],
-            start: start[i],
-          end: end[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
-            user_id: userId
-        };
+//         const completeData = {
+//             position: position[i],
+//             organisation: organisation[i],
+//             start: start[i],
+//           end: end[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
+//             user_id: userId
+//         };
 
-        pool.query('INSERT INTO experience SET ?', completeData, (err, result) => {
-            if (err) {
-                console.error('Error inserting experience details:', err);
-                return res.redirect('/portfolio_view_experience?error=true');
-            }
+//         pool.query('INSERT INTO experience SET ?', completeData, (err, result) => {
+//             if (err) {
+//                 console.error('Error inserting experience details:', err);
+//                 return res.redirect('/portfolio_view_experience?error=true');
+//             }
 
-            console.log('Experience record inserted successfully:', result);
+//             console.log('Experience record inserted successfully:', result);
 
-            if (i === length - 1) { // Ensure this only happens once after all records are inserted
-                pool.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
-                    if (err) {
-                        console.error('Error updating profile status:', err);
-                        return res.redirect('/portfolio_view_experience?error=profile_update_failed');
-                    }
+//             if (i === length - 1) { // Ensure this only happens once after all records are inserted
+//                 pool.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
+//                     if (err) {
+//                         console.error('Error updating profile status:', err);
+//                         return res.redirect('/portfolio_view_experience?error=profile_update_failed');
+//                     }
 
-                    return res.redirect('/portfolio_view_references');
-                });
-            }
-        });
+//                     return res.redirect('/portfolio_view_references');
+//                 });
+//             }
+//         });
+//     }
+// });
+// Assuming you're using Express.js and a MySQL database
+
+router.post('/auth/experience', async (req, res) => {
+    console.log(req.body); // Log the incoming form data
+  
+    const { position, organisation, start, end, current, roles, user_id } = req.body;
+  
+    // Check if all arrays exist and are not undefined or empty
+    if (!position || !organisation || !start || !end || !roles || !current) {
+      console.error('Missing form data arrays:', { position, organisation, start, end, roles, current });
+      return res.status(400).send('Missing form data');
     }
-});
+  
+    // Iterate over the experience entries and save the data
+    for (let i = 0; i < position.length; i++) {
+      const experience = {
+        user_id: user_id,  // Assuming user_id is passed in the form or session
+        position: position[i],
+        organisation: organisation[i],
+        start: start[i],
+        end: current[i] === 'on' ? 'present' : end[i], // Set 'present' if current is checked
+        current: current[i] === 'on', // True if checked, false otherwise
+      };
+  
+      // Insert experience into the database
+      const experienceResult = await pool.query('INSERT INTO experiences SET ?', experience);
+      const experienceId = experienceResult.insertId;
+  
+      // Insert roles for this experience into the roles table
+      for (let role of roles[i]) {
+        const roleData = {
+          experience_id: experienceId,
+          role: role,
+          user_id: user_id, // Assuming user_id is used for the roles too
+        };
+  
+        await pool.query('INSERT INTO roles SET ?', roleData);
+      }
+    }
+    console.log(req.body)
+  
+    res.redirect('/portfolio_view_experience?success');
+  });
+  
+  
 
 
 //references

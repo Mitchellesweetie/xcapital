@@ -276,7 +276,7 @@
                 <div class="experience-item">
                     <div class="job-title"><%= edu.institution %></div>
                     <div class="job-tite"><%= edu.degree %></div>
-                    <div class="date"><%= edu.start %>-<%= edu.end %></div>
+                    <div class="date"><%= edu.start %>-<%= edu.current?'PRESENT' %></div>
                     <!-- <div>Second Class Honours (Lower Division)</div> -->
                 </div>
                 <%  }) %>

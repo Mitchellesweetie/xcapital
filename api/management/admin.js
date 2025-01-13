@@ -43,6 +43,8 @@ function isAuthenticated(req, res, next) {
 
 
 router.get('/categories',isAuthenticated,isAdmin, (req, res) => {
+
+  
   pool.query('SELECT * FROM categories', (err, result) => {
     if (err) {
       console.error('Database error:', err);
@@ -143,6 +145,74 @@ router.get('/edit_admin/:id',isAuthenticated,isAdmin,(req, res) => {
   });
 });
 
+router.post('/forgetpassword', (req, res) => {
+  const { email, password,confirmpassword } = req.body;
+
+  if (password !== confirmpassword) {
+    return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
+  }
+  if (!email || !password) {
+    return res.render('forgetpassword', { successMessage: null, errorMessage: 'Email and new password are required.' });
+  }
+
+  const hashedPassword = bcrypt.hashSync(password, 10);
+
+  pool.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
+    if (err) {
+      console.error('Error querying the database:', err);
+      return res.render('forgetpassword', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
+    }
+
+    if (results.affectedRows === 0) {
+      return res.render('forgetpassword', { successMessage: null, errorMessage: 'No user found with that email address.' });
+    }
+
+    res.render('login', { successMessage: 'Password updated successfully. You can now log in.', errorMessage: null });
+  });
+});
+
+
+router.get('/logout', (req, res) => {
+      req.session.destroy(err => {
+        if (err) throw err;
+        res.redirect('/login');
+      });
+    });
+
+
+    router.post('/update_admin/:id', isAuthenticated, isAdmin, (req, res) => {
+      const user_id = req.params.id; 
+      
+      const { username, email, phone, role, password, confirmpassword } = req.body;  
+    
+      if (password !== confirmpassword) {
+        return res.render('admin/admin', {
+          successMessage: null,
+          errorMessage: 'Passwords do not match.',
+          admin: { user_id, username, email, phone, role }
+        });
+      }
+    
+      pool.query(
+        'UPDATE registration SET username = ?, email = ?, phone = ?, role = ?, password = ? WHERE  user_id = ?',
+        [username, email, phone, role, password, user_id],
+        (err, result) => {
+          if (err) {
+            console.error('Database error:', err);
+            return res.render('admin/admin', {
+              successMessage: null,
+              errorMessage: 'Error occurred during fetching.',
+              admin: { user_id, username, email, phone, role }
+            });
+          }
+    
+          res.redirect('/add_users');
+        }
+      );
+    });
+    
+
+
 router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
   // Ensure statu is either 'active' or 'inactive'
   const statu = req.body.statu === 'active' ? 'active' : 'inactive';
@@ -222,11 +292,11 @@ router.post('/delete_user/:id',isAuthenticated,isAdmin, (req, res) => {
 
     if (result.affectedRows === 0) {
       console.log(`User with ID ${userId} not found.`);
-      return res.redirect('/admin/admin?error=User not found.');
+      return res.redirect('/add_users?error=User not found.');
     }
 
     console.log(`User with ID ${userId} deleted successfully.`);
-    res.redirect('/admin/admin?success=User deleted successfully.');
+    res.redirect('/add_users?success=User deleted successfully.');
   });
 });
 

@@ -487,7 +487,7 @@
           <!-- <div class="d-flex" ><a href="/create_users" style="text-decoration: none; color: black;"><svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#666666"><path d="M446.67-446.67H200v-66.66h246.67V-760h66.66v246.67H760v66.66H513.33V-200h-66.66v-246.67Z"/></svg>new admin</a></div> -->
     <h2 style="color: #2854C5; font-size: 25px;">Enter Information</h2>
     <div class="form-container">
-        <form action="/update_register" method="POST" >
+        <form action="/update_admin/<%= admin.user_id %>" method="POST" >
             <!-- First and Second Name Row -->
             <div class="form-group">
                 <div>
