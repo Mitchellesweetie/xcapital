@@ -66,7 +66,7 @@ router.post('/student_register', (req, res) => {
   var passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=<>?])[A-Za-z\d!@#$%^&*()_\-+=<>?]{8,20}$/;
 
 
-  db.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
+  pool.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
     if (err) {
       console.error('Error querying the database:', err);
       return res.render('Login/register1', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
@@ -86,7 +86,7 @@ router.post('/student_register', (req, res) => {
       return res.render('Login/register1', { successMessage: null, errorMessage: 'Passwords do not match' });
     }
 
-    db.query('INSERT INTO registration SET ?', { username:username, email:email, password: hashedPassword ,verifiedToken:verifiedToken}, (err, result) => {
+    pool.query('INSERT INTO registration SET ?', { username:username, email:email, password: hashedPassword ,verifiedToken:verifiedToken}, (err, result) => {
       if (err) {
         console.error('Error inserting user into the database:', err);
         return res.render('Login/register1', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
@@ -119,7 +119,7 @@ router.post('/student_register', (req, res) => {
 
 const query = (sql, params) => {
   return new Promise((resolve, reject) => {
-      db.query(sql, params, (err, results) => {
+      pool.query(sql, params, (err, results) => {
           if (err) return reject(err);
           resolve(results);
       });
@@ -208,7 +208,7 @@ router.post('/forgotpassword_', (req, res) => {
 
   const hashedPassword = bcrypt.hashSync(password, 10);
 
-  db.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
+  pool.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
     if (err) {
       console.error('Error querying the database:', err);
       return res.render('Login/forgotpassword', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });

@@ -50,7 +50,7 @@ const getBlogCounts = (callback) => {
             (SELECT COUNT(ID) FROM form WHERE status='pending') AS pendingBlogs,
             (SELECT COUNT(ID) FROM form WHERE status='approved') AS approvedBlogs;
     `;
-    db.query(countsQuery, (err, results) => {
+    pool.query(countsQuery, (err, results) => {
         if (err) {
             console.error('Error fetching blog counts:', err);
             return callback(err, null);
@@ -83,7 +83,7 @@ router.post('/post', upload.single('file'), (req, res) => {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
 
-        db.query('INSERT INTO form SET ?', data, (err, result) => {
+        pool.query('INSERT INTO form SET ?', data, (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
@@ -115,7 +115,7 @@ router.post('/post', upload.single('file'), (req, res) => {
     const { title, message,categoryId } = req.body;
 
     // Start a transaction to ensure data consistency
-    db.beginTransaction((err) => {
+    pool.beginTransaction((err) => {
         if (err) {
             console.error('Error starting transaction:', err);
             return res.render('form', { 
@@ -133,9 +133,9 @@ router.post('/post', upload.single('file'), (req, res) => {
             user_id: userId ,
             categoryId:categoryId,
         };
-        db.query('select * from categories',(err,categories)=>{
+        pool.query('select * from categories',(err,categories)=>{
             if (err)
-                return db.rollback(() => {
+                return pool.rollback(() => {
                     console.error('Error inserting into form table:', err);
                     res.render('form', { 
                         successMessage: null, 
@@ -146,9 +146,9 @@ router.post('/post', upload.single('file'), (req, res) => {
         
       
 
-        db.query('INSERT INTO form SET ?', formData, (err, formResult) => {
+        pool.query('INSERT INTO form SET ?', formData, (err, formResult) => {
             if (err) {
-                return db.rollback(() => {
+                return pool.rollback(() => {
                     console.error('Error inserting into form table:', err);
                     res.render('form', { 
                         successMessage: null, 
@@ -169,9 +169,9 @@ router.post('/post', upload.single('file'), (req, res) => {
                 // created_at: new Date()
             };
 
-            db.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
+            pool.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
                 if (err) {
-                    return db.rollback(() => {
+                    return pool.rollback(() => {
                         console.error('Error inserting into form_content table:', err);
                         res.render('form', { 
                             successMessage: null, 
@@ -181,9 +181,9 @@ router.post('/post', upload.single('file'), (req, res) => {
                 }
 
                 // Commit the transaction
-                db.commit((err) => {
+                pool.commit((err) => {
                     if (err) {
-                        return db.rollback(() => {
+                        return pool.rollback(() => {
                             console.error('Error committing transaction:', err);
                             res.render('form', { 
                                 successMessage: null, 

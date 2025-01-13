@@ -14,7 +14,7 @@
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    pool.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -30,7 +30,7 @@
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
         let sql='select * from form'
-        db.query(sql,(err,results)=>{
+        pool.query(sql,(err,results)=>{
         if (err) throw err;
         // const numberOfResults=results.length
         // const numberOfPages=Math.ceil(numberOfResults/resulPerPage)
@@ -54,7 +54,7 @@
         const endingLink = Math.min(iterator + 9, numberOfPages);
 
 
-        db.query(`SELECT * FROM form ORDER BY create_at DESC LIMIT ${startingLimit},${resulPerPage}`, (err, blogs) => {
+        pool.query(`SELECT * FROM form ORDER BY create_at DESC LIMIT ${startingLimit},${resulPerPage}`, (err, blogs) => {
             if (err) {
                 console.error('Error fetching blogs:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });

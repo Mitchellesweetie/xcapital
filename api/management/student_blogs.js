@@ -67,7 +67,7 @@ router.get('/home', (req, res) => {
                     left join categories on categories.categoryId=form.categoryId
                     left join comments on comments.id=form.id where form.status='approved'
                     group by form.id  order by comments.commentId desc `
-    db.query(
+    pool.query(
         `SELECT form.id, form.title,form.file, form.message, categories.category, registration.username, form.create_at, form.status
          FROM form
          LEFT JOIN categories ON form.categoryId = categories.categoryId
@@ -88,7 +88,7 @@ router.get('/home', (req, res) => {
             const blogs = Array.isArray(result) ? result : [];
             console.log("Blogs:", blogs);
 
-            db.query(mostpppular,(err,mostpopular)=>{
+            pool.query(mostpppular,(err,mostpopular)=>{
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('student_blog/index', { 
@@ -103,7 +103,7 @@ router.get('/home', (req, res) => {
                 }
                 const mostpopula = Array.isArray(mostpopular) ? mostpopular : [];
                 // console.log('here are the most popular blogs',mostpopular)
-            db.query(trending,(err,trendingblogs)=>{
+            pool.query(trending,(err,trendingblogs)=>{
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('student_blog/index', { 
@@ -118,7 +118,7 @@ router.get('/home', (req, res) => {
                     });
                 }
                 const trendingblog = Array.isArray(trendingblogs) ? trendingblogs : [];   
-                db.query(liked,(err,likeone)=>{
+                pool.query(liked,(err,likeone)=>{
                     if (err) {
                         console.error('Database error:', err);
                         return res.render('student_blog/index', { 
@@ -134,7 +134,7 @@ router.get('/home', (req, res) => {
                         });
                     }
              const like = Array.isArray(likeone) ? likeone : [];   
-             db.query(mostrecent,(err,recentresults)=>{
+             pool.query(mostrecent,(err,recentresults)=>{
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('student_blog/index', { 
@@ -155,7 +155,7 @@ router.get('/home', (req, res) => {
     
                        
 
-            db.query('SELECT * FROM categories', (err, categories) => {
+            pool.query('SELECT * FROM categories', (err, categories) => {
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('student_blog/index', { 
@@ -174,7 +174,7 @@ router.get('/home', (req, res) => {
 
                 if (categoryId) {
                     console.log("Fetching blogs for categoryId:", categoryId);
-                    db.query(
+                    pool.query(
                         `SELECT categories.categoryId, categories.category, form.id, form.title, form.message, form.file,form.create_at
                          FROM categories
                          LEFT JOIN form ON categories.categoryId = form.categoryId
@@ -242,7 +242,7 @@ router.get('/home', (req, res) => {
 
 router.get('/student_blogform',(req,res)=>{
 
-    db.query('SELECT * FROM categories',(err,result)=>{
+    pool.query('SELECT * FROM categories',(err,result)=>{
         
         if (err) {
             console.error('Database error:', err);
@@ -268,7 +268,7 @@ router.get('/student_blogform',(req,res)=>{
 //     // Query to update comment likes
 //     const updateCommentLikes = 'UPDATE comments SET likes = likes + 1 WHERE id = ?';
 
-//     db.query(updateCommentLikes, [blogId], (err) => {
+//     pool.query(updateCommentLikes, [blogId], (err) => {
 //         if (err) {
 //             console.error('Error updating comment likes:', err);
 //             return res.render('student_blog/latest_news', {
@@ -282,7 +282,7 @@ router.get('/student_blogform',(req,res)=>{
 //             });
 //         }
 
-//         db.query(updateBlogLikes, [blogId], (err) => {
+//         pool.query(updateBlogLikes, [blogId], (err) => {
 //             if (err) {
 //                 console.error('Error updating blog likes:', err);
 //                 return res.render('student_blog/latest_news', {
@@ -300,7 +300,7 @@ router.get('/student_blogform',(req,res)=>{
 //             const getBlog = 'SELECT * FROM form WHERE id = ?';
 //             const getComments = 'SELECT * FROM comments WHERE id = ?';
 
-//             db.query(getBlog, [blogId], (err, blog) => {
+//             pool.query(getBlog, [blogId], (err, blog) => {
 //                 if (err || blog.length === 0) {
 //                     console.error('Error fetching blog:', err);
 //                     return res.render('student_blog/latest_news', {
@@ -314,7 +314,7 @@ router.get('/student_blogform',(req,res)=>{
 //                     });
 //                 }
 
-//                 db.query(getComments, [blogId], (err, comments) => {
+//                 pool.query(getComments, [blogId], (err, comments) => {
 //                     if (err) {
 //                         console.error('Error fetching comments:', err);
 //                         return res.render('student_blog/latest_news', {
@@ -359,7 +359,7 @@ router.get('/latest_news/:id', (req, res) => {
                      group by form.id order by comments.commentId desc`
 
 
-    db.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
+    pool.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
         if (err) {
             console.error('Error fetching comments:', err);
             return res.render('student_blog/latest_news', { 
@@ -372,7 +372,7 @@ router.get('/latest_news/:id', (req, res) => {
             });
         }
 
-        db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+        pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
             if (err) {
                 console.error('Error fetching blog:', err);
                 return res.render('student_blog/latest_news', { 
@@ -425,7 +425,7 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     }
 
     // Insert the comment into the comments table
-    db.query(
+    pool.query(
         `INSERT INTO comments (comment_text, username, email, subjects, id, user_id)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [comment_text, username, email, subjects, blogId, userId],
@@ -440,7 +440,7 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                 });
             }
 
-            db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blogResults) => {
+            pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blogResults) => {
                 if (err || blogResults.length === 0) {
                     console.error('Error fetching blog:', err);
                     return res.status(404).send('Blog not found');
@@ -448,7 +448,7 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
 
                 const blog = blogResults[0]; 
 
-                db.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
+                pool.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
                     if (err) {
                         console.error('Error fetching comments:', err);
                         return res.render('student_blog.latest_news', { 
@@ -475,7 +475,7 @@ router.post('/post',upload.single('file'), (req, res) => {
 
  
 
-    db.query(
+    pool.query(
         `INSERT INTO form (title, message, user_id, categoryId) VALUES (?, ?, ?, ?)`, 
         [title, message, user_id, categoryId],  // Array of values, not objects
         (err, result) => {

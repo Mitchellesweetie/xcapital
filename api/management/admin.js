@@ -43,7 +43,7 @@ function isAuthenticated(req, res, next) {
 
 
 router.get('/categories',isAuthenticated,isAdmin, (req, res) => {
-  db.query('SELECT * FROM categories', (err, result) => {
+  pool.query('SELECT * FROM categories', (err, result) => {
     if (err) {
       console.error('Database error:', err);
       return res.render('admin/categories', { 
@@ -68,7 +68,7 @@ router.get('/add_categories',isAuthenticated,isAdmin,(req,res)=>{
 
 })
 router.get('/add_users',isAuthenticated,isAdmin,(req,res)=>{
-  db.query('SELECT * FROM registration where role="admin" ', (err, result) => {
+  pool.query('SELECT * FROM registration where role="admin" ', (err, result) => {
     if (err) {
       console.error('Database error:', err);
       return res.render('admin/admin', { 
@@ -91,7 +91,7 @@ router.get('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
   
 
   // Query the database to fetch the category data
-  db.query('SELECT * FROM categories WHERE categoryId = ? ', [categoryId], (err, result) => {
+  pool.query('SELECT * FROM categories WHERE categoryId = ? ', [categoryId], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/create_categories', {
@@ -120,7 +120,7 @@ router.get('/edit_admin/:id',isAuthenticated,isAdmin,(req, res) => {
   const user_id = req.params.id;
   
 
-  db.query('SELECT * FROM registration WHERE user_id = ? ', [user_id], (err, result) => {
+  pool.query('SELECT * FROM registration WHERE user_id = ? ', [user_id], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/admin', {
@@ -151,7 +151,7 @@ router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
   // Prepare the data to insert into the database
   const data = { category, statu, descriptio };
  
-  db.query('INSERT INTO categories SET ?', data, (err, result) => {
+  pool.query('INSERT INTO categories SET ?', data, (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/create_categories', { successMessage: null, errorMessage: 'Error occurred during submission.' });
@@ -167,7 +167,7 @@ router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
 router.post('/delete_categories/:id', isAuthenticated,isAdmin,(req, res) => {
   const category = req.params.id;
 
-  db.query('delete from categories where categoryId=?', [category], (err, result) => {
+  pool.query('delete from categories where categoryId=?', [category], (err, result) => {
       if (err) {
           console.error('Database error:', err);
           return res.render('admin/create_categories', { successMessage: null, errorMessage: 'Error occurred during submission.' });
@@ -190,7 +190,7 @@ router.post('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
   const status = statu === 'active' ? 'active' : 'inactive';
 
   // Update the category in the database
-  db.query(
+  pool.query(
     'UPDATE categories SET category = ?, statu = ?, descriptio = ? WHERE categoryId = ?',
     [category, status, descriptio, categoryId],
     (err, result) => {
@@ -214,7 +214,7 @@ router.post('/delete_user/:id',isAuthenticated,isAdmin, (req, res) => {
   const userId = req.params.id; // Get user ID from URL parameters
   console.log('Attempting to delete user with ID:', userId);
 
-  db.query('DELETE FROM registration WHERE user_id = ?', [userId], (err, result) => {
+  pool.query('DELETE FROM registration WHERE user_id = ?', [userId], (err, result) => {
     if (err) {
       console.error('Database error:', err.message);
       return res.redirect('/admin/admin?error=Failed to delete user. Please try again.');

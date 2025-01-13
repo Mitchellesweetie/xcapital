@@ -198,7 +198,7 @@ router.get('/myportfolio', isAuthenticated, (req, res) => {
 
     const queryPromises = Object.keys(queries).map(key => 
         new Promise((resolve, reject) => {
-            db.query(queries[key], [userId], (err, results) => {
+            pool.query(queries[key], [userId], (err, results) => {
                 if (err) return reject(err);
                 resolve({ [key]: results });
             });
@@ -266,13 +266,13 @@ router.post('/auth/personal_details', isAuthenticated, (req, res) => {
 
    
 
-        db.query('INSERT INTO personal_details SET ?', completeData, (err, result) => {
+        pool.query('INSERT INTO personal_details SET ?', completeData, (err, result) => {
             if (err) {
                 console.error('Error inserting personal details:', err);
                 return res.redirect('/portfolio_view_education');
             }
             console.log(result);
-            db.query('UPDATE registration SET profile_status = 1 WHERE user_id = ?', [userId], (err) => {
+            pool.query('UPDATE registration SET profile_status = 1 WHERE user_id = ?', [userId], (err) => {
                 if (err) {
                     console.error('Error updating profile status:', err);
                 }
@@ -329,7 +329,7 @@ router.post('/auth/education_details', isAuthenticated, async (req, res) => {
     await Promise.all(
       entries.map((entry) =>
         new Promise((resolve, reject) => {
-          db.query('INSERT INTO education SET ?', entry, (err, result) => {
+          pool.query('INSERT INTO education SET ?', entry, (err, result) => {
             if (err) return reject(err);
             console.log('Education record inserted successfully:', result);
             resolve(result);
@@ -338,7 +338,7 @@ router.post('/auth/education_details', isAuthenticated, async (req, res) => {
       )
     );
 
-    db.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
+    pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
       if (err) {
         console.error('Error updating profile status:', err);
         return res.redirect('/portfolio_view_education?error=profile_update_failed');
@@ -390,7 +390,7 @@ router.post('/auth/experience', (req, res) => {
             user_id: userId
         };
 
-        db.query('INSERT INTO experience SET ?', completeData, (err, result) => {
+        pool.query('INSERT INTO experience SET ?', completeData, (err, result) => {
             if (err) {
                 console.error('Error inserting experience details:', err);
                 return res.redirect('/portfolio_view_experience?error=true');
@@ -399,7 +399,7 @@ router.post('/auth/experience', (req, res) => {
             console.log('Experience record inserted successfully:', result);
 
             if (i === length - 1) { // Ensure this only happens once after all records are inserted
-                db.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
+                pool.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
                     if (err) {
                         console.error('Error updating profile status:', err);
                         return res.redirect('/portfolio_view_experience?error=profile_update_failed');
@@ -447,7 +447,7 @@ router.post('/auth/references',(req,res)=>{
         };
   
 
-    db.query('insert into  user_references set ?',reference,(err,result)=>{
+    pool.query('insert into  user_references set ?',reference,(err,result)=>{
         if (err){
             console.error('Error approving blog:', err);
             return res.redirect('/portfolio_view_references');
@@ -456,7 +456,7 @@ router.post('/auth/references',(req,res)=>{
         experienceInsertCount++;       
         
         if (experienceInsertCount === length ) {  
-         db.query('UPDATE registration SET profile_status = 4 WHERE user_id = ?', [userId], (err) => {
+         pool.query('UPDATE registration SET profile_status = 4 WHERE user_id = ?', [userId], (err) => {
             if (err) {
                 console.error('Error updating profile status:', err);
                 return res.redirect('/portfolio_view_references?error=profile_update_failed');
@@ -509,7 +509,7 @@ router.post('/auth/portfolio_view_skills', isAuthenticated, (req, res) => {
             user_id: userId
         };
 
-        db.query('INSERT INTO skills SET ?', reference, (err, result) => {
+        pool.query('INSERT INTO skills SET ?', reference, (err, result) => {
             if (err) {
                 console.error('Error inserting skills:', err);
                 return res.redirect('/portfolio_view_skills?error=true');
@@ -518,7 +518,7 @@ router.post('/auth/portfolio_view_skills', isAuthenticated, (req, res) => {
             experienceInsertCount++;
 
             if (experienceInsertCount === length) {
-                db.query('UPDATE registration SET profile_status = 5 WHERE user_id = ?', [userId], (err) => {
+                pool.query('UPDATE registration SET profile_status = 5 WHERE user_id = ?', [userId], (err) => {
                     if (err) {
                         console.error('Error updating profile status:', err);
                         return res.redirect('/portfolio_view_skills?error=profile_update_failed');
@@ -566,7 +566,7 @@ router.post('/auth/portfolio_view_awards',isAuthenticated,(req,res)=>{
         };
   
 
-    db.query('insert into  awards set ?',reference,(err,result)=>{
+    pool.query('insert into  awards set ?',reference,(err,result)=>{
         if (err){
             console.error('Error approving blog:', err);
             return res.redirect('/portfolio_view_awards');
@@ -575,7 +575,7 @@ router.post('/auth/portfolio_view_awards',isAuthenticated,(req,res)=>{
         experienceInsertCount++;       
         
         if (experienceInsertCount === length ) {  
-         db.query('UPDATE registration SET profile_status = 6 WHERE user_id = ?', [userId], (err) => {
+         pool.query('UPDATE registration SET profile_status = 6 WHERE user_id = ?', [userId], (err) => {
             if (err) {
                 console.error('Error updating profile status:', err);
                 return res.redirect('/portfolio_view_awards?error=profile_update_failed');
@@ -625,7 +625,7 @@ router.post('/auth/portfolio_view_languages',isAuthenticated,(req,res)=>{
         };
   
 
-    db.query('insert into  languages set ?',reference,(err,result)=>{
+    pool.query('insert into  languages set ?',reference,(err,result)=>{
         if (err){
             console.error('Error approving blog:', err);
             return res.redirect('/portfolio_view_languages');
@@ -636,7 +636,7 @@ router.post('/auth/portfolio_view_languages',isAuthenticated,(req,res)=>{
        
 
         if (experienceInsertCount === length ) {  
-            db.query('UPDATE registration SET profile_status = 7 WHERE user_id = ?', [userId], (err) => {
+            pool.query('UPDATE registration SET profile_status = 7 WHERE user_id = ?', [userId], (err) => {
                if (err) {
                    console.error('Error updating profile status:', err);
                    return res.redirect('/portfolio_view_languages?error=profile_update_failed');

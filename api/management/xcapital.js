@@ -75,14 +75,14 @@ GROUP BY form.id, categories.categoryId, form.categoryId
 ORDER BY comment_count DESC  LIMIT ? OFFSET ?
     `;
     
-    db.query(blogQuery, [perPage, offset], (err, results) => {
+    pool.query(blogQuery, [perPage, offset], (err, results) => {
         if (err) {
             return res.send('Error fetching blogs');
         }
 
         const totalBlogsQuery = `SELECT COUNT(*) AS total FROM form WHERE status = 'approved'`;
 
-        db.query(totalBlogsQuery, (err, countResult) => {
+        pool.query(totalBlogsQuery, (err, countResult) => {
             if (err) {
                 return res.send('Error fetching total blog count');
             }

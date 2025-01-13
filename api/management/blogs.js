@@ -56,7 +56,7 @@ const getBlogCounts = (callback) => {
             (SELECT COUNT(ID) FROM form WHERE status='pending') AS pendingBlogs,
             (SELECT COUNT(ID) FROM form WHERE status='approved') AS approvedBlogs;
     `;
-    db.query(countsQuery, (err, results) => {
+    pool.query(countsQuery, (err, results) => {
         if (err) {
             console.error('Error fetching blog counts:', err);
             return callback(err, null);
@@ -89,7 +89,7 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
 
-        db.query('INSERT INTO form SET ?', data, (err, result) => {
+        pool.query('INSERT INTO form SET ?', data, (err, result) => {
             if (err) {
                 console.error('Database error:', err);
                 return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });
@@ -121,7 +121,7 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
 //     const { title, message,categoryId } = req.body;
 
 //     // Start a transaction to ensure data consistency
-//     db.beginTransaction((err) => {
+//     pool.beginTransaction((err) => {
 //         if (err) {
 //             console.error('Error starting transaction:', err);
 //             return res.render('form', { 
@@ -139,9 +139,9 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
 //             user_id: userId ,
 //             categoryId:categoryId,
 //         };
-//         db.query('select * from categories',(err,categories)=>{
+//         pool.query('select * from categories',(err,categories)=>{
 //             if (err)
-//                 return db.rollback(() => {
+//                 return pool.rollback(() => {
 //                     console.error('Error inserting into form table:', err);
 //                     res.render('form', { 
 //                         successMessage: null, 
@@ -152,9 +152,9 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
         
       
 
-//         db.query('INSERT INTO form SET ?', formData, (err, formResult) => {
+//         pool.query('INSERT INTO form SET ?', formData, (err, formResult) => {
 //             if (err) {
-//                 return db.rollback(() => {
+//                 return pool.rollback(() => {
 //                     console.error('Error inserting into form table:', err);
 //                     res.render('form', { 
 //                         successMessage: null, 
@@ -175,9 +175,9 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
 //                 // created_at: new Date()
 //             };
 
-//             db.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
+//             pool.query('INSERT INTO blogs SET ?', contentData, (err, contentResult) => {
 //                 if (err) {
-//                     return db.rollback(() => {
+//                     return pool.rollback(() => {
 //                         console.error('Error inserting into form_content table:', err);
 //                         res.render('form', { 
 //                             successMessage: null, 
@@ -187,9 +187,9 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
 //                 }
 
 //                 // Commit the transaction
-//                 db.commit((err) => {
+//                 pool.commit((err) => {
 //                     if (err) {
-//                         return db.rollback(() => {
+//                         return pool.rollback(() => {
 //                             console.error('Error committing transaction:', err);
 //                             res.render('form', { 
 //                                 successMessage: null, 
@@ -218,7 +218,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
       return res.redirect('/login');
     }
 
-    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
+    pool.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -233,7 +233,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-        db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+        pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching blog count:', err);
                 return res.render('pendingblogs', {
@@ -254,15 +254,15 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
             const iterator = Math.max(1, page - 5);
             const endingLink = Math.min(iterator + 9, numberOfPages);
 
-        db.query('SELECT  * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
+        pool.query('SELECT  * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
                 [startingLimit, resultsPerPage], (err, blogs) => {
             if (err) {
                 console.error('Error fetching approved blogs:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching approved blogs', blogs: [] });
             }
-            db.query('select * from categories',(err,categories)=>{
+            pool.query('select * from categories',(err,categories)=>{
                 if (err)
-                    return db.rollback(() => {
+                    return pool.rollback(() => {
                         console.error('Error inserting into form table:', err);
                         res.render('form', { 
                             successMessage: null, 
@@ -309,7 +309,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
 //     if (!userId) {
 //       return res.redirect('/login');
 //     }
-//     db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
+//     pool.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
 //         if (err || userResults.length === 0) {
 //             console.error('Error fetching user data:', err || 'User not found');
 //             return res.render('login', {
@@ -330,7 +330,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
 //             });
 //         }
 
-//         db.query('SELECT COUNT(*) AS count FROM form WHERE status="pending"', (err, results) => {
+//         pool.query('SELECT COUNT(*) AS count FROM form WHERE status="pending"', (err, results) => {
 //             if (err) {
 //                 console.error('Error fetching blog count:', err);
 //                 return res.render('pendingblogs', {
@@ -350,7 +350,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
 //             const iterator = Math.max(1, page - 2);
 //             const endingLink = Math.min(iterator + 4, numberOfPages);
 
-//             db.query(
+//             pool.query(
 //                 'SELECT  * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
 //                 [startingLimit, resultsPerPage],
 //                 (err, blogs) => {
@@ -411,7 +411,7 @@ router.get('/pendingblogs/:id',isAdmin,isAuthenticated,(req, res) => {
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
+    pool.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -428,7 +428,7 @@ router.get('/pendingblogs/:id',isAdmin,isAuthenticated,(req, res) => {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
 
-        db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+        pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
             if (err) {
                 console.error('Error fetching blog:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog', blogs: [] });
@@ -466,7 +466,7 @@ router.post('/update/:id',isAdmin, isAuthenticated,(req, res) => {
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
+    pool.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -483,14 +483,14 @@ router.post('/update/:id',isAdmin, isAuthenticated,(req, res) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-        db.query('UPDATE form SET ? WHERE id = ?', [data,blogId], (err, result) => {
+        pool.query('UPDATE form SET ? WHERE id = ?', [data,blogId], (err, result) => {
             if (err) {
                 console.error('Error approving blog:', err);
                 return res.redirect('/admin_dashboard')
             }
      
         
-            db.query('SELECT * FROM form WHERE status = "pending" ORDER BY create_at DESC', (err, blogs) => {
+            pool.query('SELECT * FROM form WHERE status = "pending" ORDER BY create_at DESC', (err, blogs) => {
                 if (err) {
                     console.error('Error fetching blogs:', err);
                     return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
@@ -518,7 +518,7 @@ router.get('/approvedblogs',isAdmin,isAuthenticated,(req, res) => {
     if (!userId) {
       return res.redirect('/login');
     }
-    db.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
+    pool.query('SELECT username FROM registration WHERE user_id = ?', [userId], (err, userResults) => {
         if (err || userResults.length === 0) {
             console.error('Error fetching user data:', err || 'User not found');
             return res.render('login', {
@@ -533,7 +533,7 @@ router.get('/approvedblogs',isAdmin,isAuthenticated,(req, res) => {
         if (err) {
             return res.render('approvedblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-        db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+        pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching blog count:', err);
                 return res.render('pendingblogs', {
@@ -554,7 +554,7 @@ router.get('/approvedblogs',isAdmin,isAuthenticated,(req, res) => {
             const iterator = Math.max(1, page - 5);
             const endingLink = Math.min(iterator + 9, numberOfPages);
 
-        db.query('SELECT  * FROM form WHERE status="approved" ORDER BY create_at DESC LIMIT ?, ?',
+        pool.query('SELECT  * FROM form WHERE status="approved" ORDER BY create_at DESC LIMIT ?, ?',
                 [startingLimit, resultsPerPage], (err, blogs) => {
             if (err) {
                 console.error('Error fetching approved blogs:', err);
@@ -597,7 +597,7 @@ router.post('/approve/:id',isAdmin,isAuthenticated, (req, res) => {
     }
     const id = req.params.id;
 
-    db.query('UPDATE form SET status = ? WHERE id = ?', ['approved', id], (err, result) => {
+    pool.query('UPDATE form SET status = ? WHERE id = ?', ['approved', id], (err, result) => {
         if (err) {
             console.error('Error approving blog:', err);
             return res.render('index', { successMessage: null, errorMessage: 'Error approving the blog', blogs: [] });
@@ -641,7 +641,7 @@ router.get('/search',isAdmin,isAuthenticated,(req,res)=>{
     }
 
     const data=req.body
-    db.query('select * from form',data,(err,results)=>{
+    pool.query('select * from form',data,(err,results)=>{
         if (err) {
             console.error('Error Fetching blog:', err);
             return res.render('index', { successMessage: null, errorMessage: 'Error fetching  blogs', blogs: [] });

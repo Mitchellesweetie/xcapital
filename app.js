@@ -78,7 +78,7 @@ function isAdmin(req, res, next) {
     }
     return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
   }
-// const db=mysql.createConnection({
+// const pool=mysql.createConnection({
 //     host: process.env.host,
 //     user: process.env.username,
 //     password: process.env.password,
@@ -100,7 +100,7 @@ const pool = mysql.createPool({
         console.log('pool connection')
     }
   });
-// db.connect((err)=>{
+// pool.connect((err)=>{
 //     if(err){
 //         // console.log('Connect')
 //         console.log(err)
@@ -108,7 +108,7 @@ const pool = mysql.createPool({
 
     
 // })
-// db.on('error', (err) => {
+// pool.on('error', (err) => {
 //     console.error('Database connection error:', err);
 // });
 
@@ -131,7 +131,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
 
     const { comment_text, username, email, subjects } = req.body;
 
-    db.query(
+    pool.query(
         `INSERT INTO comments (comment_text, username, email, subjects, blog_id, user_id) 
          VALUES (?, ?, ?, ?, ?, ?)`,
         [comment_text, username, email, subjects, blogId, userId],
@@ -145,7 +145,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                 });
             }
 
-            db.query('SELECT * FROM comments WHERE blog_id = ?', [blogId], (err, comments) => {
+            pool.query('SELECT * FROM comments WHERE blog_id = ?', [blogId], (err, comments) => {
                 if (err) {
                     console.error('Error fetching comments:', err);
                     return res.render('student_blog/home', {
@@ -169,7 +169,7 @@ app.get('/admin_dashboard',isAdmin,(req, res) => {
     // if (!userId) {
     //   return res.redirect('/login');
     // }
-    // db.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
+    // pool.query('SELECT username FROM registration WHERE id = ?', [userId], (err, userResults) => {
     //     if (err || userResults.length === 0) {
     //         console.error('Error fetching user data:', err || 'User not found');
     //         return res.render('login', {
@@ -181,7 +181,7 @@ app.get('/admin_dashboard',isAdmin,(req, res) => {
 
     //     const username = userResults[0].username;
    
-    db.query('SELECT COUNT(*) AS totalBlogs FROM form', (err, results) => {
+    pool.query('SELECT COUNT(*) AS totalBlogs FROM form', (err, results) => {
         if (err) {
             console.error('Error fetching blog count:', err);
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the blog count', totalBlogs: 0 });
@@ -189,7 +189,7 @@ app.get('/admin_dashboard',isAdmin,(req, res) => {
 
         const totalBlogs = results[0].totalBlogs;
 
-        db.query("SELECT COUNT(ID) AS pendingBlogs FROM form WHERE status='pending'", (err, results) => {
+        pool.query("SELECT COUNT(ID) AS pendingBlogs FROM form WHERE status='pending'", (err, results) => {
             if (err) {
                 console.error('Error fetching pending blog count:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the pending count', pendingBlogs: 0 });
@@ -197,7 +197,7 @@ app.get('/admin_dashboard',isAdmin,(req, res) => {
 
             const pendingBlogs = results[0].pendingBlogs; 
 
-            db.query("SELECT COUNT(ID) AS approvedBlogs FROM form WHERE status='approved'", (err, results) => {
+            pool.query("SELECT COUNT(ID) AS approvedBlogs FROM form WHERE status='approved'", (err, results) => {
                 if (err) {
                     console.error('Error fetching approved blog count:', err);
                     return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the approved count', approvedBlogs: 0 });
@@ -250,7 +250,7 @@ app.get('/contact',(req,res)=>{
 
 app.get('/blog',(req,res)=>{
 
-        db.query('SELECT * FROM form', (err, results) => {
+        pool.query('SELECT * FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching data:', err);
                 return res.status(500).send('Database error');
@@ -271,7 +271,7 @@ app.get('/verify-email', (req, res) => {
         return res.render('Login/register1', { errorMessage: 'Invalid or missing token.',successMessage:null });
     }
   
-    db.query('SELECT * FROM registration WHERE verifiedToken = ?', [token], (err, results) => {
+    pool.query('SELECT * FROM registration WHERE verifiedToken = ?', [token], (err, results) => {
         if (err) {
             console.error('Error querying the database:', err);
             return res.render('error', { message: 'An error occurred. Please try again later.' });
@@ -281,7 +281,7 @@ app.get('/verify-email', (req, res) => {
             return res.render('Login/register1', { errorMessage: 'Invalid or expired token,kindly contact the administrator',successMessage:null });
         }
   
-        db.query('UPDATE registration SET isVerified = 1, verifiedToken = NULL WHERE verifiedToken = ?', [token], (updateErr) => {
+        pool.query('UPDATE registration SET isVerified = 1, verifiedToken = NULL WHERE verifiedToken = ?', [token], (updateErr) => {
             if (updateErr) {
                 console.error('Error updating user verification:', updateErr);
                 return res.render('Login/register1', { successMessage:null,errorMessage:'An error occurred. Please try again later.' });

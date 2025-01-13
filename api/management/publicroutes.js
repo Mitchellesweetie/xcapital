@@ -45,7 +45,7 @@ router.get('/forgotpassword_',(req,res)=>{
 
 })
 router.get('/dashboard',(req,res)=>{
-    db.query('select * from form ',(err,result)=>{
+    pool.query('select * from form ',(err,result)=>{
         if (err){
             console.error('Error in blogs blog:', err);
             return res.render('/xbase0dashboard');

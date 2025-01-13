@@ -65,7 +65,7 @@
 //   var passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=<>?])[A-Za-z\d!@#$%^&*()_\-+=<>?]{8,20}$/;
 
 
-//   db.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
+//   pool.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
 //     if (err) {
 //       console.error('Error querying the database:', err);
 //       return res.render('register', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
@@ -85,7 +85,7 @@
 //       return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
 //     }
 
-//     db.query('INSERT INTO registration SET ?', { username, email, password: hashedPassword ,verifiedToken}, (err, result) => {
+//     pool.query('INSERT INTO registration SET ?', { username, email, password: hashedPassword ,verifiedToken}, (err, result) => {
 //       if (err) {
 //         console.error('Error inserting user into the database:', err);
 //         return res.render('register', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
@@ -119,7 +119,7 @@
 //   const { email, password } = req.body;
 
   
-//   db.query('SELECT * FROM registration WHERE email = ?', [email], (err, results) => {
+//   pool.query('SELECT * FROM registration WHERE email = ?', [email], (err, results) => {
 //     if (err) {
 //       console.error('Error querying the database:', err);
 //       return res.render('login', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
@@ -164,7 +164,7 @@
 
 //   const hashedPassword = bcrypt.hashSync(password, 10);
 
-//   db.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
+//   pool.query('UPDATE registration SET password =? WHERE email = ?', [hashedPassword, email], (err, results) => {
 //     if (err) {
 //       console.error('Error querying the database:', err);
 //       return res.render('forgetpassword', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });

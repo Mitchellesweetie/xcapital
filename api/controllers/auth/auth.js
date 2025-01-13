@@ -41,7 +41,7 @@ const getBlogCounts = (callback) => {
             (SELECT COUNT(ID) FROM form WHERE status='pending') AS pendingBlogs,
             (SELECT COUNT(ID) FROM form WHERE status='approved') AS approvedBlogs;
     `;
-    db.query(countsQuery, (err, results) => {
+    pool.query(countsQuery, (err, results) => {
         if (err) {
             console.error('Error fetching blog counts:', err);
             return callback(err, null);
@@ -64,7 +64,7 @@ router.get('/pendingblogs', (req, res) => {
         }
 
         // Fetch total number of blogs for pagination
-        db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+        pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching blog count:', err);
                 return res.render('pendingblogs', {
@@ -85,7 +85,7 @@ router.get('/pendingblogs', (req, res) => {
             const endingLink = Math.min(iterator + 9, numberOfPages);
 
             // Fetch the blogs for the current page
-            db.query(
+            pool.query(
                 'SELECT * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
                 [startingLimit, resultsPerPage],
                 (err, blogs) => {
@@ -141,7 +141,7 @@ router.get('/pendingblogs/:id', (req, res) => {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
 
-        db.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+        pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
             if (err) {
                 console.error('Error fetching blog:', err);
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog', blogs: [] });
@@ -177,14 +177,14 @@ router.post('/update/:id', (req, res) => {
         if (err) {
             return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-        db.query('UPDATE form SET ? WHERE id = ?', [data,blogId], (err, result) => {
+        pool.query('UPDATE form SET ? WHERE id = ?', [data,blogId], (err, result) => {
             if (err) {
                 console.error('Error approving blog:', err);
                 return res.redirect('/')
             }
      
         
-            db.query('SELECT * FROM form WHERE status = "pending" ORDER BY create_at DESC', (err, blogs) => {
+            pool.query('SELECT * FROM form WHERE status = "pending" ORDER BY create_at DESC', (err, blogs) => {
                 if (err) {
                     console.error('Error fetching blogs:', err);
                     return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
@@ -210,7 +210,7 @@ router.get('/approvedblogs', (req, res) => {
         if (err) {
             return res.render('approvedblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
         }
-        db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+        pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
             if (err) {
                 console.error('Error fetching blog count:', err);
                 return res.render('pendingblogs', {
@@ -230,7 +230,7 @@ router.get('/approvedblogs', (req, res) => {
             const iterator = Math.max(1, page - 5);
             const endingLink = Math.min(iterator + 9, numberOfPages);
 
-        db.query('SELECT * FROM form WHERE status="approved" ORDER BY create_at DESC LIMIT ?, ?',
+        pool.query('SELECT * FROM form WHERE status="approved" ORDER BY create_at DESC LIMIT ?, ?',
                 [startingLimit, resultsPerPage], (err, blogs) => {
             if (err) {
                 console.error('Error fetching approved blogs:', err);
@@ -267,7 +267,7 @@ router.get('/approvedblogs', (req, res) => {
 router.post('/approve/:id', (req, res) => {
     const id = req.params.id;
 
-    db.query('UPDATE form SET status = ? WHERE id = ?', ['approved', id], (err, result) => {
+    pool.query('UPDATE form SET status = ? WHERE id = ?', ['approved', id], (err, result) => {
         if (err) {
             console.error('Error approving blog:', err);
             return res.render('index', { successMessage: null, errorMessage: 'Error approving the blog', blogs: [] });
@@ -279,7 +279,7 @@ router.post('/approve/:id', (req, res) => {
                     return res.render('index', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
                 }
 
-                db.query('SELECT * FROM form WHERE status = "pending"', (err, blogs) => {
+                pool.query('SELECT * FROM form WHERE status = "pending"', (err, blogs) => {
                     if (err) {
                         console.error('Error fetching pending blogs:', err);
                         return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching pending blogs', blogs: [] });

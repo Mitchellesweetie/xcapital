@@ -36,7 +36,7 @@ const resultsPerPage=1
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
             }
     
-            db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+            pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
                 if (err) {
                     console.error('Error fetching blog count:', err);
                     return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
@@ -50,7 +50,7 @@ const resultsPerPage=1
                 const iterator = Math.max(1, page - 5);
                 const endingLink = Math.min(iterator + 9, numberOfPages);
     
-                db.query('SELECT * FROM form ORDER BY create_at DESC LIMIT ?, ?', [startingLimit, resultsPerPage], (err, blogs) => {
+                pool.query('SELECT * FROM form ORDER BY create_at DESC LIMIT ?, ?', [startingLimit, resultsPerPage], (err, blogs) => {
                     if (err) {
                         console.error('Error fetching blogs:', err);
                         return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blogs', blogs: [] });
@@ -88,7 +88,7 @@ const resultsPerPage=1
             }
     
             // Fetch total number of blogs for pagination
-            db.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
+            pool.query('SELECT COUNT(*) AS count FROM form', (err, results) => {
                 if (err) {
                     console.error('Error fetching blog count:', err);
                     return res.render('pendingblogs', {
@@ -109,7 +109,7 @@ const resultsPerPage=1
                 const endingLink = Math.min(iterator + 9, numberOfPages);
     
                 // Fetch the blogs for the current page
-                db.query(
+                pool.query(
                     'SELECT * FROM form WHERE status="pending" ORDER BY create_at DESC LIMIT ?, ?',
                     [startingLimit, resultsPerPage],
                     (err, blogs) => {
@@ -163,7 +163,7 @@ const resultsPerPage=1
                 return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching blog counts', blogs: [] });
             }
     
-            db.query('INSERT INTO form SET ?', data, (err, result) => {
+            pool.query('INSERT INTO form SET ?', data, (err, result) => {
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('form', { successMessage: null, errorMessage: 'Error occurred during submission.' });

@@ -24,7 +24,7 @@ const pool = mysql.createPool({
 router.post('/register',(req,res)=>{
 
     const data=req.body
-    db.query('INSERT INTO registration SET ?', data,(err,result)=>{
+    pool.query('INSERT INTO registration SET ?', data,(err,result)=>{
         if(err)
             res.send(err)
         else 
@@ -40,7 +40,7 @@ router.post('/register',(req,res)=>{
 router.post('/login',(req,res)=>{
 
     const data=req.body
-    db.query('select * from registration', data,(err,result)=>{
+    pool.query('select * from registration', data,(err,result)=>{
         if(err)
             res.send(err)
         else 
@@ -54,7 +54,7 @@ router.post('/login',(req,res)=>{
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
   
-    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
+    pool.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
       if (err) throw err;
   
       if (results.length > 0 && bcrypt.compareSync(password, results[0].password)) {
