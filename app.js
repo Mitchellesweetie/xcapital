@@ -23,8 +23,25 @@ const student_blog=require('./api/management/student_blogs')
 
 dotenv.config()
 
-const app=express()
-app.use(cors())
+const app=express().use('/*',cors({
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "OPTIONS", "HEAD"],
+    allowedHeaders: [
+        "Content-Type",
+        "Origin",
+        "X-Requested-With",
+        "Accept",
+        "x-client-key",
+        "x-client-token",
+        "x-client-secret",
+        "Authorization",
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200,
+}))
+
+
+
 app.use(flash());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

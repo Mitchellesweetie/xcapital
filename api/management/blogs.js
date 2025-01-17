@@ -282,6 +282,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
             //     };
             // });
             console.log(blogs)
+          
             res.render('pendingblogs', {
                 blogs,
                 totalBlogs: counts.totalBlogs || 0,
