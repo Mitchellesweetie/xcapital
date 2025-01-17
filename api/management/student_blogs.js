@@ -570,71 +570,134 @@ router.get('/student_blogform',(req,res)=>{
 // });
 
 
-router.get('/latest_news/:id', (req, res) => {
-    const blogId = req.params.id;
-    const username = req.session.username; 
+// router.get('/latest_news/:i', (req, res) => {
+//     const blogId = req.params.id;
+//     const username = req.session.username; 
 
-    // const likeblog=`UPDATE form SET likes=likes+1 where id=1`
-    const likecomments=`UPDATE comments SET likes=likes+1 where id=1`
-    const trending=`select form.id,form.title,form.message,form.create_at,count(form.likes)from form limit 5;`
-    const mostpppular=`select form.id,form.title,form.message,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId)
-                     from form
-                     left join categories on categories.categoryId=form.categoryId
-                     left join comments on comments.id=form.id 
-                     group by form.id order by comments.commentId desc`
+//     // const likeblog=`UPDATE form SET likes=likes+1 where id=1`
+//     const likecomments=`UPDATE comments SET likes=likes+1 where id=1`
+//     const trending=`select form.id,form.title,form.message,form.create_at,count(form.likes)from form limit 5;`
+//     const mostpppular=`select form.id,form.title,form.message,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId)
+//                      from form
+//                      left join categories on categories.categoryId=form.categoryId
+//                      left join comments on comments.id=form.id 
+//                      group by form.id order by comments.commentId desc`
 
 
-    pool.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
-        if (err) {
-            console.error('Error fetching comments:', err);
-            return res.render('student_blog/latest_news', { 
-                blog: null, 
-                successMessage: null,
-                errorMessage: 'Error loading comments', 
-                comments: [], 
-                username ,
+//     pool.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
+//         if (err) {
+//             console.error('Error fetching comments:', err);
+//             return res.render('student_blog/latest_news', { 
+//                 blog: null, 
+//                 successMessage: null,
+//                 errorMessage: 'Error loading comments', 
+//                 comments: [], 
+//                 username ,
                 
-            });
-        }
+//             });
+//         }
 
-        pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
-            if (err) {
-                console.error('Error fetching blog:', err);
-                return res.render('student_blog/latest_news', { 
-                    blog: null,
-                    successMessage: null, 
-                    errorMessage: 'Blog not found', 
-                    comments:[], 
-                    username 
-                });
-            }
-            if (!blog || blog.length === 0) {
-                return res.render('student_blog/latest_news', {
-                    blog: null,
-                    successMessage: null,
-                    errorMessage: 'Blog not found',
-                    comments:[],
-                    username,
-                });
-            }
-            console.log('here are the blogs',blog)
+//         pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blog) => {
+//             if (err) {
+//                 console.error('Error fetching blog:', err);
+//                 return res.render('student_blog/latest_news', { 
+//                     blog: null,
+//                     successMessage: null, 
+//                     errorMessage: 'Blog not found', 
+//                     comments:[], 
+//                     username 
+//                 });
+//             }
+//             if (!blog || blog.length === 0) {
+//                 return res.render('student_blog/latest_news', {
+//                     blog: null,
+//                     successMessage: null,
+//                     errorMessage: 'Blog not found',
+//                     comments:[],
+//                     username,
+//                 });
+//             }
+//             console.log('here are the blogs',blog)
             
 
-            return res.render('student_blog/latest_news', {
-                blog: blog||[],
-                successMessage: null,
-                errorMessage: null, 
-                comments:comments, 
-                username,
+//             return res.render('student_blog/latest_news', {
+//                 blog: blog||[],
+//                 successMessage: null,
+//                 errorMessage: null, 
+//                 comments:comments, 
+//                 username,
               
 
-            });  }) })
+//             });  }) })
+//         });
+
+
+
+
+router.get('/latest_news/:id', (req, res) => {
+    const blogId = req.params.id;
+    const username = req.session.username;
+
+        
+    pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, results) => {
+                if (err) {
+                    console.error('Error fetching blog:', err);
+                    return res.render('student_blog/latest_news', {
+                        blog: {
+                            title: 'Error',
+                            // Add other default properties your template might need
+                        },
+                        errorMessage: 'An error occurred while fetching the blog.',
+                        comments: [],
+                        username,
+                    });
+                }
+        
+                // If no blog found, provide default values
+        const blog = results.length > 0 ? results[0] : {
+                    title: 'Blog Not Found',
+                    // Add other default properties your template might need
+                };
+        
+        pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5;', [blogId], (err, comments) => {
+            if (err) {
+                console.error('Error fetching comments:', err);
+                return res.render('student_blog.latest_news', { 
+                    errorMessage: 'Error loading comments' 
+                });
+            }
+            // console.log('lIKES being passed to render:', comment);
+
+        
+                return res.render('student_blog/latest_news', {
+                    blog,
+                    comments: comments,  
+                    username,
+
+                });
+            });
         });
-    
+        });
+        
+        
+      
+        // Endpoint to handle like post
+        router.post('/likePost', (req, res) => {
+            const postId = req.body.postId;
+            pool.query('UPDATE comments SET likes=likes+1 where id=1', [postId], (err) => {
+                if (err) throw err;
+                pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5', [postId], (err, results) => {
+                    if (err) throw err;
+                    res.json(results[0]);
+                });
+            });
+        });
 
 router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     const blogId = req.params.id;
     console.log('Received blog ID:', blogId); // Add this for debugging
+    const likecomments=`UPDATE comments SET likes=likes+1 where id=1`
+
     
     const userId = req.session.userId;
     if (!userId) {
@@ -661,9 +724,17 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                     successMessage: null,
                     errorMessage: 'Error creating comment',
                     results: [],
-                    blog:[]
+                    blog:[],
+                    likes:[]
                 });
             }
+
+            pool.query(likecomments,  (err, likeComments) => {
+                if (err) {
+                    console.error('Error fetching likes:', err);
+                    return res.status(404).send('Blog not found');
+                }
+            const likes = likeComments[0]
 
             pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blogResults) => {
                 if (err || blogResults.length === 0) {
@@ -673,7 +744,7 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
 
                 const blog = blogResults[0]; 
 
-                pool.query('SELECT * FROM comments WHERE id = ?', [blogId], (err, comments) => {
+                pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5', [blogId], (err, comments) => {
                     if (err) {
                         console.error('Error fetching comments:', err);
                         return res.render('student_blog.latest_news', { 
@@ -684,8 +755,10 @@ router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
                     res.render('student_blog/latest_news', {
                         blog: blog||[],      
                         comments: comments,  
-                        successMessage: 'Comment added successfully'
-                    });
+                        successMessage: 'Comment added successfully',
+                        likes:likes
+                    }); 
+                 });
                 });
             });
         }

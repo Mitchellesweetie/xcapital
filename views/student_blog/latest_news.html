@@ -22,192 +22,165 @@
     <link rel="stylesheet" href="/blog/css/slick.css">
     <link rel="stylesheet" href="/blog/css/nice-select.css">
     <link rel="stylesheet" href="/blog/css/style.css">
-    <style>
-        /* Comment Section Styles */
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 20px;
-            background: white;
-            border-radius: 50px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-    
-        .dropdown {
-            display: none; /* Hidden by default */
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 200px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            margin-top: 8px;
-            z-index: 1001;
-        }
-    
-        /* Show dropdown when parent has dropdown-open class */
-        .login-container.dropdown-open .dropdown {
-            display: block;
-        }
-    
-        .dropdown a {
-            display: block;
-            padding: 12px 16px;
-            color: #333;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-    
-        .dropdown a:hover {
-            background: #f0f2f5;
-        }
-    
-        .dropdown .logout {
-            color: #ed4141;
-            border-top: 1px solid #e5e7eb;
-        }
-    
-        .login-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border: none;
-            border-radius: 50px;
-            background: #ed4141;
-            color: white;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(237, 65, 65, 0.3);
-        }
-    
-        .user-profile img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-    
-    .comment-section {
-        width: 90%;
-        margin: 30px auto;
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 8px;
-    }
-    
-    .comment-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        color: #333;
-    }
-    
-    .comment {
-        background-color: #fff;
-        padding: 15px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    
-    .comment-header {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        color: #777;
-    }
-    
-    .comment-username {
-        font-weight: bold;
-        color: #333;
-    }
-    
-    .comment-body {
-        margin-top: 10px;
-        font-size: 16px;
-        line-height: 1.5;
-        color: #555;
-    }
-    
-    .comment-footer {
-        margin-top: 15px;
-        font-size: 12px;
-        color: #aaa;
-    }
-    
-    .card{
-    
-    background-color: #fff;
-    border: none;
-    }
-    
-    
-    
-    .c-badge{
-    background-color: #ed4141;
-    color: white;
-    height: 20px;
-    font-size: 11px;
-    width: 92px;
-    border-radius: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 2px;
-    }
-    
-    .comment-text{
-    font-size: 13px;
-    }
-    
-    .wish{
-    
-    color:#35b69f;
-    }
-    
-    
-    .user-feed{
-    
-        font-size: 14px;
-        margin-top: 12px;
-    }
-
-    .like-button {
-    background: transparent;  
-    border: none;  
-    color: #ff6600;           
-    cursor: pointer;
-    padding: 5px 10px;
-    font-size: 1.2em;
-    transition: all 0.3s ease; 
-}
-
-
-
-.wish {
-    color: #ff6600;             
-}
-
-.wish i {
-    margin-right: 5px;          
-    color: #ff6600;             
-}
-
-.like-button:active {
-    transform: scale(0.95);     
-}
-
-
-    </style>
 </head>
+<style>
+    /* Comment Section Styles */
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        background: white;
+        border-radius: 50px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dropdown {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 200px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-top: 8px;
+        z-index: 1001;
+    }
+
+    /* Show dropdown when parent has dropdown-open class */
+    .login-container.dropdown-open .dropdown {
+        display: block;
+    }
+
+    .dropdown a {
+        display: block;
+        padding: 12px 16px;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .dropdown a:hover {
+        background: #f0f2f5;
+    }
+
+    .dropdown .logout {
+        color: #ed4141;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .login-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 50px;
+        background: #ed4141;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(237, 65, 65, 0.3);
+    }
+
+    .user-profile img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+.comment-section {
+    width: 90%;
+    margin: 30px auto;
+    font-family: Arial, sans-serif;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.comment-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.comment {
+    background-color: #fff;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #777;
+}
+
+.comment-username {
+    font-weight: bold;
+    color: #333;
+}
+
+.comment-body {
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.comment-footer {
+    margin-top: 15px;
+    font-size: 12px;
+    color: #aaa;
+}
+
+.card{
+
+background-color: #fff;
+border: none;
+}
+
+
+
+.c-badge{
+background-color: #ed4141;
+color: white;
+height: 20px;
+font-size: 11px;
+width: 92px;
+border-radius: 5px;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-top: 2px;
+}
+
+.comment-text{
+font-size: 13px;
+}
+
+.wish{
+
+color:#35b69f;
+}
+
+
+.user-feed{
+
+    font-size: 14px;
+    margin-top: 12px;
+}
+</style>
     
 <body>
 <!-- Preloader Start -->
@@ -251,7 +224,7 @@
                         <!-- Logo -->
                         <div class="col-xl-3 col-lg-3 col-md-3 d-none d-md-block">
                             <div class="logo">
-                                <a href="#"><img src="/blog/img/logo/logo.png" alt=""></a>
+                                <a href="/student_blog/home"><img src="/blog/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-xl-9 col-lg-9 col-md-9">
@@ -268,22 +241,18 @@
                         <div class="col-xl-8 col-lg-8 col-md-12 header-flex">
                             <!-- sticky -->
                             <div class="sticky-logo">
-                                <a href="#"><img src="/blog/img/logo/logo.png" alt=""></a>
+                                <a href="/student_blog/home"><img src="/blog/img/logo/logo.png" alt=""></a>
                             </div>
                             <!-- Main-menu -->
                             <div class="main-menu d-none d-md-block">
                                 <nav>                  
                                     <ul id="navigation">
-                                        <li><a href="/student_blog">Home</a></li>
+                                        <li><a href="/student_blog/home">Home</a></li>
                                         <li><a href="#">about</a></li>
                                         <li><a href="#">Category</a></li>
                                         <li><a href="#">Latest News</a></li>
                                         <li><a href="#">Pages</a>
-                                            <ul class="submenu">
-                                                <li><a href=#">Blog</a></li>
-                                                <li><a href="#">Blog Details</a></li>
-                                                <li><a href="#">Element</a></li>
-                                            </ul>
+                                            
                                         </li>
                                         <li><a href="#">Contact</a></li>
                                     </ul>
@@ -293,16 +262,47 @@
                         <div class="col-xl-4 col-lg-4 col-md-4">
                             <div class="header-right f-right d-none d-lg-block">
                                 <!-- Heder social -->
-                                <ul class="header-social">    
+                                <!-- <ul class="header-social">    
                                     <li><a href="https://www.fb.com/sai4ull"><i class="fab fa-facebook-f"></i></a></li>
                                     <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fab fa-instagram"></i></a></li>
                                     <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
-                                </ul>
+                                </ul> -->
                                 <!-- Search Nav -->
-                                <div class="nav-search search-switch">
-                                    <i class="fa fa-search"></i>
+                                <div class="login-container">
+                                    <% if (username) { %>
+                                        <!-- User Profile -->
+                                        <div class="user-profile">
+                                            <img src="/blog/img/loggedin.png" alt="User Avatar">
+                                            <span class="user-name"><%= username %></span>
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M6 9l6 6 6-6"/>
+                                            </svg>
+                                        </div>
+                                        <!-- Dropdown Menu -->
+                                        <div class="dropdown">
+                                            <a href="/myportfolio">Profile</a>
+                                            <a href="#">Edit Portfolio</a>
+                                            <a href="/myportfolio">Post a Blog</a>
+
+
+                                            <a href="#">Post</a>
+
+                                            <a href="/logout" class="logout">Logout</a>
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Login Link -->
+                                        <a href="/login_blog" class="login-btn">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                                            </svg>
+                                            Login
+                                        </a>
+                                    <% } %>
                                 </div>
+                                  
+                                                              
+                                
                             </div>
                         </div>
                         <!-- Mobile Menu -->
@@ -325,7 +325,7 @@
                         <!-- Trending Tittle -->
                         <div class="about-right mb-90">
                             <div class="about-img">
-                                <img src="<%= blog.file %>" alt="">
+                                <img src="/blog/img/trending/trending_top.jpg" alt="">
                             </div>
                             <div class="heading-news mb-10 pt-10">
                                 <% if (blog) { %>
@@ -376,37 +376,8 @@
                                               <p class="text-justify comment-text mb-0"> <%= comment.comment_text %></p>
                         
                                               <div class="d-flex flex-row user-feed">
-                                                <form >
-                                                    <button type="submit" class="like-button">
-                                                        <span class="wish">
-                                                            <i class="fa fa-heartbeat mr-2"></i><%= comment.likes %>
-                                                        </span>
-                                                    </button>
-                                                </form>
-                                                <!-- <div class="image-container">
-                                                    <img src="path_to_image.jpg" alt="Image" id="image" />
-                                                    <button id="likeButton" class="like-button">Like</button>
-                                                    <p id="likeCount">Likes: 0</p>
-                                                </div>
-                                                <button id="likeButton" data-post-id="1">Like</button>
-                                                <p>Likes: <span id="likeCount">0</span></p>
-                                             -->
-                                                <!-- <script>
-                                                    $(document).ready(function() {
-                                                        // Fetch initial like count
-                                                        $.get('/getLikes/1', function(data) {
-                                                            $('#likeCount').text(data.likes);
-                                                        });
-                                            
-                                                        // Handle button click
-                                                        $('#likeButton').click(function() {
-                                                            const postId = $(this).data('post-id');
-                                                            $.post('/likePost', { postId: postId }, function(data) {
-                                                                $('#likeCount').text(data.likes);
-                                                            });
-                                                        });
-                                                    });
-                                                </script> -->
+                        
+                                                <span class="wish"><i class="fa fa-heartbeat mr-2"></i><%= comment.like %></span>
                                                 <!-- <span class="ml-3"><i class="fa fa-comments-o mr-2"></i>Reply</span> -->
                         
                                                 
@@ -481,52 +452,11 @@
                                     </div>
                                 </form>
                               <script>
-                                    document.getElementById('form-contact').addEventListener('submit', function(event) {
+                                    document.getElementById('testForm').addEventListener('submit', function(event) {
                                         event.preventDefault();
-                                        if (window.location.search.includes('success=true')) {
-                                                form.reset(); // This will clear all form fields
-                                            }
-                                           console.log('Test form submitted!');
+                                        console.log('Test form submitted!');
                                     });
                                 </script>
-                                <!-- <script>
-                                    // Wait for the DOM to load before adding event listeners
-                                    document.addEventListener('DOMContentLoaded', function () {
-                                        const form = document.getElementById('contactForm');
-                                        
-                                        // Handle the form submit event
-                                        form.addEventListener('submit', function(event) {
-                                            event.preventDefault(); // Prevent the page from redirecting
-                                            
-                                            // Get the form data
-                                            const formData = new FormData(form);
-                                            
-                                            // Send the form data via AJAX
-                                            fetch(form.action, {
-                                                method: 'POST',
-                                                body: formData,
-                                            })
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                if (data.success) {
-                                                    // Handle success (e.g., display a success message, update the UI)
-                                                    alert('Comment added successfully');
-                                                    
-                                                    // Optionally, clear the form fields after submission
-                                                    form.reset();
-                                                } else {
-                                                    // Handle error (e.g., display an error message)
-                                                    alert('Error submitting comment');
-                                                }
-                                            })
-                                            .catch(error => {
-                                                console.error('Error:', error);
-                                                alert('Something went wrong. Please try again later.');
-                                            });
-                                        });
-                                    });
-                                </script> -->
-                                
                             </div>
                         </div>
                     </div>
@@ -593,7 +523,7 @@
                             <div class="single-footer-caption mb-30">
                                 <!-- logo -->
                                 <div class="footer-logo">
-                                    <a href="#"><img src="/blog/img/logo/logo2_footer.png" alt=""></a>
+                                    <a href="/student_blog/home"><img src="/blog/img/logo/logo2_footer.png" alt=""></a>
                                 </div>
                                 <div class="footer-tittle">
                                     <div class="footer-pera">
@@ -683,6 +613,34 @@
 <!-- Search model end -->
 
 <!-- JS here -->
+<script>
+
+    function toggleDropdown() {
+        document.querySelector('.login-container').classList.toggle('dropdown-open');
+    }
+
+    // Add click event to user profile
+    const userProfile = document.querySelector('.user-profile');
+    if (userProfile) {
+        userProfile.addEventListener('click', toggleDropdown);
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const container = document.querySelector('.login-container');
+        if (container && !container.contains(event.target)) {
+            container.classList.remove('dropdown-open');
+        }
+    });
+
+    // Handle logout
+    document.querySelector('.logout')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/logout';
+    });
+
+
+</script>
 
     <script src="/blog/js/vendor/modernizr-3.5.0.min.js"></script>
     <!-- Jquery, Popper, Bootstrap -->
@@ -716,23 +674,7 @@
     
     <!-- Jquery Plugins, main Jquery -->	
     <script src="/blog/js/plugins.js"></script>
-    <script src="/blog/js/main.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Fetch initial like count for the specific comment
-            $.get('/getLikes/1', function(data) {  // Replace 1 with dynamic comment ID if needed
-                $('#likeCount').text(data.likes); // Update the like count on page load
-            });
-    
-            // Handle button click for liking a comment
-            $('#likeButton').click(function() {
-                const commentId = $(this).data('comment-id');  // Get the commentId from the button's data attribute
-                $.post('/student_blog/likePost', { commentId: commentId }, function(data) {
-                    $('#likeCount').text(data.likes);  // Update the like count in the UI after incrementing
-                });
-            });
-        });
-    </script>
+   
     
 </body>
 </html>

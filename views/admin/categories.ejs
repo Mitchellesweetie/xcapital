@@ -56,6 +56,41 @@
           font-weight: 30px;
           font-style: normal;
         }
+        .create-user-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: right;
+  font-weight: 400;
+  background-color: #2854C5;
+  color: white;
+  font-size: 20px;
+  height: 50px;
+  width: 150px;
+  margin: 20px;
+  border-radius: 20px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.create-user-button a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: white;
+  text-align: center;
+  gap: 8px; /* Adds spacing between the icon and text */
+}
+
+.create-user-button:hover {
+  background-color: #1d3c91;
+  transform: translateY(-2px); /* Adds a slight elevation effect */
+}
+
+.create-user-button svg {
+  fill: currentColor;
+}
+
     </style>
   </head>
   <body>
@@ -327,7 +362,18 @@
         <div class="container-lg px-4">
         
           
-          <div class="d-flex" style="float: right; font-weight: 400; background: #2854C5; text-align: center; align-items: center;  color: white; font-size: 20px; height: 50px; width: 150px;margin: 20px; border-radius: 20px;" ><a href="/add_categories" style="text-decoration: none; color: white; text-align: center;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M427-428H168v-106h259v-259h106v259h259v106H533v259H427v-259Z"/></svg>Create New</a></div>
+          <!-- <div class="d-flex" style="float: right; font-weight: 400; background: #2854C5; text-align: center; align-items: center;  color: white; font-size: 20px; height: 50px; width: 150px;margin: 20px; border-radius: 20px;" ><a href="/add_categories" style="text-decoration: none; color: white; text-align: center;"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M427-428H168v-106h259v-259h106v259h259v106H533v259H427v-259Z"/></svg>Create New</a></div> -->
+
+          <div class="create-user-button">
+            <a href="/add_categories">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                <path d="M427-428H168v-106h259v-259h106v259h259v106H533v259H427v-259Z" />
+              </svg>
+              Create New
+            </a>
+          </div>
+          
+
           <% if (errorMessage) { %>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
               <strong><%= errorMessage %><strong>
@@ -341,7 +387,7 @@
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
-          <table class="table">
+          <table class="table table-striped table-hover">
             <thead>
               <tr>
                 <th scope="col">#</th>

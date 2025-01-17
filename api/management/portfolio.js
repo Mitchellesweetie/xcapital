@@ -183,44 +183,82 @@ router.get('/download-cv', isAuthenticated,async (req, res) => {
 
 router.get('/myportfolio', isAuthenticated, (req, res) => {
     console.log('Logged in user ID:', req.session.userId);
-
     const userId = req.session.userId;
 
     const queries = {
-        education: 'SELECT * FROM education WHERE user_id = ?',
+        education: 'SELECT * FROM education WHERE user_id = ? ORDER BY education.end DESC',
         experience: 'SELECT * FROM experience WHERE user_id = ?',
+        responsibility: 'SELECT * FROM resposiblity WHERE user_id = ?',
         personal: 'SELECT * FROM personal_details WHERE user_id = ?',
         references: 'SELECT * FROM user_references WHERE user_id = ?',
-        skills:'SELECT * FROM skills WHERE user_id = ?',
-        awards:'SELECT * FROM awards WHERE user_id = ?',
-        languages:'SELECT * FROM languages WHERE user_id = ?'
+        skills: 'SELECT * FROM skills WHERE user_id = ?',
+        awards: 'SELECT * FROM awards WHERE user_id = ?',
+        languages: 'SELECT * FROM languages WHERE user_id = ?'
     };
 
-    const queryPromises = Object.keys(queries).map(key => 
-        new Promise((resolve, reject) => {
-            pool.query(queries[key], [userId], (err, results) => {
-                if (err) return reject(err);
-                resolve({ [key]: results });
-            });
-        })
-    );
+    const query = `
+        SELECT experience.*, resposiblity.responsibility, resposiblity.id
+        FROM experience
+        LEFT JOIN resposiblity ON experience.experienceid = resposiblity.positionId
+        WHERE experience.user_id = ?
+        ORDER BY experience.end DESC;
+    `;
 
-    Promise.all(queryPromises)
-        .then(results => {
-            const data = results.reduce((acc, item) => ({ ...acc, ...item }), {});
-            if (data.personal && data.personal.length > 0) {
-                data.personal = data.personal[0];
-            }
-            // res.json(data)
-            console.log({personal:data.personal})
-            res.render('portfolio/por',data); // Replace with res.render() for templates
-        })
-        .catch(err => {
+    pool.query(query, [userId], (err, results) => {
+        if (err) {
             console.error('Database error:', err);
-            res.status(500).send('An error occurred while fetching portfolio data.');
-        });
-});
+            return res.status(500).send('An error occurred while fetching data.');
+        }
 
+        // Transform results into grouped format
+        const experiences = [];
+        const experienceMap = {};
+
+        results.forEach(row => {
+            if (!experienceMap[row.experienceid]) {
+                // Initialize a new experience with an empty responsibility list
+                experienceMap[row.experienceid] = {
+                    experienceid: row.experienceid,
+                    organisation: row.organisation,
+                    position: row.position,
+                    start: row.start,
+                    end: row.end,
+                    responsibilities: [], // Initialize an empty array for responsibilities
+                };
+                experiences.push(experienceMap[row.experienceid]);
+            }
+
+            // Add responsibility if it exists
+            if (row.responsibility) {
+                experienceMap[row.experienceid].responsibilities.push(row.responsibility);
+            }
+        });
+
+        const queryPromises = Object.keys(queries).map(key =>
+            new Promise((resolve, reject) => {
+                pool.query(queries[key], [userId], (err, results) => {
+                    if (err) return reject(err);
+                    resolve({ [key]: results });
+                });
+            })
+        );
+
+        Promise.all(queryPromises)
+            .then(results => {
+                const data = results.reduce((acc, item) => ({ ...acc, ...item }), {});
+                if (data.personal && data.personal.length > 0) {
+                    data.personal = data.personal[0];
+                }
+
+                // Render portfolio with all data
+                res.render('portfolio/por', { ...data, experiences });
+            })
+            .catch(err => {
+                console.error('Database error:', err);
+                res.status(500).send('An error occurred while fetching portfolio data.');
+            });
+    });
+});
 
 
 
@@ -354,129 +392,49 @@ router.post('/auth/education_detail', async (req, res) => {
 
 
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+router.post('/auth/education_details', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
+        }
 
-router.post('/auth/education_details',isAuthenticated, async (req, res) => {
-  try {
-    const data = req.body;
-    const userId = req.session.userId; // Assuming session contains userId
+        const { degree, institution, startDate, endDate, current } = req.body;
+        const endDateValue = current === 'true' ? null : endDate;
 
-    if (!userId) {
-      return res.redirect('/login_blog');
-    }
-
-    const { degree, institution, start, end, current } = data;
-
-    const entries = Array.isArray(degree)
-      ? degree.map((_, i) => ({
-          degree: degree[i],
-          institution: institution[i],
-          start: start[i],
-          end: current && current[i] === 'true' ? 'present' : end[i] || null,
-          user_id: userId,
-        }))
-      : [
-          {
+        // Insert the education details into the database
+        await pool.query('INSERT INTO education SET ?', {
             degree,
             institution,
-            start,
-            end: current === 'true' ? 'present' : end || null,
+            start: startDate,
+            end: endDateValue,
             user_id: userId,
-          },
-        ];
-
-    for (const entry of entries) {
-      await new Promise((resolve, reject) => {
-        pool.query('INSERT INTO education SET ?', entry, (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
         });
-      });
-    }
 
-    res.redirect('/portfolio_view_education?success');
-  } catch (error) {
-    console.error('Error saving education details:', error);
-    res.redirect('/portfolio_view_education?error=true');
-  }
+        // Optionally update profile status
+        await pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId]);
+
+        // Return the saved entry as part of the response
+        return res.status(200).json({
+            success: true,
+            message: 'Education details saved successfully',
+            data: { degree, institution, startDate, endDate: endDateValue || 'Present' }
+        });
+
+    } catch (error) {
+        console.error('Error saving education details:', error.message);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
 });
 
 
+
   
-  
-// router.post('/auth/education_details', isAuthenticated, async (req, res) => {
-//   try {
-//     const data = req.body;
-//     const userId = req.session.userId;
-
-//     if (!userId) {
-//       return res.redirect('/login_blog');
-//     }
-
-//     const { degree, institution, start, end ,current} = data;
-
-//     const length = Array.isArray(degree) ? degree.length : 1;
-//     const isCurrent=current==='true'
-//     const endDateValue=isCurrent?null:end
-
-//     const entries = Array.isArray(degree)
-//       ? degree.map((_, i) => ({
-//           degree: degree[i],
-//           institution: institution[i],
-//           start: start[i],
-//           end: endDateValue[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
-//           user_id: userId,
-//         }))
-//       : [
-//           {
-//             degree,
-//             institution,
-//             start,
-//             end: end === 'on' ? new Date().toISOString().split('T')[0] : end,
-//             user_id: userId,
-//           },
-//         ];
-
-//     await Promise.all(
-//       entries.map((entry) =>
-//         new Promise((resolve, reject) => {
-//           pool.query('INSERT INTO education SET ?', entry, (err, result) => {
-//             if (err) return reject(err);
-//             console.log('Education record inserted successfully:', result);
-//             resolve(result);
-//           });
-//         })
-//       )
-//     );
-
-//     pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId], (err) => {
-//       if (err) {
-//         console.error('Error updating profile status:', err);
-//         return res.redirect('/portfolio_view_education?error=profile_update_failed');
-//       }
-
-//       return res.redirect('/portfolio_view_experience');
-//     });
-//   } catch (error) {
-//     console.error('Error inserting education details:', error);
-//     res.redirect('/portfolio_view_education?error=true');
-//   }
-// });
 
 
-//experience
+
 router.get('/portfolio_view_experience',isAuthenticated,(req,res)=>{
     const userId = req.session.userId;
 
@@ -487,101 +445,78 @@ router.get('/portfolio_view_experience',isAuthenticated,(req,res)=>{
 
 })
 
+router.post('/auth/experience_details', async (req, res) => {
+    try {
+        const userId = req.session.userId; // Assuming session contains userId
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
+        }
 
-// router.post('/auth/experience', (req, res) => {
-//     const data = req.body;
-//     const userId = req.session.userId;
+        const { primaryPosition, company, startDate, endDate, current, roles } = req.body;
 
-//     if (!userId) {
-//         return res.redirect('/login_blog');
-//     }
+        // Validate roles
+        if (!roles || !Array.isArray(roles) || roles.length === 0) {
+            console.log('Invalid roles data:', roles);
+            return res.status(400).json({ success: false, message: 'Roles must be a non-empty array.' });
+        }
 
-//     const { position, organisation, start, end } = data;
-//     const length = position.length;
+        const endDateValue = current === 'true' ? 'PRESENT' : endDate;
 
-    
-
-//     for (let i = 0; i < length; i++) {
-       
-
-//         const completeData = {
-//             position: position[i],
-//             organisation: organisation[i],
-//             start: start[i],
-//           end: end[i] === 'on' ? new Date().toISOString().split('T')[0] : end[i],
-//             user_id: userId
-//         };
-
-//         pool.query('INSERT INTO experience SET ?', completeData, (err, result) => {
-//             if (err) {
-//                 console.error('Error inserting experience details:', err);
-//                 return res.redirect('/portfolio_view_experience?error=true');
-//             }
-
-//             console.log('Experience record inserted successfully:', result);
-
-//             if (i === length - 1) { // Ensure this only happens once after all records are inserted
-//                 pool.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
-//                     if (err) {
-//                         console.error('Error updating profile status:', err);
-//                         return res.redirect('/portfolio_view_experience?error=profile_update_failed');
-//                     }
-
-//                     return res.redirect('/portfolio_view_references');
-//                 });
-//             }
-//         });
-//     }
-// });
-// Assuming you're using Express.js and a MySQL database
-
-router.post('/auth/experience', async (req, res) => {
-    console.log(req.body); // Log the incoming form data
-  
-    const { position, organisation, start, end, current, roles, user_id } = req.body;
-  
-    // Check if all arrays exist and are not undefined or empty
-    if (!position || !organisation || !start || !end || !roles || !current) {
-      console.error('Missing form data arrays:', { position, organisation, start, end, roles, current });
-      return res.status(400).send('Missing form data');
-    }
-  
-    // Iterate over the experience entries and save the data
-    for (let i = 0; i < position.length; i++) {
-      const experience = {
-        user_id: user_id,  // Assuming user_id is passed in the form or session
-        position: position[i],
-        organisation: organisation[i],
-        start: start[i],
-        end: current[i] === 'on' ? 'present' : end[i], // Set 'present' if current is checked
-        current: current[i] === 'on', // True if checked, false otherwise
-      };
-  
-      // Insert experience into the database
-      const experienceResult = await pool.query('INSERT INTO experiences SET ?', experience);
-      const experienceId = experienceResult.insertId;
-  
-      // Insert roles for this experience into the roles table
-      for (let role of roles[i]) {
-        const roleData = {
-          experience_id: experienceId,
-          role: role,
-          user_id: user_id, // Assuming user_id is used for the roles too
+        const experienceEntry = {
+            position: primaryPosition,
+            organisation: company,
+            start: startDate,
+            end: endDateValue,
+            user_id: userId,
         };
-  
-        await pool.query('INSERT INTO roles SET ?', roleData);
-      }
+
+        // Insert experience into the database
+        pool.query('INSERT INTO experience SET ?', [experienceEntry], (error, results) => {
+            if (error) {
+                console.error('Failed to insert experience entry:', error.message, error.stack);
+                return res.status(500).json({ success: false, message: 'Failed to save experience.' });
+            }
+
+            const experienceId = results.insertId;
+            console.log('Experience saved with ID:', experienceId);
+
+            // Prepare role data
+            const roleData = roles.map((role) => [experienceId, userId, role]);
+
+            // Ensure roleData is a non-empty array
+            if (roleData.length > 0) {
+                // Insert roles into the responsibility table
+                pool.query('INSERT INTO resposiblity (positionId, user_id, responsibility) VALUES ?', [roleData], (error, results) => {
+                    if (error) {
+                        console.error('Failed to insert roles:', error.message, error.stack);
+                        return res.status(500).json({ success: false, message: 'Failed to save roles.' });
+                    }
+
+                    console.log('Roles saved successfully');
+                    res.json({ success: true, message: 'Experience and roles saved successfully', experienceId });
+                });
+            } else {
+                // If no roles, just return the experience data
+                res.json({ success: true, message: 'Experience saved successfully, but no roles provided.', experienceId });
+            }
+
+        });
+        pool.query('UPDATE registration SET profile_status = 3 WHERE user_id = ?', [userId], (err) => {
+            if (err) {
+                console.error('Error updating profile status:', err);
+            }
+            // res.redirect('/portfolio_view_education?sucess1');
+        });
+    } catch (error) {
+        console.error('Error saving experience details:', error.message, error.stack);
+        res.status(500).json({ success: false, message: 'Internal Server Error', error: error.message });
     }
-    console.log(req.body)
-  
-    res.redirect('/portfolio_view_experience?success');
-  });
-  
-  
+});
 
 
-//references
+
 router.get('/portfolio_view_references',isAuthenticated,(req,res)=>{
     const userId = req.session.userId;
     console.log(userId)
@@ -593,47 +528,40 @@ router.get('/portfolio_view_references',isAuthenticated,(req,res)=>{
 
     res.render('portfolio/refrences')
 })
-router.post('/auth/references',(req,res)=>{
-    const data=req.body
-    const userId = req.session.userId;
+router.post('/auth/references',async(req,res)=>{
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
-    const{username,organisation,email,phone}=data
-    let experienceInsertCount = 0; 
-
-
-    if (!userId) {
-      return res.redirect('/login_blog');
-    }
-    const length = username.length;
-    for (let i = 0; i < length; i++) {
-        const reference = {
-            username: username[i],
-            organisation: organisation[i],
-            email: email[i],
-            phone: phone[i],
-            user_id: userId 
-        };
-  
-
-    pool.query('insert into  user_references set ?',reference,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
-            return res.redirect('/portfolio_view_references');
         }
-        console.log('Experience record inserted successfully:', result);
-        experienceInsertCount++;       
-        
-        if (experienceInsertCount === length ) {  
-         pool.query('UPDATE registration SET profile_status = 4 WHERE user_id = ?', [userId], (err) => {
-            if (err) {
-                console.error('Error updating profile status:', err);
-                return res.redirect('/portfolio_view_references?error=profile_update_failed');
-            }
 
-            return res.redirect('/portfolio_view_skills');
+        const { name,relationship, organisation, email,phone } = req.body;
+        // const endDateValue = current === 'true' ? null : endDate;
+
+        // Insert the education details into the database
+        await pool.query('INSERT INTO user_references SET ?', {
+            username:name,
+            relationship:relationship,
+            organisation:organisation,
+            email: email,
+            phone: phone,
+
+            user_id: userId,
         });
-    }
-})
+        await pool.query('UPDATE registration SET profile_status = 4 WHERE user_id = ?', [userId]);
+
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Data details saved successfully',
+                    data: { name,relationship, organisation, phone, email }
+                });
+
+    } catch (error) {
+        console.error('Error saving data details:', error.message);
+       
 }
 
 })
@@ -650,53 +578,37 @@ router.get('/portfolio_view_skills',isAuthenticated,(req,res)=>{
 })
 
 
-router.post('/auth/portfolio_view_skills', isAuthenticated, (req, res) => {
-    const data = req.body;
-    const userId = req.session.userId;
+router.post('/auth/portfolio_view_skills', isAuthenticated, async(req, res) => {
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
-    const { skilltitle, skills } = data;
+        }
 
-    if (!userId) {
-        return res.redirect('/login_blog');
-    }
+        const { skilltitle } = req.body;
+        // const endDateValue = current === 'true' ? null : endDate;
 
-    if (!Array.isArray(skilltitle) || !Array.isArray(skills)) {
+        await pool.query('INSERT INTO skills SET ?', {
+            skilltitle:skilltitle,
+            
 
-        skilltitle=[skilltitle]
-        skills=skills
-    }
-  
-
-    let experienceInsertCount = 0; 
-    const length = skilltitle.length;
-
-    for (let i = 0; i < length; i++) {
-        const reference = {
-            skilltitle: skilltitle[i],
-            skills: skills[i],
-            user_id: userId
-        };
-
-        pool.query('INSERT INTO skills SET ?', reference, (err, result) => {
-            if (err) {
-                console.error('Error inserting skills:', err);
-                return res.redirect('/portfolio_view_skills?error=true');
-            }
-            console.log('Skills record inserted successfully:', result);
-            experienceInsertCount++;
-
-            if (experienceInsertCount === length) {
-                pool.query('UPDATE registration SET profile_status = 5 WHERE user_id = ?', [userId], (err) => {
-                    if (err) {
-                        console.error('Error updating profile status:', err);
-                        return res.redirect('/portfolio_view_skills?error=profile_update_failed');
-                    }
-
-                    return res.redirect('/portfolio_view_awards');
-                });
-            }
+            user_id: userId,
         });
-    }
+        await pool.query('UPDATE registration SET profile_status = 5 WHERE user_id = ?', [userId]);
+
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Data details saved successfully',
+                    entry: { skilletitle: skilltitle }                });
+
+    } catch (error) {
+        console.error('Error saving education details:', error.message);
+       
+}
+
 });
 
 
@@ -712,48 +624,36 @@ router.get('/portfolio_view_awards',isAuthenticated,(req,res)=>{
 })
 
 
-router.post('/auth/portfolio_view_awards',isAuthenticated,(req,res)=>{
-    const data=req.body
-    const userId = req.session.userId;
+router.post('/auth/portfolio_view_awards',isAuthenticated,async(req,res)=>{
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
-    const{award}=data
-    if (!Array.isArray(award)) {
-        award = [award];  
-    }
-    let experienceInsertCount = 0; 
-
-
-    if (!userId) {
-      return res.redirect('/login_blog');
-    }
-    const length = award.length;
-    for (let i = 0; i < length; i++) {
-        const reference = {
-            award: award[i],
-            user_id: userId 
-        };
-  
-
-    pool.query('insert into  awards set ?',reference,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
-            return res.redirect('/portfolio_view_awards');
         }
-        console.log('Experience record inserted successfully:', result);
-        experienceInsertCount++;       
-        
-        if (experienceInsertCount === length ) {  
-         pool.query('UPDATE registration SET profile_status = 6 WHERE user_id = ?', [userId], (err) => {
-            if (err) {
-                console.error('Error updating profile status:', err);
-                return res.redirect('/portfolio_view_awards?error=profile_update_failed');
-            }
-      
-                return res.redirect('/portfolio_view_languages');
+
+        const { award } = req.body;
+        // const endDateValue = current === 'true' ? null : endDate;
+
+        // Insert the education details into the database
+        await pool.query('INSERT INTO awards SET ?', {
+            award:award,
             
-          });
-    }
-})
+
+            user_id: userId,
+        });
+        await pool.query('UPDATE registration SET profile_status = 6 WHERE user_id = ?', [userId]);
+
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Data details saved successfully',
+                    entry: { award: award }                });
+
+    } catch (error) {
+        console.error('Error saving education details:', error.message);
+       
 }
 
 })
@@ -771,51 +671,37 @@ router.get('/portfolio_view_languages',isAuthenticated,(req,res)=>{
 })
 
 
-router.post('/auth/portfolio_view_languages',isAuthenticated,(req,res)=>{
-    const data=req.body
-    const userId = req.session.userId;
+router.post('/auth/portfolio_view_languages',isAuthenticated,async(req,res)=>{
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
 
-    const{languages}=data
-    if (!Array.isArray(languages)) {
-        languages = [languages]; 
-    }
-    let experienceInsertCount = 0; 
-
-
-    if (!userId) {
-      return res.redirect('/login_blog');
-    }
-    const length = languages.length;
-    for (let i = 0; i < length; i++) {
-        const reference = {
-            languages: languages[i],
-            user_id: userId 
-        };
-  
-
-    pool.query('insert into  languages set ?',reference,(err,result)=>{
-        if (err){
-            console.error('Error approving blog:', err);
-            return res.redirect('/portfolio_view_languages');
         }
-        console.log('Experience record inserted successfully:', result);
-        experienceInsertCount++;       
-        
-       
 
-        if (experienceInsertCount === length ) {  
-            pool.query('UPDATE registration SET profile_status = 7 WHERE user_id = ?', [userId], (err) => {
-               if (err) {
-                   console.error('Error updating profile status:', err);
-                   return res.redirect('/portfolio_view_languages?error=profile_update_failed');
-               }
-         
-                   return res.redirect('/student_blog');
-               
-             });
-       }
-   })
-   }
+        const { language } = req.body;
+        // const endDateValue = current === 'true' ? null : endDate;
+
+        // Insert the education details into the database
+        await pool.query('INSERT INTO languages SET ?', {
+            languages:language,
+            
+
+            user_id: userId,
+        });
+        await pool.query('UPDATE registration SET profile_status = 7 WHERE user_id = ?', [userId]);
+
+
+                return res.status(200).json({
+                    success: true,
+                    message: 'Data details saved successfully',
+                    entry: { language: language }                });
+
+    } catch (error) {
+        console.error('Error saving education details:', error.message);
+       
+}
    
    })
 

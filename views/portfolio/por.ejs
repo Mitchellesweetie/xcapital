@@ -221,15 +221,17 @@
                 <div class="section-title">EXPERIENCE</div>
                 
                 <div class="experience-item">
-                    <% experience.forEach(exp => { %>
+                    <% experiences.forEach(exp => { %>
 
                     <div class="job-title"><%- exp.organisation %>, <%- exp.position %></div>
                     <div class="date"><%= exp.start %>-<%= exp.end %></div>
+                    
+
                     <ul>
-                        <li>Physical and Remote TA support to all assigned facilities.</li>
-                        <li>Deployment and Training of 3.x KenyaEMR Facility Wide.</li>
-                        <li>Effective teamwork with supporting partners.</li>
-                        <li>Database management.</li>
+                        <% exp.responsibilities.forEach(role => { %>
+                            <li><%= role %></li>
+                        <% }) %>
+
                     </ul>
                     <% }) %>
 
@@ -271,12 +273,12 @@
 
             <div class="section">
                 <div class="section-title">EDUCATION</div>
-                <% education.forEach(edu=>{ %>
+                <% education.forEach(edu =>{ %>
 
                 <div class="experience-item">
                     <div class="job-title"><%= edu.institution %></div>
                     <div class="job-tite"><%= edu.degree %></div>
-                    <div class="date"><%= edu.start %>-<%= edu.current?'PRESENT' %></div>
+                    <div class="date"><%= edu.start %>-<%= edu.end%></div>
                     <!-- <div>Second Class Honours (Lower Division)</div> -->
                 </div>
                 <%  }) %>

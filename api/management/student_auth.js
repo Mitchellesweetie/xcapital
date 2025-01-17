@@ -93,7 +93,7 @@ router.post('/student_register', (req, res) => {
       }
 
       // res.render('login', { successMessage: 'Registration successful!Verify your email to sign in', errorMessage: null });
-      const verificationLink = `http://142.93.46.52:3000//verify-email?token=${verifiedToken}`;
+      const verificationLink = `http://142.93.46.52:3000/verify-email?token=${verifiedToken}`;
       const mailOptions = {
           from: 'no-reply@xbase.co.ke',
           to: email,
@@ -223,7 +223,7 @@ router.post('/forgotpassword_', (req, res) => {
 });
 
 
-router.get('/logout', (req, res) => {
+router.get('/student_logout', (req, res) => {
       req.session.destroy(err => {
         if (err) throw err;
         res.redirect('/login_blog');

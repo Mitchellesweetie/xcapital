@@ -1,216 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV Resume Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <script src="https://unpkg.com/gijgo@1.9.14/js/gijgo.min.js" type="text/javascript"></script>
-  <link href="https://unpkg.com/gijgo@1.9.14/css/gijgo.min.css" rel="stylesheet" type="text/css" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education History</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
 
-  <style>
-    body {
-      background-color: #f8f9fa;
-      font-family: 'Inter', sans-serif;
-      font-size: 22px;
-    }
-    .form-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin: 50px auto;
-      max-width: 800px;
-    }
-    .form-title {
-      font-size: 2rem; /* Increased font size for the title */
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .btn-custom {
-      background-color: #007bff;
-      color: #fff;
-      font-size: 1.125rem; /* Increased font size for buttons */
-      padding: 10px 20px; /* Adjusted padding for a balanced button size */
-    }
-    .btn-custom:hover {
-      background-color: #0056b3;
-    }
-  </style>
-  
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 50px;
+        }
+
+        .education-entry {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .btn-add, .btn-save, .btn-remove, .btn-next {
+            font-weight: bold;
+        }
+
+        .saved-entries {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .saved-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="form-container">
-      <h1 class="form-title text-center">Education Details</h1>
-      <form id="cvForm" method="post" action="/auth/education_details" >
-        <!-- Education Section -->
-        <div class="mb-3">
-          <label class="form-label">Education</label>
-          <div id="educationContainer">
-            <!-- Initial Education Group -->
-            <div class="card card-body mb-3">
-              <div class="mb-3">
-                <label for="degree1" class="form-label">Degree</label>
-                <input type="text" class="form-control form-control-lg" id="degree1" name="degree" placeholder="E.g., Bachelor of Science in Computer Science" required>
-              </div>
-              <div class="mb-3">
-                <label for="institution1" class="form-label">Institution</label>
-                <input type="text" class="form-control form-control-lg" id="institution1" name="institution" placeholder="E.g., University of XYZ" required>
-              </div>
-              <div class="mb-3">
-                <label for="year1" class="form-label">Start</label>
-                <input type="text" class="form-control"  id="datepicker" name="start" required readonly>
-              </div>
-              <div class="mb-3">
-                <label for="end1" class="form-label">End</label>
-                <input type="text" class="form-control" id="end-datepicker" name="end" readonly >
-              </div>
-              <div class="mb-3">
-                <label for="current1" class="form-label">Current</label>
-                <input type="checkbox" id="current1" name="current" value="true" onchange="toggleEndDate(this)">
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm" id="addEducationButton" style=" height: 30px; font-size: 15px; ">Add Another Certificate</button>
-
+    <div class="container">
+        <h2 class="text-center">Education History</h2>
+        <div id="educationForms"></div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-success btn-add" onclick="addEducationForm()">+ Add Education</button>
+            <button class="btn btn-purple btn-next" onclick="proceedToNext()" id="nextButton" disabled>Next</button>
         </div>
-
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-custom" >Submit</button>
+        <div class="saved-entries" id="savedEntries">
+            <h3>Saved Entries</h3>
         </div>
-      </form>
     </div>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const addEducationButton = document.getElementById('addEducationButton');
-      let educationIndex = 1;
-  
-      // Initialize datepickers for the first set of fields
-      $('#datepicker').datepicker({ uiLibrary: 'bootstrap' });
-      $('#end-datepicker').datepicker({ uiLibrary: 'bootstrap' });
-  
-      // Add new education section dynamically
-      addEducationButton.addEventListener('click', function () {
-        educationIndex++;
-        const educationGroup = document.createElement('div');
-        educationGroup.classList.add('card', 'card-body', 'mb-3');
-        educationGroup.id = `educationGroup${educationIndex}`;  // Add unique id for deletion
-  
-        educationGroup.innerHTML = `
-          <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Degree</label>
-            <input type="text" class="form-control form-control-lg" id="degree${educationIndex}" name="degree" placeholder="E.g., Bachelor of Science in Computer Science" required>
-          </div>
-          <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Institution</label>
-            <input type="text" class="form-control form-control-lg" id="institution${educationIndex}" name="institution" placeholder="E.g., University of XYZ" required>
-          </div>
-          <div class="mb-3">
-            <label for="start${educationIndex}" class="form-label">Start</label>
-            <input type="text" class="form-control datepicker" id="start-datepicker${educationIndex}" name="start" placeholder="Start Date" required readonly>
-          </div>
-          <div class="mb-3">
-            <label for="end${educationIndex}" class="form-label">End</label>
-            <input type="text" class="form-control datepicker" id="end-datepicker${educationIndex}" name="end" placeholder="End Date" readonly>
-          </div>
-          <div class="mb-3">
-            <label for="current${educationIndex}" class="form-label">Current</label>
-            <input type="checkbox" id="current${educationIndex}" name="current[${educationIndex}]" value="true" onchange="toggleEndDate(${educationIndex})">
-          </div>
-          <button type="button" class="btn btn-danger btn-sm" onclick="deleteEducationSection()" style="margin-top: 10px; height:40px;float: right;width: 200px;" >Delete</button>
+    <!-- jQuery, Popper.js, Bootstrap JS, and Bootstrap Datepicker JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+    let educationEntries = [];
+    let formCount = 0;
+
+    function addEducationForm() {
+        formCount++;
+        const formId = `education-${formCount}`;
+
+        const formHtml = `
+            <div class="education-entry" id="${formId}">
+                <h5>Education Entry ${formCount}</h5>
+                <div class="form-group">
+                    <label for="institution-${formId}">School/Institution</label>
+                    <input type="text" class="form-control" id="institution-${formId}" required>
+                </div>
+                <div class="form-group">
+                    <label for="degree-${formId}">Degree/Certificate</label>
+                    <input type="text" class="form-control" id="degree-${formId}"  placeholder="BACHELOR OF SCIENC IN XYZ"required>
+                </div>
+              
+                <div class="form-group">
+                    <label for="start-${formId}">Start Date (MM/DD/YYYY)</label>
+                    <input type="text" class="form-control datepicker" id="start-${formId}" placeholder="MM/DD/YYYY" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="end-${formId}">End Date (MM/DD/YYYY)</label>
+                    <input type="text" class="form-control datepicker" id="end-${formId}" placeholder="MM/DD/YYYY" readonly>
+                </div>
+                <div class="form-group">
+                    <input type="checkbox" id="present-${formId}" onclick="toggleEndDate('${formId}')">
+                    <label for="present-${formId}">Present Education</label>
+                </div>
+                <button class="btn btn-primary btn-save" id="save-btn-${formId}">Save Entry</button>
+                <button class="btn btn-danger btn-remove" onclick="removeEntry('${formId}')">Remove Entry</button>
+            </div>
         `;
-        
-        document.getElementById('educationContainer').appendChild(educationGroup);
-  
-        // Initialize datepicker for dynamically added inputs
-        $(`#start-datepicker${educationIndex}`).datepicker({ uiLibrary: 'bootstrap' });
-        $(`#end-datepicker${educationIndex}`).datepicker({ uiLibrary: 'bootstrap' });
-  
-        // Attach event handler to the newly created checkbox
-        const currentCheckbox = document.getElementById(`current${educationIndex}`);
-        currentCheckbox.addEventListener('change', function () {
-          toggleEndDate(educationIndex);
-        });
-      });
-    });
-  
-    // Function to disable end date when "current" is checked
-    function toggleEndDate(index) {
-      const currentCheckbox = document.getElementById(`current${index}`);
-      const endDateInput = document.getElementById(`end-datepicker${index}`);
-  
-      if (currentCheckbox.checked) {
-        endDateInput.style.display = 'none'; // Hide the input
-        endDateInput.value = ''; // Optionally clear the value
-        $(endDateInput).datepicker('destroy'); // Destroy the datepicker
-      } else {
-        endDateInput.style.display = 'block'; // Show the input
-        $(endDateInput).datepicker({ uiLibrary: 'bootstrap' }); // Reinitialize the datepicker
-      }
-    }
-  
-    // Function to delete the education section
-    function deleteEducationSection(index) {
-      const educationGroup = document.getElementById(`educationGroup${index}`);
-      if (educationGroup) {
-        educationGroup.remove(); // Remove the education section from the DOM
-      }
-    }
-  </script>
-  
-  <script>
-     function toggleEndDate(index) {
-      const currentCheckbox = document.getElementById(`current${index}`);
-      const endDateInput = document.getElementById(`end-datepicker${index}`);
-      
-      if (currentCheckbox.checked) {
-        endDateInput.style.display = 'none'; // Hide the input
-        endDateInput.value = ''; // Optionally clear the value
-        $(endDateInput).datepicker('destroy'); // Destroy the datepicker
-      } else {
-        endDateInput.style.display = 'block'; // Show the input
-        $(endDateInput).datepicker({ uiLibrary: 'bootstrap' }); // Reinitialize the datepicker
-      }}
-  </script>
-  
-  
-      <script>
-        $('#datepicker').datepicker({
-            uiLibrary: 'bootstrap'
-        });
-    </script>
-      <script>
-        $('#end-datepicker').datepicker({
-            uiLibrary: 'bootstrap'
-        });
-    </script>
-    <!-- <script>
-      document.getElementById('cvForm').addEventListener('submit', (e) => {
-          e.preventDefault(); // Prevent actual submission
-          const formData = new FormData(e.target);
-          console.log([...formData.entries()]);
-});
 
-    </script> -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        document.getElementById('educationForms').insertAdjacentHTML('beforeend', formHtml);
+
+        // Initialize datepicker on newly added text inputs
+        $('#start-' + formId).datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true
+        });
+
+        $('#end-' + formId).datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true
+        });
+
+        // Attach the event listener for the save button
+        document.getElementById(`save-btn-${formId}`).addEventListener('click', () => saveEntry(formId));
+    }
+
+    function toggleEndDate(formId) {
+        const isChecked = document.getElementById(`present-${formId}`).checked;
+        const endDateInput = document.getElementById(`end-${formId}`);
+        
+        if (isChecked) {
+            endDateInput.disabled = true;
+            endDateInput.style.display = 'none'; // Hide the End Date field
+            endDateInput.value = 'PRESENT'
+        } else {
+            endDateInput.disabled = false;
+            endDateInput.style.display = 'block'; // Show the End Date field
+        }
+    }
+
+    function saveEntry(formId) {
+        const formData = {
+            institution: document.getElementById(`institution-${formId}`).value,
+            degree: document.getElementById(`degree-${formId}`).value,
+            // field: document.getElementById(`field-${formId}`).value,
+            startDate: document.getElementById(`start-${formId}`).value,
+            current: document.getElementById(`present-${formId}`).checked ? 'true' : 'false',
+            endDate: document.getElementById(`present-${formId}`).checked ? 'Present' : document.getElementById(`end-${formId}`).value
+        };
+
+        // Validate form data
+        if (!validateForm(formData)) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Send form data to the backend using fetch
+        fetch('/auth/education_details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // alert('Education entry saved successfully');
+                displaySavedEntry(data.data); // Pass saved data from backend
+                document.getElementById(formId).remove();
+                // Enable the Next button after a successful save
+                document.getElementById('nextButton').disabled = false;
+            } else {
+                alert('Error saving education entry');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function validateForm(formData) {
+        if (!formData.institution || !formData.degree  || !formData.startDate) {
+            return false; // If any of these fields are missing, return false
+        }
+
+        if (formData.current === 'false' && !formData.endDate) {
+            return false; // End date is required if the education is not ongoing
+        }
+
+        return true; // All validations passed
+    }
+
+    function displaySavedEntry(entry) {
+        const entryHtml = `
+            <div class="saved-entry">
+                <strong>${entry.institution}</strong><br>
+                ${entry.degree} <br>
+                ${entry.startDate} - ${entry.endDate || 'Present'}
+            </div>
+        `;
+        document.getElementById('savedEntries').insertAdjacentHTML('beforeend', entryHtml);
+    }
+
+    function removeEntry(formId) {
+        document.getElementById(formId).remove();
+    }
+
+    function proceedToNext() {
+        window.location.href = '/portfolio_view_experience'; 
+    }
+</script>
+
 </body>
 </html>

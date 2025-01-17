@@ -20,6 +20,47 @@ const pool = mysql.createPool({
     password: process.env.password,
     database: process.env.database
   });
+  // router.post('/auth_register', (req, res) => {
+  //   const { username, email,phone,role, password, confirmpassword } = req.body;
+    
+
+  //   const hashedPassword = bcrypt.hashSync(password, 10);
+  //   const verifiedToken = crypto.randomBytes(32).toString('hex');
+  //   var passw = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_\-+=<>?])[A-Za-z\d!@#$%^&*()_\-+=<>?]{8,20}$/;
+  
+  
+  //   pool.query('SELECT email FROM registration WHERE email = ?', [email], (err, results) => {
+  //     if (err) {
+  //       console.error('Error querying the database:', err);
+  //       return res.render('register', { successMessage: null, errorMessage: 'An error occurred. Please try again later.' });
+  //     }
+  
+  //     if (results.length > 0) {
+  //       return res.render('register', { successMessage: null, errorMessage: 'Email has already been registered' });
+  //     }
+  //     if(!password.match(passw)){
+  //       return res.render('register', { successMessage: null, errorMessage: 'Password should contain lower case character,upper character and special character' });}
+  
+  //     if (password.length < 8) {
+  //       return res.render('register', { successMessage: null, errorMessage: 'Password must be at least 8 characters long' });
+  //     }
+  
+  //     if (password !== confirmpassword) {
+  //       return res.render('register', { successMessage: null, errorMessage: 'Passwords do not match' });
+  //     }
+  
+  //     pool.query(`INSERT INTO users (username, email, password, role)VALUES (?, ?, ?, 'admin')`, { username, email,phone, password: hashedPassword ,verifiedToken}, (err, result) => {
+  //       if (err) {
+  //         console.error('Error inserting user into the database:', err);
+  //         return res.render('admin/create_admin', { successMessage: null, errorMessage: 'Error registering user. Please try again later.' });
+  //       }
+  
+        
+  
+  //             return res.render('login', { successMessage: 'Registration successful!', errorMessage: null });
+  //         });
+  //     });
+  //   });
 router.post('/register', (req, res) => {
     const { username, email,phone,role, password, confirmpassword } = req.body;
     
