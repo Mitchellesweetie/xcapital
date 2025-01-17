@@ -376,7 +376,7 @@
                                               <p class="text-justify comment-text mb-0"> <%= comment.comment_text %></p>
                         
                                               <div class="d-flex flex-row user-feed">
-                                                <form >
+                                                <form class="like-form" data-id="<%= comment.commentId %> ">
                                                     <button type="submit" class="like-button">
                                                         <span class="wish">
                                                             <i class="fa fa-heartbeat mr-2"></i><%= comment.likes %>
@@ -480,7 +480,7 @@
                                         <!-- class="button button-contactForm boxed-btn boxed-btn2 -->
                                     </div>
                                 </form>
-                              <script>
+                              <!-- <script>
                                     document.getElementById('form-contact').addEventListener('submit', function(event) {
                                         event.preventDefault();
                                         if (window.location.search.includes('success=true')) {
@@ -488,7 +488,7 @@
                                             }
                                            console.log('Test form submitted!');
                                     });
-                                </script>
+                                </script> -->
                                 <!-- <script>
                                     // Wait for the DOM to load before adding event listeners
                                     document.addEventListener('DOMContentLoaded', function () {
@@ -733,6 +733,78 @@
             });
         });
     </script>
+ 
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('contactForm');
+        const commentsContainer = document.getElementById('comments');
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent page reload
+
+            const formData = new FormData(form);
+            const jsonData = Object.fromEntries(formData);
+
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jsonData),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert(data.message); // Show a success message
+
+                        // Optionally, add the new comment dynamically
+                        // const newComment = document.createElement('div');
+                        // newComment.textContent = jsonData.comment_text;
+                        // commentsContainer.prepend(newComment); // Add new comment at the top
+
+                        form.reset(); // Clear the form
+                    } else {
+                        alert(`Error: ${data.message}`); // Show an error message
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting your comment.');
+                });
+        });
+    });
+</script>
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('contactForm');
+
+    fetch(form.action, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(jsonData),
+})
+    .then((response) => response.text()) // Use .text() to inspect raw response
+    .then((text) => {
+        console.log('Raw Response:', text);
+        try {
+            const data = JSON.parse(text); // Attempt to parse if it looks like JSON
+            console.log('Parsed JSON:', data);
+        } catch (e) {
+            console.error('Error parsing JSON:', e);
+            alert('Invalid response from server');
+        }
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form.');
+    });
+
+    });
+
+
+   </script>
+    
     
 </body>
 </html>

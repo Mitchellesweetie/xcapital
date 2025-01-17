@@ -80,9 +80,10 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
     if (!userId) {
       return res.redirect('/login');
     }
-    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
+    const filePath = req.file ? `/home/capitalmitchelle/xcapital/uploads/images/${req.file.filename}` : null
     const { categoryId,title, message } = req.body;
     const data = { categoryId,title, message,file: filePath,  }; 
+    console.log(filePath)
 
     getBlogCounts((err, counts) => {
         if (err) {
@@ -280,6 +281,7 @@ router.get('/pendingblogs',isAdmin,isAuthenticated,(req, res) => {
             //         fullContent: blog.message, // Full content for later display
             //     };
             // });
+            console.log(blogs)
             res.render('pendingblogs', {
                 blogs,
                 totalBlogs: counts.totalBlogs || 0,

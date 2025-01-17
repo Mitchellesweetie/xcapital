@@ -682,88 +682,53 @@ router.get('/latest_news/:id', (req, res) => {
         
       
         // Endpoint to handle like post
-        router.post('/likePost', (req, res) => {
-            const postId = req.body.postId;
-            pool.query('UPDATE comments SET likes=likes+1 where id=1', [postId], (err) => {
-                if (err) throw err;
-                pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5', [postId], (err, results) => {
-                    if (err) throw err;
-                    res.json(results[0]);
-                });
+        router.post('/likePost:id', (req, res) => {
+            const postId = req.params.id;
+            pool.query('UPDATE comments SET likes=likes+1 where commentId=?', [postId], (err) => {
+                if (err) {
+                    console.error('Error creating comment:', err);
+                    return res.status(500).json({ success: false, message: 'Error adding a like' });
+                }
+    
+                res.json({ success: true, message: 'like added successfully' });
+            
+                             
             });
         });
 
-router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
-    const blogId = req.params.id;
-    console.log('Received blog ID:', blogId); // Add this for debugging
-    const likecomments=`UPDATE comments SET likes=likes+1 where id=1`
-
-    
-    const userId = req.session.userId;
-    if (!userId) {
-        return res.redirect('/login_blog');
-    }
-
-    const { comment_text, username, email, subjects } = req.body;
-    
-    // Add validation to ensure blogId exists
-    if (!blogId) {
-        console.error('No blog ID provided');
-        return res.status(400).send('Blog ID is required');
-    }
-
-    // Insert the comment into the comments table
-    pool.query(
-        `INSERT INTO comments (comment_text, username, email, subjects, id, user_id)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [comment_text, username, email, subjects, blogId, userId],
-        (err, results) => {
-            if (err) {
-                console.error('Error creating comment:', err);
-                return res.render('student_blog/latest_news', {
-                    successMessage: null,
-                    errorMessage: 'Error creating comment',
-                    results: [],
-                    blog:[],
-                    likes:[]
-                });
+        router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
+            const blogId = req.params.id;
+            const userId = req.session.userId;
+        
+            if (!userId) {
+                return res.json({ success: false, message: 'You must be logged in to comment' });
             }
-
-            pool.query(likecomments,  (err, likeComments) => {
-                if (err) {
-                    console.error('Error fetching likes:', err);
-                    return res.status(404).send('Blog not found');
-                }
-            const likes = likeComments[0]
-
-            pool.query('SELECT * FROM form WHERE id = ?', [blogId], (err, blogResults) => {
-                if (err || blogResults.length === 0) {
-                    console.error('Error fetching blog:', err);
-                    return res.status(404).send('Blog not found');
-                }
-
-                const blog = blogResults[0]; 
-
-                pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5', [blogId], (err, comments) => {
+        
+            const { comment_text, username, email, subjects } = req.body;
+        
+            if (!blogId || !comment_text || !username || !email || !subjects) {
+                return res.status(400).json({ success: false, message: 'All fields are required' });
+            }
+        
+            pool.query(
+                `INSERT INTO comments (comment_text, username, email, subjects, id, user_id)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [comment_text, username, email, subjects, blogId, userId],
+                (err) => {
                     if (err) {
-                        console.error('Error fetching comments:', err);
-                        return res.render('student_blog.latest_news', { 
-                            errorMessage: 'Error loading comments' 
-                        });
+                        console.error('Error creating comment:', err);
+                        return res.status(500).json({ success: false, message: 'Error creating comment' });
                     }
-
-                    res.render('student_blog/latest_news', {
-                        blog: blog||[],      
-                        comments: comments,  
-                        successMessage: 'Comment added successfully',
-                        likes:likes
-                    }); 
-                 });
-                });
-            });
-        }
-    );
-});
+        
+                    res.json({ success: true, message: 'Comment added successfully' });
+                }
+            );
+        });
+        
+        
+        
+        
+        
 
 router.post('/post',upload.single('file'), (req, res) => {
    
