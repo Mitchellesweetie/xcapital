@@ -8,11 +8,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
     <link rel="shortcut icon" type="image/x-icon" href="/blog/img/favicon.ico">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> -->
+   <!-- Bootstrap CSS (use the latest version) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Bootstrap JS (use the latest version) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
 
     <!-- CSS here -->
     <link rel="stylesheet" href="/blog/css/bootstrap.min.css">
@@ -33,8 +38,7 @@
     top: 0;
     right: 20px;
   } */
-
-  
+   
     .user-profile {
         display: flex;
         align-items: center;
@@ -59,7 +63,7 @@
         margin-top: 8px;
         z-index: 1001;
     }
-
+ 
     /* Show dropdown when parent has dropdown-open class */
     .login-container.dropdown-open .dropdown {
         display: block;
@@ -226,12 +230,13 @@
                                         <!-- Dropdown Menu -->
                                         <div class="dropdown">
                                             <a href="/myportfolio">Profile</a>
-                                            <a href="#">Edit Portfolio</a>
-                                                <a href="/myportfolio" data-bs-toggle="modal" data-bs-target="#exampleModal">Post a Blog</a>
+                                            <a href="">Edit Portfolio</a>
 
                                             <a href="/download-cv">download portfolio</a>
 
                                             <a href="/student_logout" class="logout">Logout</a>
+                                            <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal">Post a Blog</a>
+
 
                                             
                                             <!-- Modal -->
@@ -275,8 +280,8 @@
                                                 </div>
                                               </div>
                                             </div>
-                                            <!-- Button to trigger the modal -->
-
+                                           
+                                                
 
 
                                         </div>
@@ -1061,9 +1066,64 @@
 
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const modalElement = document.getElementById('exampleModal');
+        const modal = new bootstrap.Modal(modalElement, {
+            backdrop: false // You can change this to false if you want to remove the backdrop
+        });
+        
+        // Show modal when the link is clicked
+        const showModalButton = document.querySelector('[data-bs-toggle="modal"]');
+        if (showModalButton) {
+            showModalButton.addEventListener('click', () => {
+                modal.show();
+            });
+        }
+    
+        // Focus on the first input field when the modal is shown
+        modalElement.addEventListener('shown.bs.modal', function () {
+            const firstInput = modalElement.querySelector('input, textarea');
+            if (firstInput) {
+                firstInput.focus(); // Focus on the first input field inside the modal
+            }
+        });
+    
+        // Handle form submission using AJAX
+        const form = document.getElementById('createPostForm');
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent the default form submission
+            
+            const formData = new FormData(form); // Collect form data
+    
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+    
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    modal.hide(); // Close the modal upon successful post creation
+                    alert('Post created successfully!');
+                } else {
+                    alert('Failed to create post: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error submitting the form:', error);
+                alert('There was an error processing your request. Please try again.');
+            }
+        });
+    });
+    </script>
+    
 </body>
 </html>

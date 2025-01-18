@@ -80,7 +80,7 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
     if (!userId) {
       return res.redirect('/login');
     }
-    const filePath = req.file ? `/home/capitalmitchelle/xcapital/uploads/images/${req.file.filename}` : null
+    const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
     const { categoryId,title, message } = req.body;
     const data = { categoryId,title, message,file: filePath,  }; 
     console.log(filePath)

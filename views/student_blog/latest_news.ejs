@@ -8,6 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
     <link rel="shortcut icon" type="image/x-icon" href="/blog/img/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/blog/img/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     
     <!-- CSS here -->
     <link rel="stylesheet" href="/blog/css/bootstrap.min.css">
@@ -205,6 +211,49 @@
     transform: scale(0.95);     
 }
 
+.login-container.dropdown-open .dropdown {
+        display: block;
+    }
+
+    .dropdown a {
+        display: block;
+        padding: 12px 16px;
+        color: #333;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+
+    .dropdown a:hover {
+        background: #f0f2f5;
+    }
+
+    .dropdown .logout {
+        color: #ed4141;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .login-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 24px;
+        border: none;
+        border-radius: 50px;
+        background: #ed4141;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(237, 65, 65, 0.3);
+    }
+
+    .user-profile img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
     </style>
 </head>
@@ -293,16 +342,92 @@
                         <div class="col-xl-4 col-lg-4 col-md-4">
                             <div class="header-right f-right d-none d-lg-block">
                                 <!-- Heder social -->
-                                <ul class="header-social">    
+                                <!-- <ul class="header-social">    
                                     <li><a href="https://www.fb.com/sai4ull"><i class="fab fa-facebook-f"></i></a></li>
                                     <li><a href="#"><i class="fab fa-twitter"></i></a></li>
                                     <li><a href="#"><i class="fab fa-instagram"></i></a></li>
                                     <li> <a href="#"><i class="fab fa-youtube"></i></a></li>
                                 </ul>
-                                <!-- Search Nav -->
-                                <div class="nav-search search-switch">
+                                 Search Nav -->
+                                <!-- <div class="nav-search search-switch">
                                     <i class="fa fa-search"></i>
+                                </div> -->
+                                <div class="login-container">
+                                    <% if (username) { %>
+                                        <!-- User Profile -->
+                                        <div class="user-profile">
+                                            <img src="/blog/img/loggedin.png" alt="User Avatar">
+                                            <span class="user-name"><%= username %></span>
+                                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M6 9l6 6 6-6"/>
+                                            </svg>
+                                        </div>
+                                        <!-- Dropdown Menu -->
+                                        <div class="dropdown">
+                                            <a href="/myportfolio">Profile</a>
+                                            <a href="">Edit Portfolio</a>
+                                                <a href="" data-bs-toggle="modal" data-bs-target="#exampleModal">Post a Blog</a>
+
+                                            <a href="/download-cv">download portfolio</a>
+
+                                            <a href="/student_logout" class="logout">Logout</a>
+
+                                            
+                                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-scrollable modal-lg">
+                                                  <div class="modal-content">
+                                                    <div class="modal-header">
+                                                      <h5 class="modal-title" id="exampleModalLabel">Create a Post</h5>
+                                                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                      <form id="createPostForm" action="/api/post" method="post" enctype="multipart/form-data" novalidate>
+                                                        <div class="form-floating mb-3">
+                                                          <select class="form-select" id="categorySelect" name="categoryId" required>
+                                                            <option value="" disabled selected>Select a Category</option>
+                                                            <% categories.forEach(category => { %>
+                                                              <option value="<%= category.categoryId %>"><%= category.category %></option>
+                                                            <% }) %>
+                                                          </select>
+                                                          <label for="categorySelect">Category</label>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                          <label for="titleInput" class="form-label">Title</label>
+                                                          <input type="text" class="form-control" id="titleInput" name="title" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                          <label for="bodyTextarea" class="form-label">Body</label>
+                                                          <textarea class="form-control" id="bodyTextarea" name="message" rows="5" required></textarea>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                          <label for="fileInput" class="form-label">Upload File</label>
+                                                          <input type="file" class="form-control" id="fileInput" name="file">
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                          <button type="submit" class="btn btn-primary">Post</button>
+                                                        </div>
+                                                      </form>
+                                                      
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+
+
+
+                                        </div>
+                                    <% } else { %>
+                                        <!-- Login Link -->
+                                        <a href="/login_blog" class="login-btn">
+                                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/>
+                                            </svg>
+                                            Login
+                                        </a>
+                                    <% } %>
                                 </div>
+                                
                             </div>
                         </div>
                         <!-- Mobile Menu -->
@@ -337,10 +462,30 @@
                             <div class="about-prea">
                                 <% if (blog) { %>
                                     <%- blog.message %>
+                                  
+                                   
                                 <% } else { %>
                                     <p>The blog content is unavailable.</p>
                                 <% } %>
+
+                                
                             </div>
+                            <% if (blog) { %>
+                                <div class="like-forms" data-id="<%= blog.id %>">
+                                    <button type="button" class="like-button">
+                                        <span class="wish">
+                                            <i class="fa fa-heartbeat mr-2"></i>
+                                        </span>
+                                    </button>
+                                    <span class="like-count"><%= blog.likes %></span>
+                                </div>
+                            <% } else { %>
+                                <p>No blog found.</p>
+                            <% } %>
+                            
+                           
+                            
+                          
                             
 
 
@@ -375,42 +520,17 @@
                         
                                               <p class="text-justify comment-text mb-0"> <%= comment.comment_text %></p>
                         
-                                              <div class="d-flex flex-row user-feed">
-                                                <form class="like-form" data-id="<%= comment.commentId %> ">
+                                              <!-- <div class="d-flex flex-row user-feed">
+                                                <form class="like-form" data-id=" comment>
                                                     <button type="submit" class="like-button">
                                                         <span class="wish">
-                                                            <i class="fa fa-heartbeat mr-2"></i><%= comment.likes %>
+                                                            <i class="fa fa-heartbeat mr-2"></i>
                                                         </span>
                                                     </button>
                                                 </form>
-                                                <!-- <div class="image-container">
-                                                    <img src="path_to_image.jpg" alt="Image" id="image" />
-                                                    <button id="likeButton" class="like-button">Like</button>
-                                                    <p id="likeCount">Likes: 0</p>
-                                                </div>
-                                                <button id="likeButton" data-post-id="1">Like</button>
-                                                <p>Likes: <span id="likeCount">0</span></p>
-                                             -->
-                                                <!-- <script>
-                                                    $(document).ready(function() {
-                                                        // Fetch initial like count
-                                                        $.get('/getLikes/1', function(data) {
-                                                            $('#likeCount').text(data.likes);
-                                                        });
                                             
-                                                        // Handle button click
-                                                        $('#likeButton').click(function() {
-                                                            const postId = $(this).data('post-id');
-                                                            $.post('/likePost', { postId: postId }, function(data) {
-                                                                $('#likeCount').text(data.likes);
-                                                            });
-                                                        });
-                                                    });
-                                                </script> -->
-                                                <!-- <span class="ml-3"><i class="fa fa-comments-o mr-2"></i>Reply</span> -->
-                        
                                                 
-                                              </div>
+                                              </div> -->
                                               
                                             </div>
                                             
@@ -717,24 +837,41 @@
     <!-- Jquery Plugins, main Jquery -->	
     <script src="/blog/js/plugins.js"></script>
     <script src="/blog/js/main.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Fetch initial like count for the specific comment
-            $.get('/getLikes/1', function(data) {  // Replace 1 with dynamic comment ID if needed
-                $('#likeCount').text(data.likes); // Update the like count on page load
-            });
-    
-            // Handle button click for liking a comment
-            $('#likeButton').click(function() {
-                const commentId = $(this).data('comment-id');  // Get the commentId from the button's data attribute
-                $.post('/student_blog/likePost', { commentId: commentId }, function(data) {
-                    $('#likeCount').text(data.likes);  // Update the like count in the UI after incrementing
-                });
-            });
-        });
-    </script>
  
+ 
+    <script>
 
+        function toggleDropdown() {
+            document.querySelector('.login-container').classList.toggle('dropdown-open');
+        }
+    
+        // Add click event to user profile
+        const userProfile = document.querySelector('.user-profile');
+        if (userProfile) {
+            userProfile.addEventListener('click', toggleDropdown);
+        }
+    
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const container = document.querySelector('.login-container');
+            if (container && !container.contains(event.target)) {
+                container.classList.remove('dropdown-open');
+            }
+        });
+    
+        // Handle logout
+        document.querySelector('.logout')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = '/logout';
+        });
+    
+    
+    
+    
+    
+    
+    
+    </script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const form = document.getElementById('contactForm');
@@ -804,6 +941,51 @@
 
 
    </script>
+   <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+
+   <script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.like-forms').forEach(form => {
+        form.querySelector('.like-button').addEventListener('click', async (e) => {
+            e.preventDefault(); // Prevent any default behavior
+
+            const postId = form.dataset.id; // Get the dynamic ID from the data-id attribute
+            const likeCountSpan = form.querySelector('.like-count'); // Get the like count element
+
+            try {
+                // Send a POST request to the server to update the like count
+                const response = await fetch(`/student_blog/likePosts/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({}) // Send empty body since we don't need extra data
+                });
+
+                const data = await response.json(); // Parse the JSON response
+
+                if (response.ok && data.success) {
+                    // Update the like count in the UI
+                    const currentLikes = parseInt(likeCountSpan.textContent, 10) || 0;
+                    likeCountSpan.textContent = currentLikes + 1;
+                } else if (data.message === 'You must be logged in to like a post') {
+                    // If the user is not logged in, redirect them to the login page
+                    window.location.href = '/login_blog'; // Adjust the URL if needed
+                } else {
+                    alert('Failed to add like: ' + (data.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Fetch Error:', error); // Log error details
+                alert('Error processing your request. Please try again.');
+            }
+        });
+    });
+});
+
+    </script>
+    
+    
     
     
 </body>

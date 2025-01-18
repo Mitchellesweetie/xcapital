@@ -37,11 +37,13 @@ router.get('/categories',(req,res)=>{
 })
 
 function isAuthenticated(req, res, next) {
-        if (req.session && req.session.userId) {
-            return next(); 
-        }
-        res.redirect('/login_blog'); 
+    if (req.session && req.session.userId) {
+        return next(); 
+    } else {
+        res.status(401).json({ success: false, message: 'You must be logged in to perform this action' });
     }
+}
+
 
 
 
@@ -658,7 +660,22 @@ router.get('/latest_news/:id', (req, res) => {
                     title: 'Blog Not Found',
                     // Add other default properties your template might need
                 };
-        
+       
+                pool.query('SELECT * FROM categories', (err, categories) => {
+                    if (err) {
+                        console.error('Database error:', err);
+                        return res.render('student_blog/latest_news', { 
+                            successMessage: null, 
+                            errorMessage: 'Error occurred during fetching categories',
+                            blogs, 
+                            username,
+                            comments: comments,  
+                            categories: [] ,
+    
+    
+                            
+                                            });
+                    }
         pool.query('SELECT * FROM comments WHERE id = ? ORDER BY created_at DESC LIMIT 5;', [blogId], (err, comments) => {
             if (err) {
                 console.error('Error fetching comments:', err);
@@ -673,16 +690,17 @@ router.get('/latest_news/:id', (req, res) => {
                     blog,
                     comments: comments,  
                     username,
+                    categories
 
                 });
             });
         });
-        });
+        }); });
         
         
       
         // Endpoint to handle like post
-        router.post('/likePost:id', (req, res) => {
+        router.post('/likePost/:id', (req, res) => {
             const postId = req.params.id;
             pool.query('UPDATE comments SET likes=likes+1 where commentId=?', [postId], (err) => {
                 if (err) {
@@ -695,12 +713,64 @@ router.get('/latest_news/:id', (req, res) => {
                              
             });
         });
+        router.post('/likePosts/:id', isAuthenticated, (req, res) => {
+            const postId = req.params.id;
+            const userId = req.session.userId;
+        
+            // If the user is not logged in, send a response indicating this
+            if (!userId) {
+                return res.status(401).json({ success: false, message: 'You must be logged in to like a post' });
+            }
+        
+            // Check if postId is valid
+            if (!postId) {
+                return res.status(400).json({ success: false, message: 'Invalid post ID' });
+            }
+        
+            // Query the database to find the post by postId
+            pool.query('SELECT * FROM form WHERE id = ?', [postId], (err, results) => {
+                if (err) {
+                    console.error('Error querying the database:', err);
+                    return res.status(500).json({ success: false, message: 'Database error occurred' });
+                }
+        
+                if (results.length === 0) {
+                    return res.status(404).json({ success: false, message: 'Post not found' });
+                }
+        
+                // Post found, proceed with the like update
+                pool.query(
+                    'UPDATE form SET likes = likes + 1 WHERE id = ?',
+                    [postId],
+                    (err, results) => {
+                        if (err) {
+                            console.error('Error updating likes:', err);
+                            return res.status(500).json({ success: false, message: 'Database error occurred' });
+                        }
+        
+                        if (results.affectedRows === 0) {
+                            return res.status(404).json({ success: false, message: 'Post not found or user unauthorized' });
+                        }
+        
+                        // Send a success response
+                        res.json({ success: true, message: 'Like added successfully' });
+                    }
+                );
+            });
+        });
+        
+        
+        
+        
+        
 
         router.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
             const blogId = req.params.id;
             const userId = req.session.userId;
         
             if (!userId) {
+                // return res.redirect('/login');
+
                 return res.json({ success: false, message: 'You must be logged in to comment' });
             }
         
