@@ -834,15 +834,26 @@
                                                 <p>19 Jan 2020</p>
                                             </div>
                                         </div> 
+
+
+                                        <% if (blogs && blogs.length > 0) { %>
+                                            <% blogs.forEach(blog => { %>  
+
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
-                                                <img src="assets/img/gallery/weekly2News2.png" alt="">
+                                                <img src="<%= blog.file %>" alt="">
                                             </div>
                                             <div class="weekly3-caption">
-                                                <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
+                                                <h4><a href="/student_blog/latest_news/<%= blog.id %>"><%= blog.title %></a></h4>
                                                 <p>19 Jan 2020</p>
                                             </div>
                                         </div> 
+                                        <% }) %>
+
+                                        <% } else { %>
+                                            <p>No blogs available.</p>
+                                        <% } %>
+
                                         <div class="weekly3-single">
                                             <div class="weekly3-img">
                                                 <img src="assets/img/gallery/weekly2News3.png" alt="">
