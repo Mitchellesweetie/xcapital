@@ -421,19 +421,18 @@
                             <div class="col-xl-8 col-md-9">
                                 <div class="properties__button">
                                     <!-- Nav Button -->  
-                                    <% if (categories && categories.length > 0) { %>
+                                    <% if (blogs && blogs.length > 0) { %>
                                         <nav>   
                                             <div class="nav nav-tabs d-flex justify-content-start" id="nav-tab" role="tablist" style="gap: 10px;">
-                                                <% categories.forEach(category => { %>
-                                                    <% console.log('Category in loop:', category); %>
-                                                    <a class="nav-item nav-link <%= category.categoryId == currentCategoryId ? 'active' : '' %>"  
-                                                        id="nav-<%= category.categoryId %>-tab" 
+                                                <% blogs.forEach(blog => { %>
+                                                    <a class="nav-item nav-link <%= blog.categoryId == currentCategoryId ? 'active' : '' %>"  
+                                                        id="nav-<%= blog.categoryId %>-tab" 
                                                         data-toggle="tab"
-                                                        href="#nav-<%= category.categoryId %>" 
+                                                        href="#nav-<%= blog.categoryId %>" 
                                                         role="tab" 
-                                                        aria-controls="nav-<%= category.categoryId %>" 
-                                                        aria-selected="<%= category.categoryId == currentCategoryId %>">
-                                                        <%= category.category %>
+                                                        aria-controls="nav-<%= blog.categoryId %>" 
+                                                        aria-selected="<%= blog.categoryId == currentCategoryId %>">
+                                                        <%= blog.category %>
                                                     </a>
                                                 <% }); %>    
                                             </div>
@@ -467,16 +466,16 @@
                                             role="tabpanel" 
                                             aria-labelledby="nav-<%= category.categoryId %>-tab">
                                             <div class="row">
-                                                <% if (categoryBlogsForThisTab && categoryBlogsForThisTab.length > 0) { %>
+                                                <% if (blogs && blogs.length > 0) { %>
                                                     <!-- Display blogs for this category -->
-                                                    <% categoryBlogsForThisTab.forEach(blog => { %>
+                                                    <% blogs.forEach(blog => { %>
                                                         <div class="col-xl-6 col-lg-12">
                                                             <div class="whats-news-single mb-40">
                                                                 <div class="whates-img">
                                                                     <img src="assets/img/gallery/whats_news_details1.png" alt="">
                                                                 </div>
                                                                 <div class="whates-caption">
-                                                                    <h4><a href="/blogs/<%= blog.id %>"><%= blog.title %></a></h4>
+                                                                    <h4><a href="/student_blog/latest_news/<%= blog.id %>"><%= blog.title %></a></h4>
                                                                     <span>by <%= blog.username %> - <%= new Date(blog.create_at).toLocaleDateString('en-US') %></span>
                                                                     <p><%= blog.message %></p>
                                                                 </div>
@@ -670,17 +669,16 @@
                     <div class="col-12">
                         <div class="recent-active dot-style d-flex dot-style">
                             <!-- Single -->
-                            <% if (trendingblog && trendingblog.length > 0) { %>
-                                
-                                <% trendingblog.forEach(trend=>{ %>
+                            <% if (mostpopula1 && mostpopula1.length > 0) { %>
+                                <% mostpopula1.forEach(mostpopulars => { %> 
 
                             <div class="single-recent">
                                 <div class="what-img">
-                                    <img src="<%= trend.file %>" alt="">
+                                    <img src="<%= mostpopulars.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="#" > <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4></a></h4>
-                                    <P>Jun 19, 2020</P>
+                                    <h4><a href="#" > <h4><a href="/student_blog/latest_news/<%= mostpopulars.id %>"><%= mostpopulars.title %></a></h4></a></h4>
+                                    <P><%= mostpopulars.create_at %></P>
                                     <!-- <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                     
                                 </div>
@@ -691,20 +689,17 @@
                                 <% } %>
                             </div>
                             <!-- Single -->
-                            <% if (trendingblog && trendingblog.length > 0) { %>
-                                
-                                <% trendingblog.forEach(trend=>{ %>
-
-
+                            <% if (mostrecentone && mostrecentone.length > 0) { %>
+                                <% mostrecentone.forEach( recent => { %> 
                              <div class="single-recent">
                                
 
                                 <div class="what-img">
-                                    <img src="<%= trend.file %>" alt="">
+                                    <img src="<%= recent.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4>
-                                    <P>Jun 19, 2020</P>
+                                    <h4><a href="/student_blog/latest_news/<%= recent.id %>"><%= recent.title %></a></h4>
+                                    <P><%= recent.create_at %></P>
                                 </div>
 
                             </div>
@@ -716,27 +711,45 @@
 
 
                             <!-- Single -->
+                            <% if (trendingblog && trendingblog.length > 0) { %>
+                                
+                                <% trendingblog.forEach(trend=>{ %>
+
                             <div class="single-recent">
                                 <div class="what-img">
-                                    <img src="/blog/img/gallery/tranding1.png" alt="">
+                                    <img src="<%= trend.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="latest_news.html"> <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4></a></h4>
+                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"> <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4></a></h4>
                                     <P>Jun 19, 2020</P>
                                     <!-- <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                 </div>
                             </div>
+                            <% }) %>
+
+                            <% } else { %>
+                                <p>No blogs available.</p>
+                            <% } %>
                             <!-- Single -->
+                            <% if (trendingblog && trendingblog.length > 0) { %>
+                                
+                                <% trendingblog.forEach(trend=>{ %>
+
                             <div class="single-recent">
                                 <div class="what-img">
-                                    <img src="/blog/img/gallery/tranding2.png" alt="">
+                                    <img src="<%= trend.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="latest_news.html">What to Expect From the 2020 Oscar Nomin ations</a></h4>
-                                    <P>Jun 19, 2020</P>
+                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4>
+                                    <P><%= trend.create_at %> </P>
                                     <!-- <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                 </div>
                             </div> 
+                            <% }) %>
+
+                            <% } else { %>
+                                <p>No blogs available.</p>
+                            <% } %>
                         </div>
                     </div>
                 </div>
@@ -870,7 +883,7 @@
                                             </div>
                                             <div class="weekly3-caption">
                                                 <h4><a href="/student_blog/latest_news/<%= blog.id %>"><%= blog.title %></a></h4>
-                                                <p>19 Jan 2020</p>
+                                                <p><%= blog.create_at %></p>
                                             </div>
                                         </div> 
                                         <% }) %>
