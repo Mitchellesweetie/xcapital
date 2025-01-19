@@ -15,6 +15,7 @@ const sanitizeHtml = require('sanitize-html')
 const session=require('express-session')
 const puppeteer = require('puppeteer');
 
+
 // const sanitizedContent = sanitizeHtml(message);
 const resume=require('./api/management/portfolio')
 const categories=require('./api/management/admin')
@@ -71,6 +72,7 @@ app.use('/student_blog',student_blog)
 app.use(require('./api/management/admin_auth'))
 app.use(require('./api/management/publicroutes'))
 app.use(require('./api/management/student_auth'))
+app.use('/',require('./api/management/download'))
 app.use(require('./api/management/xcapital'))
 
 

@@ -1,9 +1,12 @@
+
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql');
 const dotenv = require('dotenv');
 const puppeteer = require('puppeteer');
 const path=require('path')
+const ejs=require('ejs')
+const fs = require('fs').promises;
 
 
 dotenv.config();
@@ -36,123 +39,194 @@ function isAuthenticated(req, res, next) {
 //download
 async function getPersonal(userId) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT * FROM personal_details WHERE user_id = ? ORDER BY end_date DESC',
+        pool.query(
+            'SELECT * FROM personal_details WHERE user_id = ?',
             [userId],
             (error, results) => {
                 if (error) reject(error);
-                resolve(results[0]);            }
+                resolve(results || []);  // Assuming the first result is the user's personal data
+            }
         );
     });
 }
 
+// Fetch Education
+async function getEducation(userId) {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'SELECT * FROM education WHERE user_id = ?',
+            [userId],
+            (error, results) => {
+                if (error) reject(error);
+                resolve(results || []);
+            }
+        );
+    });
+}
+
+// Fetch References
+async function getReferences(userId) {
+    return new Promise((resolve, reject) => {
+        pool.query(
+            'SELECT * FROM user_references WHERE user_id = ?',
+            [userId],
+            (error, results) => {
+                if (error) reject(error);
+                resolve(results || []);
+            }
+        );
+    });
+}
+
+// Fetch Skills
 async function getSkills(userId) {
     return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT * FROM skills WHERE user_id = ? ',
+        pool.query(
+            'SELECT * FROM skills WHERE user_id = ?',
             [userId],
             (error, results) => {
                 if (error) reject(error);
-                resolve(results[0]);            }
+                resolve(results || []);
+            }
         );
     });
 }
 
+// Fetch Awards
 async function getAwards(userId) {
     return new Promise((resolve, reject) => {
-        connection.query(
+        pool.query(
             'SELECT * FROM awards WHERE user_id = ?',
             [userId],
             (error, results) => {
                 if (error) reject(error);
-                resolve(results[0]);            }
-        );
-    });
-}
-async function getEducation(userId) {
-    return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT * FROM education WHERE user_id = ? ORDER BY end_date DESC',
-            [userId],
-            (error, results) => {
-                if (error) reject(error);
-                resolve(results[0]);            }
+                resolve(results || []);
+            }
         );
     });
 }
 
+// Fetch Languages
 async function getLanguages(userId) {
     return new Promise((resolve, reject) => {
-        connection.query(
+        pool.query(
             'SELECT * FROM languages WHERE user_id = ?',
             [userId],
             (error, results) => {
                 if (error) reject(error);
-                resolve(results[0]);            }
+                resolve(results || []);
+            }
         );
     });
 }
 
-
+// Fetch Experience and Responsibilities
 async function getExperience(userId) {
+    const query = `
+        SELECT experience.*, resposiblity.responsibility, resposiblity.id
+        FROM experience
+        LEFT JOIN resposiblity ON experience.experienceid = resposiblity.positionId
+        WHERE experience.user_id = ?
+        ORDER BY experience.end DESC;
+    `;
+    
     return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT * FROM experience WHERE user_id = ? ORDER BY end DESC',
-            [userId],
-            (error, results) => {
-                if (error) reject(error);
-                resolve(results[0]);            }
-        );
+        pool.query(query, [userId], (err, results) => {
+            if (err) {
+                console.error('Database error:', err);
+                return reject(err);
+            }
+
+            // Transform results into grouped format
+            const experienceMap = {};
+            results.forEach(row => {
+                if (!experienceMap[row.experienceid]) {
+                    // Initialize a new experience with an empty responsibility list
+                    experienceMap[row.experienceid] = {
+                        experienceid: row.experienceid,
+                        organisation: row.organisation,
+                        position: row.position,
+                        start: row.start,
+                        end: row.end,
+                        responsibilities: [], // Initialize an empty array for responsibilities
+                    };
+                }
+
+                // Add responsibility if it exists
+                if (row.responsibility) {
+                    experienceMap[row.experienceid].responsibilities.push(row.responsibility);
+                }
+            });
+
+            resolve(Object.values(experienceMap)); // Return grouped experiences
+        });
     });
 }
 
-async function getReferences(userId) {
-    return new Promise((resolve, reject) => {
-        connection.query(
-            'SELECT * FROM references WHERE user_id = ?',
-            [userId],
-            (error, results) => {
-                if (error) reject(error);
-                resolve(results[0]);            }
-        );
-    });
-}
-
-
-router.get('/download-cv', isAuthenticated,async (req, res) => {
-    const userId=req.session.userId
+// Route to download CV as PDF
+router.get('/download-cv', isAuthenticated, async (req, res) => {
+    const userId = req.session.userId;
+    let browser = null;
+    let page = null;
     if (!userId) {
         return res.redirect('/login_blog');
-      }
+    }
+
     try {
-        // Get all user data
-        const personal_details = await getPersonal(userId);
+        // Fetch user data
+        const personal = await getPersonal(userId);
         const education = await getEducation(userId);
-        const experience = await getExperience(userId);
         const references = await getReferences(userId);
         const skills = await getSkills(userId);
         const awards = await getAwards(userId);
         const languages = await getLanguages(userId);
+        const experiences = await getExperience(userId);  // Fetch experiences
 
+        // Render EJS template
+        const templatePath = path.join(__dirname, '..', '..', 'views', 'portfolio', 'download.ejs');
+        const templateContent = await fs.readFile(templatePath, 'utf8');
 
+        // Render the template with EJS
+        const html = await ejs.render(templateContent, {
+            personal,
+            education,
+            experiences,
+            references,
+            skills,
+            awards,
+            languages
+        }, {
+            filename: templatePath // This helps with including other files if needed
+        });
 
+        // Log template size for debugging
+        console.log('Rendered HTML size:', html.length);
 
-        // Render EJS template with data
-        const template = await ejs.renderFile(
-            path.join(__dirname, 'views', 'portfolio','por.ejs'),
-            { 
-                personal_details,
-                education,
-                experience,
-                references,skills,awards,languages
-            }
-        );
+        // Launch browser
+        browser = await puppeteer.launch({
+            headless: 'new',
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage'
+            ]
+        });
+
+        page = await browser.newPage();
+
+        // Set content with HTML mime type
+        await page.setContent(html, {
+            waitUntil: ['domcontentloaded', 'networkidle0'],
+            timeout: 30000
+        });
+
+        // Wait for content to be visible
+        await page.waitForSelector('.cv-container', { 
+            visible: true,
+            timeout: 5000 
+        });
 
         // Generate PDF
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        
-        await page.setContent(template);
         const pdf = await page.pdf({
             format: 'A4',
             printBackground: true,
@@ -161,21 +235,35 @@ router.get('/download-cv', isAuthenticated,async (req, res) => {
                 right: '20px',
                 bottom: '20px',
                 left: '20px'
-            }
+            },
+            preferCSSPageSize: true
         });
 
+        // Clean up
         await browser.close();
 
-        // Send PDF
+        // Set correct headers for PDF
         res.contentType('application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=cv.pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="cv.pdf"');
         res.send(pdf);
 
     } catch (error) {
-        console.error('Error generating PDF:', error);
-        res.status(500).send('Error generating PDF');
+        console.error('Error in PDF generation:', error);
+        
+        // Clean up in case of error
+        if (browser) {
+            await browser.close();
+        }
+        
+        // Send detailed error for debugging
+        res.status(500).json({
+            error: 'Error generating PDF',
+            details: error.message,
+            stack: error.stack
+        });
     }
 });
+
 
 
 
@@ -717,7 +805,7 @@ router.get('/blog/:id', (req, res) => {
         WHERE id = ?
     `;
 
-    connection.query(query, [blogId], (err, result) => {
+    pool.query(query, [blogId], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Server error');
