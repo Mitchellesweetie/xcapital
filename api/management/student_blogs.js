@@ -58,14 +58,14 @@ router.get('/home', (req, res) => {
                         from form   LEFT JOIN categories ON form.categoryId = categories.categoryId
                         LEFT JOIN registration ON form.user_id = registration.user_id    where form.status='approved' order by create_at desc limit 1`
     const liked=`select form.id,form.title,form.file,form.message,form.create_at,count(form.likes) , 
-                       categories.categoryId ,form.categoryId,registration.username 
+                       categories.categoryId ,form.categoryId,registration.username ,categories.category
                       from form
                         left join categories on categories.categoryId=form.categoryId
                         left join registration on form.user_id=registration.user_id
                         left join comments on comments.id=form.id where form.status='approved'
                         group by form.id  order by comments.commentId desc limit 1`
 
-    const mostpopular1=`select form.id,form.title,form.file,form.message,form.status,form.create_at,categories.categoryId ,form.categoryId,count(comments.commentId),
+    const mostpopular1=`select form.id,form.title,form.file,form.message,form.status,form.create_at,categories.category,categories.categoryId ,form.categoryId,count(comments.commentId),
                         registration.username
                         from form
                         left join categories on categories.categoryId=form.categoryId
