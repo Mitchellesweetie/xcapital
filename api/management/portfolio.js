@@ -44,7 +44,7 @@ async function getPersonal(userId) {
             [userId],
             (error, results) => {
                 if (error) reject(error);
-                resolve(results || []);  // Assuming the first result is the user's personal data
+                resolve(results[0]);  // Assuming the first result is the user's personal data
             }
         );
     });
@@ -165,106 +165,80 @@ async function getExperience(userId) {
 
 // Route to download CV as PDF
 router.get('/download-cv', isAuthenticated, async (req, res) => {
-    const userId = req.session.userId;
     let browser = null;
     let page = null;
-    if (!userId) {
-        return res.redirect('/login_blog');
-    }
 
     try {
-        // Fetch user data
-        const personal = await getPersonal(userId);
-        const education = await getEducation(userId);
-        const references = await getReferences(userId);
-        const skills = await getSkills(userId);
-        const awards = await getAwards(userId);
-        const languages = await getLanguages(userId);
-        const experiences = await getExperience(userId);  // Fetch experiences
+        const userId = req.session.userId;
+        if (!userId) return res.redirect('/login_blog');
 
-        // Render EJS template
+        const data = {
+            personal: await getPersonal(userId),
+            education: await getEducation(userId),
+            references: await getReferences(userId),
+            skills: await getSkills(userId),
+            awards: await getAwards(userId),
+            languages: await getLanguages(userId),
+            experiences: await getExperience(userId)
+        };
+
         const templatePath = path.join(__dirname, '..', '..', 'views', 'portfolio', 'download.ejs');
-        const templateContent = await fs.readFile(templatePath, 'utf8');
+        const html = await ejs.renderFile(templatePath, data);
 
-        // Render the template with EJS
-        const html = await ejs.render(templateContent, {
-            personal,
-            education,
-            experiences,
-            references,
-            skills,
-            awards,
-            languages
-        }, {
-            filename: templatePath // This helps with including other files if needed
-        });
-
-        // Log template size for debugging
-        console.log('Rendered HTML size:', html.length);
-
-        // Launch browser
         browser = await puppeteer.launch({
             headless: 'new',
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage'
-            ]
+            args: ['--no-sandbox'],
+            defaultViewport: {
+                width: 1200,
+                height: 1600,
+                deviceScaleFactor: 1.5
+            }
         });
 
         page = await browser.newPage();
-
-        // Set content with HTML mime type
-        await page.setContent(html, {
-            waitUntil: ['domcontentloaded', 'networkidle0'],
-            timeout: 30000
+        await page.evaluateHandle('document.fonts.ready');
+        await page.setContent(html, { waitUntil: 'networkidle0' });
+        
+        // Add print-specific styles
+        await page.addStyleTag({
+            content: `
+                @page { size: A4; margin: 0; }
+                body { margin: 0; padding: 0; }
+                .cv-container {
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                    padding: 40px !important;
+                    display: grid !important;
+                    grid-template-columns: 65% 35% !important;
+                }
+                .experience-item, .skill-category {
+                    page-break-inside: avoid;
+                }
+            `
         });
 
-        // Wait for content to be visible
-        await page.waitForSelector('.cv-container', { 
-            visible: true,
-            timeout: 5000 
-        });
-
-        // Generate PDF
-        const pdf = await page.pdf({
+        const buffer = await page.pdf({
             format: 'A4',
             printBackground: true,
-            margin: {
-                top: '20px',
-                right: '20px',
-                bottom: '20px',
-                left: '20px'
-            },
-            preferCSSPageSize: true
+            margin: { top: '10px', right: '10px', bottom: '10px', left: '10px' },
+            scale: 0.8
         });
 
-        // Clean up
         await browser.close();
 
-        // Set correct headers for PDF
-        res.contentType('application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="cv.pdf"');
-        res.send(pdf);
+        res.writeHead(200, {
+            'Content-Type': 'application/pdf',
+            'Content-Length': buffer.length,
+            'Content-Disposition': 'attachment; filename=cv.pdf'
+        });
+        res.end(buffer);
 
     } catch (error) {
-        console.error('Error in PDF generation:', error);
-        
-        // Clean up in case of error
-        if (browser) {
-            await browser.close();
-        }
-        
-        // Send detailed error for debugging
-        res.status(500).json({
-            error: 'Error generating PDF',
-            details: error.message,
-            stack: error.stack
-        });
+        if (browser) await browser.close();
+        console.error('PDF Generation Error:', error);
+        res.status(500).send(error.message);
     }
 });
-
-
 
 
 //whole portfolio

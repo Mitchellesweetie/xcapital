@@ -419,28 +419,29 @@
                                 </div>
                             </div>
                             <div class="col-xl-8 col-md-9">
-                                <div class="properties__button">
-                                    <!-- Nav Button -->  
-                                    <% if (blogs && blogs.length > 0) { %>
-                                        <nav>   
-                                            <div class="nav nav-tabs d-flex justify-content-start" id="nav-tab" role="tablist" style="gap: 10px;">
-                                                <% blogs.forEach(blog => { %>
-                                                    <a class="nav-item nav-link <%= blog.categoryId == currentCategoryId ? 'active' : '' %>"  
-                                                        id="nav-<%= blog.categoryId %>-tab" 
-                                                        data-toggle="tab"
-                                                        href="#nav-<%= blog.categoryId %>" 
-                                                        role="tab" 
-                                                        aria-controls="nav-<%= blog.categoryId %>" 
-                                                        aria-selected="<%= blog.categoryId == currentCategoryId %>">
-                                                        <%= blog.category %>
-                                                    </a>
-                                                <% }); %>    
-                                            </div>
-                                        </nav>
-                                    <% } else { %>
-                                        <p>No categories available.</p>
-                                    <% } %>
-                                </div>
+                              <div class="properties__button">
+    <!-- Nav Button -->
+    <% if (categories && categories.length > 0) { %>
+        <nav>
+            <div class="nav nav-tabs d-flex justify-content-start" id="nav-tab" role="tablist" style="gap: 10px;">
+                <% categories.forEach(category => { %>
+                    <a class="nav-item nav-link <%= category.categoryId == currentCategoryId ? 'active' : '' %>"  
+                       id="nav-<%= category.categoryId %>-tab" 
+                       data-toggle="tab"
+                       href="#nav-<%= category.categoryId %>" 
+                       role="tab" 
+                       aria-controls="nav-<%= category.categoryId %>" 
+                       aria-selected="<%= category.categoryId == currentCategoryId %>">
+                        <%= category.categoryName %>
+                    </a>
+                <% }); %>
+            </div>
+        </nav>
+    <% } else { %>
+        <p>No categories available.</p>
+    <% } %>
+</div>
+
                             </div>
                         </div>
                         <!-- Tab content -->
@@ -677,7 +678,7 @@
                                     <img src="<%= mostpopulars.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="#" > <h4><a href="/student_blog/latest_news/<%= mostpopulars.id %>"><%= mostpopulars.title %></a></h4></a></h4>
+                                    <h4><a href="/student_blog/latest_news/<%= mostpopulars.id %>"><%= mostpopulars.title %></a></h4>
                                     <P><%= mostpopulars.create_at %></P>
                                     <!-- <a class="popup-video btn-icon" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                     
@@ -720,7 +721,7 @@
                                     <img src="<%= trend.file %>" alt="">
                                 </div>
                                 <div class="what-cap">
-                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"> <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4></a></h4>
+                                    <h4><a href="/student_blog/latest_news/<%= trend.id %>"><%= trend.title %></a></h4>
                                     <P>Jun 19, 2020</P>
                                     <!-- <a class="popup-video" href="https://www.youtube.com/watch?v=1aP-TXUpNoU"><span class="flaticon-play-button"></span></a> -->
                                 </div>

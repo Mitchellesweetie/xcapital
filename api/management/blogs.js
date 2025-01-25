@@ -82,7 +82,7 @@ router.post('/post', upload.single('file'),isAdmin, isAuthenticated,(req, res) =
     }
     const filePath = req.file ? `/uploads/images/${req.file.filename}` : null
     const { categoryId,title, message } = req.body;
-    const data = { categoryId,title, message,file: filePath,  }; 
+    const data = { categoryId,title, message,file: filePath, user_id:userId }; 
     console.log(filePath)
 
     getBlogCounts((err, counts) => {

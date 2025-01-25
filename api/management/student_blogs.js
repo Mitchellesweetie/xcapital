@@ -47,10 +47,14 @@ function isAuthenticated(req, res, next) {
 
 
 
-router.get('/home', (req, res) => {
+router.get('/home', async(req, res) => {
     console.log('Session Username:', req.session.username);
     const { categoryId } = req.query;  
     const username = req.session.username; 
+    const categories = await pool.query('SELECT * FROM categories'); 
+    const blog = await pool.query('SELECT * FROM form'); 
+    const categoriblogs = Array.isArray(blog) ? queryResults : Object.values(blog);
+    const currentCategoryId = req.query.categoryId || (categories[0] && categories[0].categoryId); 
     const mostrecent=`select form.id, form.title,form.file, form.message, categories.category, registration.username, form.create_at, form.status
                         from form   LEFT JOIN categories ON form.categoryId = categories.categoryId
                         LEFT JOIN registration ON form.user_id = registration.user_id    where form.status='approved' order by create_at desc limit 5`
@@ -80,7 +84,7 @@ router.get('/home', (req, res) => {
                     left join categories on categories.categoryId=form.categoryId
                     left join comments on comments.id=form.id where form.status='approved'
                     group by form.id  order by comments.commentId desc `
-    pool.query(
+    await pool.query(
         `SELECT form.id, form.title,form.file, form.message, categories.category, registration.username, form.create_at, form.status
          FROM form
          LEFT JOIN categories ON form.categoryId = categories.categoryId
@@ -97,7 +101,8 @@ router.get('/home', (req, res) => {
                     categories: []  ,
                     mostpopula1: [] ,
                     like:[],
-                    mostrecentone:[]
+                    mostrecentone:[],categoriblogs:categoriblogs,        
+                    currentCategoryId: []
 
                 });
             }
@@ -105,7 +110,7 @@ router.get('/home', (req, res) => {
             const blogs = Array.isArray(result) ? result : [];
             // console.log("Blogs:", blogs);
 
-            pool.query(mostpppular,(err,mostpopular)=>{
+     pool.query(mostpppular,(err,mostpopular)=>{
                 if (err) {
                     console.error('Database error:', err);
                     return res.render('student_blog/index', { 
@@ -115,7 +120,8 @@ router.get('/home', (req, res) => {
                         username,
                         categories: [] ,
                         mostpopular:[],         
-                        mostpopula1: [] ,like:[],mostrecentone:[]
+                        mostpopula1: [] ,like:[],mostrecentone:[],categoriblogs:categoriblogs,        
+                        currentCategoryId: []
 
 
                     });
@@ -131,7 +137,8 @@ router.get('/home', (req, res) => {
                             username,
                             categories: [] ,
                             mostpopular:[],         
-                            mostpopula1: [] ,like:[],mostrecentone:[]
+                            mostpopula1: [] ,like:[],mostrecentone:[],categoriblogs:categoriblogs,        
+                            currentCategoryId: []
     
     
                         });
@@ -149,7 +156,8 @@ router.get('/home', (req, res) => {
                         categories: [] ,
                         mostpopular:[],
                         trendingblog:[],
-                        mostpopula1: [] ,like:[],mostrecentone:[]
+                        mostpopula1: [] ,like:[],mostrecentone:[],categoriblogs:categoriblogs,        
+                        currentCategoryId: []
 
 
                     });
@@ -169,7 +177,8 @@ router.get('/home', (req, res) => {
                         trendingblog:[],
                         like:[],
                         mostpopula1: [] ,
-                        mostrecentone:[]
+                        mostrecentone:[],categoriblogs:categoriblogs,        
+                        currentCategoryId: parseInt(currentCategoryId)
 
 
                     });
@@ -187,7 +196,8 @@ router.get('/home', (req, res) => {
                         mostpopular:[],
                         trendingblog:[],
                         mostpopula1:[],
-                        like:[],mostrecentone:[]
+                        like:[],mostrecentone:[],categoriblogs:categoriblogs,        
+                        currentCategoryId: parseInt(currentCategoryId)
 
 
                     });
@@ -206,13 +216,13 @@ router.get('/home', (req, res) => {
                             mostpopular:[],
                             trendingblog:[],
                             like:[],
-                            mostpopula1: [] ,mostrecentone:[]
+                            mostpopula1: [] ,mostrecentone:[],categoriblogs:categoriblogs,        
+                            currentCategoryId: parseInt(currentCategoryId)
 
     
                         });
                     }
              const like = Array.isArray(likeone) ? likeone : [];  
-             console.log('trying likes',like)
 
                        
 
@@ -228,7 +238,8 @@ router.get('/home', (req, res) => {
                         trendingblog,
                         mostpopula1: mostpopula1 ,
                         like:like,
-                        mostrecentone:[]
+                        mostrecentone:[],categoriblogs:categoriblogs,        
+                        currentCategoryId: parseInt(currentCategoryId)
 
 
                         
@@ -260,7 +271,8 @@ router.get('/home', (req, res) => {
                                     trendingblog,
                                     mostpopula1: mostpopula1 ,
                                     like:like,
-                                    mostrecentone:[]
+                                    mostrecentone:[],categoriblogs:categoriblogs,        
+                                    currentCategoryId: parseInt(currentCategoryId)
 
 
 
@@ -284,7 +296,8 @@ router.get('/home', (req, res) => {
                                 like:like,
                                 recentblog:recentblog,
                                 mostpopula1: mostpopula1 ,
-                                mostrecentone:mostrecentone
+                                mostrecentone:mostrecentone,categoriblogs:categoriblogs,        
+                                currentCategoryId: parseInt(currentCategoryId)
 
 
 
@@ -302,7 +315,8 @@ router.get('/home', (req, res) => {
                         like:like,
                         recentblog:recentblog,
                         mostpopula1:mostpopula1,
-                        mostrecentone:mostrecentone
+                        mostrecentone:mostrecentone,categoriblogs:categoriblogs,        
+                        currentCategoryId:null
 
 
                     });   
