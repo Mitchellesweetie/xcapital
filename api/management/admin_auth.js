@@ -14,7 +14,7 @@ const jwt=require('jsonwebtoken')
 
 dotenv.config();
 const pool = mysql.createPool({
-    connectionLimit: 10, // Adjust based on your app's load
+    connectionLimit: 50, // Adjust based on your app's load
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
@@ -151,7 +151,7 @@ router.post('/register', (req, res) => {
               // Set session variables
               req.session.userId = user.user_id;
               req.session.username = user.username;
-              req.session.role = user.role;
+              req.session.admin = user.role;
               
               // Save session before redirecting
               req.session.save((err) => {

@@ -14,7 +14,7 @@ const nodemailer=require('nodemailer')
 const sanitizeHtml = require('sanitize-html')
 const session=require('express-session')
 const puppeteer = require('puppeteer');
-
+const compression=require('compression')
 
 // const sanitizedContent = sanitizeHtml(message);
 const resume=require('./api/management/portfolio')
@@ -42,7 +42,7 @@ const app=express().use('/*',cors({
 }))
 
 
-
+app.use(compression())
 app.use(flash());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -85,27 +85,22 @@ function isAuthenticated(req, res, next) {
     }
     res.redirect('/login'); 
 }
-// function isAdmin(req, res, next) {
-//   if (req.session && req.session.userRole === 'admin') {
-//       return next();
-//   }
-//   res.status(403).render('error', { message: 'Access denied.' }); 
-// }
 function isAdmin(req, res, next) {
-    if (!req.session.admin)
-         {        return next();
-    }
-    return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
+  if (req.session.admin && req.session.userId) {
+      return next();
   }
-// const pool=mysql.createConnection({
-//     host: process.env.host,
-//     user: process.env.username,
-//     password: process.env.password,
-//     database: process.env.database
+//   res.redirect('/login'); 
 
-// })
+  res.status(403).render('error', { message: 'Access denied.' }); 
+}
+// function isAdmin(req, res, next) {
+//     if (!req.session.admin && req.session.userId )
+//          {        return next();
+//     }
+//     return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
+//   }
 const pool = mysql.createPool({
-    connectionLimit: 10, // Adjust based on your app's load
+    connectionLimit: 50,
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
@@ -119,17 +114,7 @@ const pool = mysql.createPool({
         console.log('pool connection')
     }
   });
-// pool.connect((err)=>{
-//     if(err){
-//         // console.log('Connect')
-//         console.log(err)
-//     }
 
-    
-// })
-// pool.on('error', (err) => {
-//     console.error('Database connection error:', err);
-// });
 
 app.get('/student_blog',(req,res)=>{
 
@@ -182,7 +167,7 @@ app.post('/blogs/:id/comment', isAuthenticated, (req, res) => {
     );
 });
 
-app.get('/admin_dashboard',isAdmin,isAuthenticated,(req, res) => {
+app.get('/admin_dashboard',isAdmin,(req, res) => {
     // const userId = req.session.userId;
 
     // if (!userId) {
@@ -203,7 +188,7 @@ app.get('/admin_dashboard',isAdmin,isAuthenticated,(req, res) => {
     pool.query('SELECT COUNT(*) AS totalBlogs FROM form', (err, results) => {
         if (err) {
             console.error('Error fetching blog count:', err);
-            return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the blog count', totalBlogs: 0 });
+            return res.render('admin/pendingblogs', { successMessage: null, errorMessage: 'Error fetching the blog count', totalBlogs: 0 });
         }
 
         const totalBlogs = results[0].totalBlogs;
@@ -211,7 +196,7 @@ app.get('/admin_dashboard',isAdmin,isAuthenticated,(req, res) => {
         pool.query("SELECT COUNT(ID) AS pendingBlogs FROM form WHERE status='pending'", (err, results) => {
             if (err) {
                 console.error('Error fetching pending blog count:', err);
-                return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the pending count', pendingBlogs: 0 });
+                return res.render('admin/pendingblogs', { successMessage: null, errorMessage: 'Error fetching the pending count', pendingBlogs: 0 });
             }
 
             const pendingBlogs = results[0].pendingBlogs; 
@@ -219,12 +204,12 @@ app.get('/admin_dashboard',isAdmin,isAuthenticated,(req, res) => {
             pool.query("SELECT COUNT(ID) AS approvedBlogs FROM form WHERE status='approved'", (err, results) => {
                 if (err) {
                     console.error('Error fetching approved blog count:', err);
-                    return res.render('pendingblogs', { successMessage: null, errorMessage: 'Error fetching the approved count', approvedBlogs: 0 });
+                    return res.render('admin/pendingblogs', { successMessage: null, errorMessage: 'Error fetching the approved count', approvedBlogs: 0 });
                 }
 
                 const approvedBlogs = results[0].approvedBlogs; 
 
-                res.render('index', {
+                res.render('admin/index', {
                     totalBlogs: totalBlogs,
                     pendingBlogs: pendingBlogs,
                     approvedBlogs: approvedBlogs,

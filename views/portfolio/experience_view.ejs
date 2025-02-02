@@ -1,109 +1,257 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV Resume Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .form-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin: 50px auto;
-      max-width: 800px;
-    }
-    .form-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .btn-custom {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .btn-custom:hover {
-      background-color: #0056b3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experience History</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-top: 50px;
+        }
+
+        .experience-entry {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .btn-add, .btn-save, .btn-remove, .btn-next, .btn-add-role {
+            font-weight: bold;
+        }
+
+        .saved-entries {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .saved-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .roles-container {
+            margin-top: 15px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="form-container">
-      <h1 class="form-title text-center">Experience </h1>
-      <form id="cvForm">
-      
-        <div class="mb-3">
-          <label class="form-label">Experience</label>
-          <div id="educationContainer">
-            <!-- Initial Education Group -->
-            <div class="card card-body mb-3">
-              <div class="mb-3">
-                <label for="degree1" class="form-label">Position</label>
-                <input type="text" class="form-control" id="degree1" name="position">
-              </div>
-              <div class="mb-3">
-                <label for="institution1" class="form-label">Organisation</label>
-                <input type="text" class="form-control" id="institution1" name="organisation" >
-              </div>
-              <div class="mb-3">
-                <label for="year1" class="form-label">Start</label>
-                <input type="date" class="form-control" id="start1" name="start">
-              </div>
-              <div class="mb-3">
-                <label for="end1" class="form-label">End</label>
-                <input type="date" class="form-control" id="end1" name="end">
-              </div>
-              <div class="mb-3">
-                <label for="current1" class="form-label">Current</label>
-                <input type="checkbox" id="current1" name="current" onchange="toggleCurrent(this)">
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Experience</button>
+    <div class="container">
+        <h2 class="text-center">Experience History</h2>
+        <div id="experienceForms"></div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-success btn-add" onclick="addExperienceForm()">+ Add Experience</button>
+            <button class="btn btn-purple btn-next" onclick="proceedToNext()" id="nextButton" disabled>Next</button>
         </div>
-
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-custom">Submit</button>
+        <div class="saved-entries" id="savedEntries">
+            <h3>Saved Entries</h3>
         </div>
-      </form>
     </div>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const addEducationButton = document.getElementById('addEducationButton');
-      const educationContainer = document.getElementById('educationContainer');
-      let educationIndex = 1;
+    <!-- jQuery, Popper.js, Bootstrap JS, and Bootstrap Datepicker JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
 
-      addEducationButton.addEventListener('click', function () {
-        educationIndex++;
-        const educationGroup = document.createElement('div');
-        educationGroup.classList.add('card', 'card-body', 'mb-3');
-        educationGroup.innerHTML = `
-          <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Degree</label>
-            <input type="text" class="form-control" id="degree${educationIndex}" name="degree[]" placeholder="E.g., Bachelor of Science">
-          </div>
-          <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Institution</label>
-            <input type="text" class="form-control" id="institution${educationIndex}" name="institution[]" placeholder="E.g., University of XYZ">
-          </div>
-          <div class="mb-3">
-            <label for="year${educationIndex}" class="form-label">Year of Graduation</label>
-            <input type="text" class="form-control" id="year${educationIndex}" name="year[]" placeholder="E.g., 2024">
-          </div>
-        `;
-        educationContainer.appendChild(educationGroup);
-      });
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let experienceEntries = [];
+        let formCount = 0;
+
+        function addExperienceForm() {
+            formCount++;
+            const formId = `experience-${formCount}`;
+
+            const formHtml = `
+                <div class="experience-entry" id="${formId}">
+                    <h5>Experience Entry ${formCount}</h5>
+                    <div class="form-group">
+                        <label for="company-${formId}">Company</label>
+                        <input type="text" class="form-control" id="company-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="position-${formId}">Primary Position</label>
+                        <input type="text" class="form-control" id="position-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="start-${formId}">Start Date (MM/DD/YYYY)</label>
+                        <input type="text" class="form-control datepicker" id="start-${formId}" placeholder="MM/DD/YYYY" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="end-${formId}">End Date (MM/DD/YYYY)</label>
+                        <input type="text" class="form-control datepicker" id="end-${formId}" placeholder="MM/DD/YYYY" readonly>
+                    </div>
+                    <div class="form-group">
+                        <input type="checkbox" id="present-${formId}" onclick="toggleEndDate('${formId}')">
+                        <label for="present-${formId}">Current Position</label>
+                    </div>
+                    <div class="roles-container" id="roles-${formId}">
+                        <div class="form-group role-entry">
+                            <label for="role-${formId}-1">Role 1</label>
+                            <input type="text" class="form-control" id="role-${formId}-1" placeholder="Enter a role">
+                        </div>
+                    </div>
+                    <button class="btn btn-info btn-add-role" onclick="addRole('${formId}')">+ Add Role</button>
+                    <button class="btn btn-primary btn-save" id="save-btn-${formId}">Save Entry</button>
+                    <button class="btn btn-danger btn-remove" onclick="removeEntry('${formId}')">Remove Entry</button>
+                </div>
+            `;
+
+            document.getElementById('experienceForms').insertAdjacentHTML('beforeend', formHtml);
+
+            // Initialize datepicker on newly added text inputs
+            $('#start-' + formId).datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true
+            });
+
+            $('#end-' + formId).datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true
+            });
+
+            // Attach the event listener for the save button
+            document.getElementById(`save-btn-${formId}`).addEventListener('click', () => saveEntry(formId));
+        }
+
+        function toggleEndDate(formId) {
+            const isChecked = document.getElementById(`present-${formId}`).checked;
+            const endDateInput = document.getElementById(`end-${formId}`);
+            
+            if (isChecked) {
+                endDateInput.disabled = true;
+                endDateInput.style.display = 'none'; // Hide the End Date field
+                endDateInput.value = 'PRESENT'
+            } else {
+                endDateInput.disabled = false;
+                endDateInput.style.display = 'block'; // Show the End Date field
+            }
+        }
+
+        function addRole(formId) {
+            const rolesContainer = document.getElementById(`roles-${formId}`);
+            const roleCount = rolesContainer.children.length + 1;
+            
+            const roleHtml = `
+                <div class="form-group role-entry">
+                    <label for="role-${formId}-${roleCount}">Role ${roleCount}</label>
+                    <input type="text" class="form-control" id="role-${formId}-${roleCount}" placeholder="Enter a role">
+                </div>
+            `;
+            rolesContainer.insertAdjacentHTML('beforeend', roleHtml);
+        }
+
+        function saveEntry(formId) {
+            // Collect form data for the current entry
+            const formData = {
+                company: document.getElementById(`company-${formId}`).value,
+                primaryPosition: document.getElementById(`position-${formId}`).value,
+                startDate: document.getElementById(`start-${formId}`).value,
+                current: document.getElementById(`present-${formId}`).checked ? 'true' : 'false',
+                endDate: document.getElementById(`present-${formId}`).checked ? 'Present' : document.getElementById(`end-${formId}`).value,
+                roles: []
+            };
+
+            // Collect all roles for the experience entry
+            const rolesContainer = document.getElementById(`roles-${formId}`);
+            const roleInputs = rolesContainer.getElementsByTagName('input');
+            for (let i = 0; i < roleInputs.length; i++) {
+            if (roleInputs[i].value.trim()) {
+                formData.roles.push(roleInputs[i].value.trim());
+            }
+        }
+
+            // Log the form data to verify
+            console.log(formData);
+
+            // Validate form data
+            if (!validateForm(formData)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Save entry via AJAX request (to avoid page reload)
+            fetch('/auth/experience_details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Display the saved entry in the UI
+                    displaySavedEntry(formData);
+
+                    // Optionally, remove the form from the page
+                    document.getElementById(formId).remove();
+
+                    // Optionally, enable the next button if this is the first entry
+                    document.getElementById('nextButton').disabled = false;
+                } else {
+                    alert('Error saving experience details.');
+                }
+            })
+            .catch(error => {
+                console.log('Error saving experience details:', error);
+                alert('An error occurred while saving your experience details. Please try again.');
+            });
+        }
+
+        function validateForm(formData) {
+            // Check if all required fields are filled
+            if (!formData.company || !formData.primaryPosition || !formData.startDate) {
+                return false; // If any of these fields are missing, return false
+            }
+
+            // If "Current Position" checkbox is not checked, End Date must be filled
+            if (formData.current === 'false' && !formData.endDate) {
+                return false; // End date is required if the position is not ongoing
+            }
+
+            return true; // All validations passed
+        }
+
+        function displaySavedEntry(entry) {
+            const entryHtml = `
+                <div class="saved-entry">
+                    <strong>${entry.company}</strong><br>
+                    Primary Position: ${entry.primaryPosition}<br>
+                    Roles: ${entry.roles.join(', ')}<br>
+                    ${entry.startDate} - ${entry.endDate || 'Present'}
+                </div>
+            `;
+            document.getElementById('savedEntries').insertAdjacentHTML('beforeend', entryHtml);
+        }
+
+        function removeEntry(formId) {
+            document.getElementById(formId).remove();
+        }
+
+        function proceedToNext() {
+            window.location.href = '/student_blog'; 
+            alert('Experience history saved successfully! Proceeding to next section...');
+        }
+    </script>
 </body>
 </html>

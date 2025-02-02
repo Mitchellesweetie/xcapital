@@ -19,7 +19,8 @@
 
     <title>Dashboard Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <link rel="apple-touch-icon" sizes="57x57" href="assets/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="assets/favicon/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="assets/favicon/apple-icon-72x72.png">
@@ -46,14 +47,35 @@
     <link href="/css/examples.css" rel="stylesheet">
     <script src="/js/config.js"></script>
     <script src="/js/color-modes.js"></script>
+    <!-- <script src="/ckeditor/ckeditor.js"></script> -->
+
     <link href="/node_modules/@coreui/chartjs/dist/css/coreui-chartjs.css" rel="stylesheet">
     <style>
+        /* Ensure the down arrow is white by default */
+    
         .sidebar-brand-full{
           font-family: "Dancing Script", cursive;
           font-optical-sizing: auto;
           font-weight: 30px;
           font-style: normal;
+                  }
+          .blog-content .blog-message {
+            overflow: hidden;
+            max-height: 100px;
+            transition: max-height 0.3s ease-out;
+          }
+
+          .blog-content.expanded .blog-message {
+            max-height: none;
+          }
+          .ck-editor__editable {
+            min-height: 500px;
         }
+       
+
+       
+
+      
 
     </style>
   </head>
@@ -82,17 +104,34 @@
              </button>
            </h2>
            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+             <div class="accordion-body">
+               <ul class="navbar-nav">
+                 <li class="nav-item">
+                   <a class="nav-link " aria-current="page" href="/add_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Users</a>
+                   <a class="nav-link " aria-current="page" href="/create_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Create New</a>
+                 </li>
+               </ul>
+           </div>
+           </div>
+         </div>
+         <!-- <div class="accordion-item" style="border: none;">
+          <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/></svg>  My Team
+            </button>
+          </h2>
+           <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
               <ul class="navbar-nav">
                 <li class="nav-item">
-                  <a class="nav-link " aria-current="page" href="/add_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Admins</a>
-                  <a class="nav-link " aria-current="page" href="/create_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Create New</a>
-
+                  <a class="nav-link " aria-current="page" href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Tutors</a>
+               
               </ul>
           </div>
           </div>
-         </div>
-         <div class="accordion-item" style="border: none;">
+        </div> -->
+        
+        <div class="accordion-item" style="border: none;">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseXI" aria-expanded="false" aria-controls="collapseXI">
             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="m354-287 126-76 126 77-33-144 111-96-146-13-58-136-58 135-146 13 111 97-33 143ZM233-120l65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-350Z"/></svg> Categories
@@ -105,27 +144,12 @@
                 <li class="nav-item">
                   <a class="nav-link " aria-current="page" href="/categories"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Categories</a>
                   <a class="nav-link " aria-current="page" href="/add_categories"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Create New</a>
-          
+ </li>
+
               </ul>
           </div>
           </div>
         </div>
-         <!-- <div class="accordion-item" style="border: none;">
-          <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/></svg>  My Team
-            </button>
-          </h2>
-           <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample"> 
-            <div class="accordion-body">
-              <ul class="navbar-nav">
-                <li class="nav-item">
-                  <a class="nav-link " aria-current="page" href="#"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Tutors</a>
-               
-              </ul>
-          </div>
-          </div> 
-        </div> -->
          <div class="accordion-item" style="border: none;">
            <h2 class="accordion-header">
              <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>
@@ -140,9 +164,10 @@
                  <li class="nav-item">
                    <a class="nav-link" href="/api/pendingblogs"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Pending Blogs</a>
                  </li>
-               </ul> 
-              </div>
+               </ul>
+         
 
+             </div>
            </div>
          </div>
          <div class="accordion-item" style="border: none;">
@@ -206,7 +231,7 @@
             </svg>
           </button>
           <ul class="header-nav d-none d-lg-flex">
-            <li class="nav-item"><a class="nav-link" href="#">Welcome,  <%= username %></a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Dashboard</a></li>
          
           </ul>
           <ul class="header-nav ms-auto">
@@ -261,7 +286,12 @@
               <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
             </li>
             <li class="nav-item dropdown"><a class="nav-link py-0 pe-0" data-coreui-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                <!-- <div class="avatar avatar-md"><img class="avatar-img" src="assets/img/avatars/8.jpg" alt="user@email.com"></div></a> -->
+                <div class="avatar avatar-md" onclick="myFunction()" id="profile">
+                  <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"> -->
+                  <title>Profile</title>
+                  <path d="M19.294 16.109l-3.414-2.219 1.287-2.359c0.288-0.519 0.457-1.137 0.458-1.796v-3.735c0-2.9-2.351-5.25-5.25-5.25s-5.25 2.351-5.25 5.25v0 3.735c0.001 0.658 0.17 1.277 0.468 1.815l-0.010-0.019 1.287 2.359-3.414 2.219c-1.033 0.676-1.706 1.828-1.706 3.137 0 0.002 0 0.005 0 0.007v-0 3.997h17.25v-3.997c0-0.002 0-0.005 0-0.007 0-1.309-0.673-2.461-1.692-3.128l-0.014-0.009zM19.5 21.75h-14.25v-2.497c0-0.001 0-0.003 0-0.004 0-0.785 0.404-1.477 1.015-1.877l0.009-0.005 4.578-2.976-1.952-3.578c-0.173-0.311-0.274-0.682-0.275-1.077v-3.735c0-2.071 1.679-3.75 3.75-3.75s3.75 1.679 3.75 3.75v0 3.735c-0 0.395-0.102 0.766-0.281 1.089l0.006-0.012-1.952 3.579 4.578 2.976c0.62 0.406 1.024 1.097 1.024 1.882 0 0.001 0 0.003 0 0.004v-0z"></path>
+                  </svg></div></a> 
+               
               <div class="dropdown-menu dropdown-menu-end pt-0">
                 <div class="dropdown-header bg-body-tertiary text-body-secondary fw-semibold rounded-top mb-2">Account</div><a class="dropdown-item" href="#">
                   <svg class="icon me-2">
@@ -307,7 +337,7 @@
             <ol class="breadcrumb my-0">
               <li class="breadcrumb-item"><a href="#">Home</a>
               </li>
-              <li class="breadcrumb-item active"><span>Approved Blogs</span>
+              <li class="breadcrumb-item active"><span>Pending Blogs</span>
               </li>
             </ol>
           </nav>
@@ -406,132 +436,187 @@
                 </div>
               </div>
             </div>          
-        
+        <!-- Scrollable modal -->
+
         
         
             <!-- /.col-->
           </div>
-          <!-- /.row-->
-          <form class="d-flex" role="search" method="post" action="/api/search">
+          <!-- <form class="d-flex" role="search" method="post" action="/api/search">
             <input class="form-control" type="search" placeholder="Search" aria-label="Search" style="width: 350px; margin: 7px; height:50px">
             <button class="btn btn-outline-primary" type="submit"style="width: 200px; margin: 7px; height:50px">Search</button>
-          </form>
-          <% if (errorMessage) { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <strong><%= errorMessage %><strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% } %>
-      
-          <% if (successMessage) { %>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <strong><%= successMessage %><strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% } %>
-          
-          <div class="card-body">
-            <% if (blogs.length > 0) { %>
-              <% blogs.forEach(blog => { %>
-                <div class="card" style="padding: 30px; margin: 10px;">
-                  <div class="card-body">
-                    <h2 style="font-size: 40px;"><%= blog.title %></h2>
-                    <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
-          
-                    <div class="d-flex" style="flex-wrap: wrap;">
-                      <!-- Image on the left -->
-                      <img src="<%= blog.file %>" style="width: 200px; height: 200px; margin-right: 20px;">
-                      
-                      <!-- Content container -->
-                      <div class="content-wrapper" style="flex: 1;">
-                        <div id="blog-content-<%= blog.id %>" class="blog-content">
-                          <div class="blog-message"><%- blog.message %></div>
-                          <button onclick="toggleReadMore('<%= blog.id %>')" 
-                                  class="btn btn-link text-danger"
-                                  style="padding: 0;">Read More</button>
-                        </div>
-                      </div>
-                    </div>
-          
-                    <p>Status: <%= blog.status %></p>
-                   
-                  </div>
-                </div>
-              <% }); %>
-            <% } else { %>
-              <p>No blogs available.</p>
-            <% } %>
+          </form> -->
+          <div class="d-flex" >
+<!-- Trigger Button -->
+<button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    <svg xmlns="http://www.w3.org/2000/svg" height="40px" viewBox="0 -960 960 960" width="40px" fill="#666666">
+    <path d="M446.67-446.67H200v-66.66h246.67V-760h66.66v246.67H760v66.66H513.33V-200h-66.66v-246.67Z"/>
+  </svg>
+  Post Blog
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create a Post</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="createPostForm" action="/api/post" method="post" enctype="multipart/form-data" novalidate>
+          <div class="form-floating mb-3">
+            <select class="form-select" id="categorySelect" name="categoryId" required>
+              <option value="" disabled selected>Select a Category</option>
+              <% categories.forEach(category => { %>
+                <option value="<%= category.categoryId %>"><%= category.category %></option>
+              <% }) %>
+            </select>
+            <label for="categorySelect">Category</label>
+          </div>
+          <div class="mb-3">
+            <label for="titleInput" class="form-label">Title</label>
+            <input type="text" class="form-control" id="titleInput" name="title" required>
+          </div>
+          <div class="mb-3">
+            <label for="bodyTextarea" class="form-label">Body</label>
+            <textarea class="form-control" id="bodyTextarea" name="message" rows="5" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="fileInput" class="form-label">Upload File</label>
+            <input type="file" class="form-control" id="fileInput" name="file" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Post</button>
+          </div>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+</div>
+            
           </div>
 
-
-
-    
-          <!-- /.card-->
+   
+            <% if (errorMessage) { %>
+                      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong><%= errorMessage %></strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                
+                    <% if (successMessage) { %>
+                      <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong><%= successMessage %></strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                      </div>
+                    <% } %>
+                  
+                    
+                                      <div class="card-body">
+                      <% if (blogs.length > 0) { %>
+                        <% blogs.forEach(blog => { %>
+                          <div class="card" style="padding: 30px; margin: 10px;">
+                            <div class="card-body">
+                              <h2 style="font-size: 40px;"><%= blog.title %></h2>
+                              <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
+                    
+                              <div class="d-flex" style="flex-wrap: wrap;">
+                                <!-- Image on the left -->
+                                <img src="<%= blog.file %>" style="width: 200px; height: 200px; margin-right: 20px;">
+                                
+                                <!-- Content container -->
+                                <div class="content-wrapper" style="flex: 1;">
+                                  <div id="blog-content-<%= blog.id %>" class="blog-content">
+                                    <div class="blog-message"><%- blog.message %></div>
+                                    <button onclick="toggleReadMore('<%= blog.id %>')" 
+                                            class="btn btn-link text-danger"
+                                            style="padding: 0;">Read More</button>
+                                  </div>
+                                </div>
+                              </div>
+                    
+                              <p>Status: <%= blog.status %></p>
+                              <a href="/api/pendingblogs/<%= blog.id %>"><button type="button" class="btn btn-warning">Edit</button></a>
+                              <% if (blog.status === 'pending') { %>
+                                <form action="/api/approve/<%= blog.id %>" method="post" style="display:inline;">
+                                  <button type="submit" class="btn btn-success">Approve</button>
+                                </form>
+                              <% } else { %>
+                                <span class="badge badge-success">Approved</span>
+                              <% } %>
+                            </div>
+                          </div>
+                        <% }); %>
+                      <% } else { %>
+                        <p>No blogs available.</p>
+                      <% } %>
+                    </div>
+                   
+                   
+            
+          <!-- /.card -->
           
             
             <!-- /.col-->
-            <!-- <div class="col-sm-6 col-lg-4">
-              <div class="card" style="--cui-card-cap-bg: #4875b4">
-                <div class="card-header position-relative d-flex justify-content-center align-items-center">
-                  <svg class="icon icon-3xl text-white my-4">
-                    <use xlink:href="node_modules/@coreui/icons/sprites/brand.svg#cib-linkedin"></use>
-                  </svg>
-                  <div class="chart-wrapper position-absolute top-0 start-0 w-100 h-100">
-                    <canvas id="social-box-chart-3" height="90"></canvas>
-                  </div>
-                </div>
-                <div class="card-body row text-center">
-                  <div class="col">
-                    <div class="fs-5 fw-semibold">500+</div>
-                    <div class="text-uppercase text-body-secondary small">contacts</div>
-                  </div>
-                  <div class="vr"></div>
-                  <div class="col">
-                    <div class="fs-5 fw-semibold">292</div>
-                    <div class="text-uppercase text-body-secondary small">feeds</div>
-                  </div>
-                </div>
-              </div> -->
+           
+         
             
-            <!-- /.col-->
+            <!-- /.cola-->
           
           <!-- /.row-->
+        
           <div class="break"></div>
-         
           <nav aria-label="Page navigation example" style="bottom: 0;">
             <ul class="pagination justify-content-center">
                 <% if (page > 1) { %>
                     <li class="page-item">
-                        <a class="page-link" href="/api/approvedblogs page - 1 %>">Previous</a>
+                        <a class="page-link" href="/api/pendingblogs ?page - 1 %>">Previous</a>
                     </li>
                 <% } %>
         
                 <% for (let i = iterator; i <= endingLink; i++) { %>
                     <% if (i === page) { %>
                         <li class="page-item active">
-                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
+                            <a class="page-link" href="/api/pendingblogs?page=<%= i %>"><%= i %></a>
                         </li>
                     <% } else { %>
                         <li class="page-item">
-                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
+                            <a class="page-link" href="/api//pendingblogs?page=<%= i %>"><%= i %></a>
                         </li>
                     <% } %>
                 <% } %>
         
                 <% if (page < numberOfPages) { %>
                     <li class="page-item">
-                        <a class="page-link" href="/api/approvedblogs?page=<%= page + 1 %>">Next</a>
+                        <a class="page-link" href="/api/pendingblogs?page=<%= page + 1 %>">Next</a>
                     </li>
                 <% } %>
             </ul>
         </nav>
-             
-         
-      
-        <footer class="footer px-9" style="position: fixed; bottom: 0; width: 100%; text-align: center;">
-          <h style="color: grey; text-align: center;">Xcapital&copy; 2024</h>
+            
+        
+          
+                    
+           
+        
+                      
+      </div> </div></div>
+      <footer class="footer" style="position: fixed; bottom: 0; width: 100%; display: flex; justify-content: center; align-items: center; color: grey; background-color: #f8f9fa; padding: 10px 0;">
+        <p style="margin: 0; color: grey;">xcapital&copy; 2024</p>
     </footer>
-  
+
+      <script>
+        
+        function myFunction(){
+
+        }
+
+
+      </script>
+    
     <!-- CoreUI and necessary plugins-->
     <script src="node_modules/@coreui/coreui/dist/js/coreui.bundle.min.js"></script>
     <script src="node_modules/simplebar/dist/simplebar.min.js"></script>
@@ -545,20 +630,72 @@
       });
       
     </script>
-  <script>
-    function toggleReadMore(blogId) {
-      const contentElement = document.getElementById(`blog-content-${blogId}`);
-      const button = contentElement.querySelector('button');
-      
-      if (contentElement.classList.contains('expanded')) {
-        contentElement.classList.remove('expanded');
-        button.textContent = 'Read More';
-      } else {
-        contentElement.classList.add('expanded');
-        button.textContent = 'Read Less';
-      }
+ <script>
+  function toggleReadMore(blogId) {
+    const contentElement = document.getElementById(`blog-content-${blogId}`);
+    const button = contentElement.querySelector('button');
+    
+    if (contentElement.classList.contains('expanded')) {
+      contentElement.classList.remove('expanded');
+      button.textContent = 'Read More';
+    } else {
+      contentElement.classList.add('expanded');
+      button.textContent = 'Read Less';
     }
-    </script>
+  }
+  </script>
+  <!-- <script>
+    ClassicEditor
+        .create(document.querySelector('#exampleFormControlTextarea1'))
+        .then(editor => {
+            // Set consistent height
+            editor.ui.view.editable.element.style.height = '500px';
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script> -->
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  let editorInstance;
+
+  // Initialize CKEditor
+  ClassicEditor
+    .create(document.querySelector('#bodyTextarea'))
+    .then(editor => {
+      editorInstance = editor;
+    })
+    .catch(error => {
+      console.error('CKEditor initialization error:', error);
+    });
+
+  // Add submit event listener to form
+  document.getElementById('createPostForm').addEventListener('submit', (event) => {
+    // Ensure CKEditor data is synced with textarea before form submission
+    const editorData = editorInstance.getData();
+    document.querySelector('#bodyTextarea').value = editorData;
+    
+    // Debugging: Check the textarea content
+    console.log('Textarea content:', document.querySelector('#bodyTextarea').value);
+    
+    // Make sure the content is not empty
+    if (document.querySelector('#bodyTextarea').value.trim() === '') {
+      event.preventDefault();
+      alert('Body cannot be empty!');
+    } else {
+      console.log('Form is ready to submit.');
+    }
+  });
+
+  // Optionally reset the form on page reload
+  window.onload = function() {
+    document.getElementById('createPostForm').reset();
+    if (editorInstance) {
+      editorInstance.setData('');
+    }
+  };
+</script>
+
     <!-- Plugins and scripts required by this view-->
     <script src="node_modules/chart.js/dist/chart.umd.js"></script>
     <script src="node_modules/@coreui/chartjs/dist/js/coreui-chartjs.js"></script>
@@ -568,6 +705,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
     
   </body>
 </html>

@@ -8,7 +8,7 @@ const resulPerPage=2
 
 dotenv.config();
 const pool = mysql.createPool({
-    connectionLimit: 10, 
+    connectionLimit: 50, 
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,

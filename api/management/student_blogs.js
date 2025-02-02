@@ -7,7 +7,7 @@ const path = require('path')
 
 dotenv.config();
 const pool = mysql.createPool({
-    connectionLimit: 10, // Adjust based on your app's load
+    connectionLimit: 50, 
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
@@ -108,7 +108,6 @@ router.get('/home', async(req, res) => {
             }
 
             const blogs = Array.isArray(result) ? result : [];
-            // console.log("Blogs:", blogs);
 
      pool.query(mostpppular,(err,mostpopular)=>{
                 if (err) {
@@ -415,45 +414,69 @@ router.get('/latest_news/:id', (req, res) => {
             const postId = req.params.id;
             const userId = req.session.userId;
         
-            // If the user is not logged in, send a response indicating this
             if (!userId) {
-                return res.status(401).json({ success: false, message: 'You must be logged in to like a post' });
+                return res.status(401).json({ success: false, message: 'You must be logged in to like/unlike a post' });
             }
         
-            // Check if postId is valid
             if (!postId) {
                 return res.status(400).json({ success: false, message: 'Invalid post ID' });
             }
         
-            // Query the database to find the post by postId
-            pool.query('SELECT * FROM form WHERE id = ?', [postId], (err, results) => {
+            pool.query('SELECT * FROM likes WHERE user_id = ? AND blog_id = ?', [userId, postId], (err, results) => {
                 if (err) {
-                    console.error('Error querying the database:', err);
+                    console.error('Error querying the likes table:', err);
                     return res.status(500).json({ success: false, message: 'Database error occurred' });
                 }
         
-                if (results.length === 0) {
-                    return res.status(404).json({ success: false, message: 'Post not found' });
+                if (results.length > 0) {
+                    pool.query(
+                        'DELETE FROM likes WHERE user_id = ? AND blog_id = ?',
+                        [userId, postId],
+                        (err) => {
+                            if (err) {
+                                console.error('Error deleting from likes table:', err);
+                                return res.status(500).json({ success: false, message: 'Database error occurred' });
+                            }
+        
+                            pool.query(
+                                'UPDATE form SET likes = likes - 1 WHERE id = ? AND likes > 0',
+                                [postId],
+                                (err) => {
+                                    if (err) {
+                                        console.error('Error decrementing likes count:', err);
+                                        return res.status(500).json({ success: false, message: 'Database error occurred' });
+                                    }
+        
+                                    res.json({ success: true, action: 'unliked', message: 'Like removed successfully' });
+                                }
+                            );
+                        }
+                    );
+                } else {
+                    pool.query(
+                        'INSERT INTO likes (user_id, blog_id) VALUES (?, ?)',
+                        [userId, postId],
+                        (err) => {
+                            if (err) {
+                                console.error('Error inserting into likes table:', err);
+                                return res.status(500).json({ success: false, message: 'Database error occurred' });
+                            }
+        
+                            pool.query(
+                                'UPDATE form SET likes = likes + 1 WHERE id = ?',
+                                [postId],
+                                (err) => {
+                                    if (err) {
+                                        console.error('Error incrementing likes count:', err);
+                                        return res.status(500).json({ success: false, message: 'Database error occurred' });
+                                    }
+        
+                                    res.json({ success: true, action: 'liked', message: 'Like added successfully' });
+                                }
+                            );
+                        }
+                    );
                 }
-        
-                // Post found, proceed with the like update
-                pool.query(
-                    'UPDATE form SET likes = likes + 1 WHERE id = ?',
-                    [postId],
-                    (err, results) => {
-                        if (err) {
-                            console.error('Error updating likes:', err);
-                            return res.status(500).json({ success: false, message: 'Database error occurred' });
-                        }
-        
-                        if (results.affectedRows === 0) {
-                            return res.status(404).json({ success: false, message: 'Post not found or user unauthorized' });
-                        }
-        
-                        // Send a success response
-                        res.json({ success: true, message: 'Like added successfully' });
-                    }
-                );
             });
         });
         

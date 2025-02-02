@@ -244,7 +244,7 @@ router.get('/download-cv', isAuthenticated, async (req, res) => {
 //whole portfolio
 
 router.get('/myportfolio', isAuthenticated, (req, res) => {
-    console.log('Logged in user ID:', req.session.userId);
+    // console.log('Logged in user ID:', req.session.userId);
     const userId = req.session.userId;
 
     const queries = {
@@ -326,6 +326,7 @@ router.get('/myportfolio', isAuthenticated, (req, res) => {
 
 //personal details
 
+
 router.get('/personal_details',isAuthenticated,(req,res)=>{
     const userId = req.session.userId;
     console.log(userId)
@@ -339,6 +340,7 @@ router.get('/personal_details',isAuthenticated,(req,res)=>{
 
     res.render('portfolio/portfolio_form',{successMessage: null,errorMessage:null})
 })
+
 router.post('/auth/personal_details', isAuthenticated, (req, res) => {
     const userId = req.session.userId;
 
@@ -382,6 +384,9 @@ router.post('/auth/personal_details', isAuthenticated, (req, res) => {
         });
     });
 
+
+    
+
 //education
 router.get('/portfolio_view_education',isAuthenticated ,(req,res)=>{
     const userId = req.session.userId;
@@ -395,16 +400,6 @@ router.get('/portfolio_view_education',isAuthenticated ,(req,res)=>{
     res.render('portfolio/education')
 })
 
-router.get('/try',(req,res)=>{
-   
-
-    res.render('portfolio/trying')
-})
-
-
-// Route for handling education details form submission
-// Route for handling education details form submission
-// Route for handling education details form submission
 router.post('/auth/education_detail', async (req, res) => {
     const { degree = [], institution = [], start = [], end = [], current = [] } = req.body;
   
@@ -450,7 +445,6 @@ router.post('/auth/education_detail', async (req, res) => {
   });
   
   
-// Start the server
 
 
   
@@ -466,7 +460,6 @@ router.post('/auth/education_details', async (req, res) => {
         const { degree, institution, startDate, endDate, current } = req.body;
         const endDateValue = current === 'true' ? null : endDate;
 
-        // Insert the education details into the database
         await pool.query('INSERT INTO education SET ?', {
             degree,
             institution,
@@ -475,10 +468,8 @@ router.post('/auth/education_details', async (req, res) => {
             user_id: userId,
         });
 
-        // Optionally update profile status
         await pool.query('UPDATE registration SET profile_status = 2 WHERE user_id = ?', [userId]);
 
-        // Return the saved entry as part of the response
         return res.status(200).json({
             success: true,
             message: 'Education details saved successfully',
@@ -698,7 +689,6 @@ router.post('/auth/portfolio_view_awards',isAuthenticated,async(req,res)=>{
         const { award } = req.body;
         // const endDateValue = current === 'true' ? null : endDate;
 
-        // Insert the education details into the database
         await pool.query('INSERT INTO awards SET ?', {
             award:award,
             
@@ -745,7 +735,6 @@ router.post('/auth/portfolio_view_languages',isAuthenticated,async(req,res)=>{
         const { language } = req.body;
         // const endDateValue = current === 'true' ? null : endDate;
 
-        // Insert the education details into the database
         await pool.query('INSERT INTO languages SET ?', {
             languages:language,
             
@@ -795,4 +784,138 @@ router.get('/blog/:id', (req, res) => {
 });
 
 
+
+
+
+
+
+
+
+
+//UPDATES
+//personal_details
+router.get('/edit_details/:id',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+    const user_id=req.params.id
+    console.log(userId)
+
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+    pool.query('select * from personal_details where user_id=?',[userId],(err,results)=>{
+
+        if(err)
+            return res.status(404).send('Error occured')
+
+        if (results.length === 0) {
+            return res.redirect('/personal_details'); 
+        }
+  
+        const personal = results[0]; 
+  
+
+
+        res.render('portfolio/portfolio_edit',{successMessage: null,errorMessage:null,personal:personal})      
+
+    })
+
+
+
+})
+
+
+router.post('/edit_details/:id', isAuthenticated, (req, res) => {
+    const userId = req.session.userId;
+    const user_id = req.params.id;
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+    const data = req.body;
+    const {
+        salutation, fullName, about, gender, gmail, number_,
+        dob, ethnicity, religion, nationality
+    } = data;
+
+    const sqlQuery = `
+        UPDATE personal_details
+        SET salutation = ?, fullName = ?, about = ?, gender = ?, gmail = ?, 
+            number_ = ?, dob = ?, ethnicity = ?, religion = ?, nationality = ?
+        WHERE user_id = ?
+    `;
+    const values = [
+        salutation, fullName, about, gender, gmail, 
+        number_, dob, ethnicity, religion, nationality, user_id
+    ];
+
+    pool.query(sqlQuery, values, (err, result) => {
+        if (err) {
+            console.error('Error updating personal details:', err);
+            return res.redirect(`/edit_details/${user_id}?error=profile_update_failed`);
+        }
+
+        res.redirect('/myportfolio');
+    });
+});
+//education
+router.get('/edit_education/:id',isAuthenticated ,(req,res)=>{
+    const userId = req.session.userId;
+    const user_id=req.params.id
+    console.log(userId)
+
+
+    if (!userId) {
+        return res.redirect('/login_blog');
+    }
+
+    pool.query('select * from  education where user_id=?',[userId],(err,results)=>{
+
+        if(err)
+            return res.status(404).send('Error occured')
+
+        if (results.length === 0) {
+            return res.redirect('/portfolio_view_education'); 
+        }
+  
+        const education = results[0]; 
+
+        res.render('portfolio/education_edit',{successMessage: null,errorMessage:null,education:education})      
+
+    })
+})
+router.post('/edit_education/:id', async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            // return res.status(401).json({ success: false, message: 'User not authenticated' });
+            return res.redirect('/login_blog');
+
+        }
+
+        const { degree, institution, startDate, endDate, current } = req.body;
+        const endDateValue = current === 'true' ? null : endDate;
+
+        await pool.query('UPDATE  education SET degree=?, institution=?, startDate=?, endDate=? WHERE user_id=? AND educationid=?', {
+            degree,
+            institution,
+            start: startDate,
+            end: endDateValue,
+            user_id: userId,
+        });
+
+
+        return res.status(200).json({
+            success: true,
+            message: 'Education details saved successfully',
+            data: { degree, institution, startDate, endDate: endDateValue || 'Present' }
+        });
+
+    } catch (error) {
+        console.error('Error saving education details:', error.message);
+        return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+    
 module.exports = router;

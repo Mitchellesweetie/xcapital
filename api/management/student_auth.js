@@ -12,7 +12,7 @@ const jwt=require('jsonwebtoken')
 dotenv.config()
 
 const pool = mysql.createPool({
-    connectionLimit: 10, // Adjust based on your app's load
+    connectionLimit: 50, 
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,

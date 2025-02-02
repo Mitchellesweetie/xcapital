@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>News  HTML-5 Template </title>
+    <title>Xcapital News </title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="manifest" href="site.webmanifest">
@@ -329,7 +329,7 @@
                                         <li><a href="#">Latest News</a></li>
                                         <li><a href="#">Pages</a>
                                             <ul class="submenu">
-                                                <li><a href=#">Blog</a></li>
+                                                <li><a href="#">Blog</a></li>
                                                 <li><a href="#">Blog Details</a></li>
                                                 <li><a href="#">Element</a></li>
                                             </ul>
@@ -567,7 +567,6 @@
 
 
                        
-                        </ul>
                         <!-- From -->
                         <div class="row">
                             <div class="col-lg-8">
@@ -699,6 +698,7 @@
                     </div>
                 </div>
         </div>
+    </div>
     </div>
     <!-- About US End -->
 </main>
@@ -944,46 +944,49 @@
    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
    <script>
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.like-forms').forEach(form => {
-        form.querySelector('.like-button').addEventListener('click', async (e) => {
-            e.preventDefault(); // Prevent any default behavior
-
-            const postId = form.dataset.id; // Get the dynamic ID from the data-id attribute
-            const likeCountSpan = form.querySelector('.like-count'); // Get the like count element
-
-            try {
-                // Send a POST request to the server to update the like count
-                const response = await fetch(`/student_blog/likePosts/${postId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({}) // Send empty body since we don't need extra data
-                });
-
-                const data = await response.json(); // Parse the JSON response
-
-                if (response.ok && data.success) {
-                    // Update the like count in the UI
-                    const currentLikes = parseInt(likeCountSpan.textContent, 10) || 0;
-                    likeCountSpan.textContent = currentLikes + 1;
-                } else if (data.message === 'You must be logged in to like a post') {
-                    // If the user is not logged in, redirect them to the login page
-                    window.location.href = '/login_blog'; // Adjust the URL if needed
-                } else {
-                    alert('Failed to add like: ' + (data.message || 'Unknown error'));
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.like-forms').forEach(form => {
+            form.querySelector('.like-button').addEventListener('click', async (e) => {
+                e.preventDefault();
+    
+                const postId = form.dataset.id; 
+                const likeCountSpan = form.querySelector('.like-count'); // Like count element
+                const likeButton = form.querySelector('.like-button'); // Button element
+    
+                try {
+                    const response = await fetch(`/student_blog/likePosts/${postId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+    
+                    const data = await response.json();
+    
+                    if (response.ok && data.success) {
+                        // Update UI based on the toggle
+                        const currentLikes = parseInt(likeCountSpan.textContent, 10) || 0;
+                        if (data.action === 'liked') {
+                            likeCountSpan.textContent = currentLikes + 1;
+                            likeButton.textContent = 'Unlike';
+                        } else if (data.action === 'unliked') {
+                            likeCountSpan.textContent = currentLikes - 1;
+                            likeButton.textContent = 'Like';
+                        }
+                    } else if (data.message === 'You must be logged in to like a post') {
+                        window.location.href = '/student_logout'; // Redirect to login if not authenticated
+                    } else {
+                        alert('Failed to process like: ' + (data.message || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    alert('Error processing your request. Please try again.');
                 }
-            } catch (error) {
-                console.error('Fetch Error:', error); // Log error details
-                alert('Error processing your request. Please try again.');
-            }
+            });
         });
     });
-});
-
     </script>
+    
     
     
     

@@ -13,7 +13,7 @@ const jwt=require('jsonwebtoken')
 
 dotenv.config();
 const pool = mysql.createPool({
-    connectionLimit: 10, // Adjust based on your app's load
+    connectionLimit: 50,
     host: process.env.host,
     user: process.env.username,
     password: process.env.password,
@@ -28,12 +28,14 @@ const pool = mysql.createPool({
     }
   });
 
-function isAdmin(req, res, next) {
-  if (!req.session.admin)
-       {        return next();
+  function isAdmin(req, res, next) {
+    if (req.session.admin && req.session.userId) {
+        return next();
+    }
+  //   res.redirect('/login'); 
+  
+    res.status(403).render('error', { message: 'Access denied.' }); 
   }
-  return res.status(403).render('error', { message: 'Access Denied. Admins only.' });
-}
 function isAuthenticated(req, res, next) {
   if (req.session && req.session.userId) {
       return next(); 
@@ -42,7 +44,7 @@ function isAuthenticated(req, res, next) {
 }
 
 
-router.get('/categories',isAuthenticated,isAdmin, (req, res) => {
+router.get('/categories',isAdmin, (req, res) => {
 
   
   pool.query('SELECT * FROM categories', (err, result) => {
@@ -62,14 +64,14 @@ router.get('/categories',isAuthenticated,isAdmin, (req, res) => {
     });
   });
 });
-router.get('/add_categories',isAuthenticated,isAdmin,(req,res)=>{
+router.get('/add_categories',isAdmin,(req,res)=>{
  
 
   res.render('admin/create_categories', { successMessage: null, errorMessage: null
   })
 
 })
-router.get('/add_users',isAuthenticated,isAdmin,(req,res)=>{
+router.get('/add_users',isAdmin,(req,res)=>{
   pool.query('SELECT * FROM registration where role="admin" ', (err, result) => {
     if (err) {
       console.error('Database error:', err);
@@ -88,7 +90,7 @@ router.get('/create_users',(req,res)=>{
     res.render('admin/create_admin', { successMessage: null, errorMessage: null })
 
 })
-router.get('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
+router.get('/edit_categories/:id',isAdmin,(req, res) => {
   const categoryId = req.params.id;
   
 
@@ -118,7 +120,7 @@ router.get('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
   });
 });
 
-router.get('/edit_admin/:id',isAuthenticated,isAdmin,(req, res) => {
+router.get('/edit_admin/:id',isAdmin,(req, res) => {
   const user_id = req.params.id;
   
 
@@ -180,7 +182,7 @@ router.get('/logout', (req, res) => {
     });
 
 
-    router.post('/update_admin/:id', isAuthenticated, isAdmin, (req, res) => {
+    router.post('/update_admin/:id',  isAdmin, (req, res) => {
       const user_id = req.params.id; 
       
       const { username, email, phone, role, password, confirmpassword } = req.body;  
@@ -213,7 +215,7 @@ router.get('/logout', (req, res) => {
     
 
 
-router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
+router.post('/add_categories',isAdmin, (req, res) => {
   // Ensure statu is either 'active' or 'inactive'
   const statu = req.body.statu === 'active' ? 'active' : 'inactive';
   const { category, descriptio } = req.body;
@@ -234,7 +236,7 @@ router.post('/add_categories',isAuthenticated,isAdmin, (req, res) => {
       });
   });
 });
-router.post('/delete_categories/:id', isAuthenticated,isAdmin,(req, res) => {
+router.post('/delete_categories/:id', isAdmin,(req, res) => {
   const category = req.params.id;
 
   pool.query('delete from categories where categoryId=?', [category], (err, result) => {
@@ -253,7 +255,7 @@ router.post('/delete_categories/:id', isAuthenticated,isAdmin,(req, res) => {
 });
 
 
-router.post('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
+router.post('/edit_categories/:id',isAdmin,(req, res) => {
   const categoryId = req.params.id; 
   const { category, statu, descriptio } = req.body;  // Extract data from the form submission
 
@@ -280,7 +282,7 @@ router.post('/edit_categories/:id',isAuthenticated,isAdmin,(req, res) => {
 });
 
 
-router.post('/delete_user/:id',isAuthenticated,isAdmin, (req, res) => {
+router.post('/delete_user/:id',isAdmin, (req, res) => {
   const userId = req.params.id; // Get user ID from URL parameters
   console.log('Attempting to delete user with ID:', userId);
 

@@ -214,10 +214,13 @@
                 </div>
         
                 <div class="summary">
-                    <%- personal.about %>
+                
+                
+                    <%- personal.about %>       
+                    <a href="/edit_details/<%= personal.user_id %>"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg></a>          
+                
                 </div>
         
-                
                 <div class="section-title">EXPERIENCE</div>
                 
                 <div class="experience-item">
@@ -236,46 +239,16 @@
                     <% }) %>
 
                 </div>
-<!-- 
-                <div class="experience-item">
-                    <div class="job-title">USAID HealthIT Project, Mombasa — Intern</div>
-                    <div class="date">FEBRUARY 2024 - OCTOBER 2024</div>
-                    <ul>
-                        <li>Deployment and Training of 2.x KenyaEMR Palladium, 2.x facility wide KenyaEMR plus and 3.x KenyaEMR Facility Wide.</li>
-                        <li>Support on CHP registry.</li>
-                        <li>Documentation of bugs of Health Information Systems.</li>
-                        <li>Data Collection and analysis using KoboToolbox.</li>
-                        <li>Physical and Remote TA support to all assigned facilities</li>
-                        <li>Database management.</li>
-                        <li>Effective teamwork with supporting partners.</li>
-                    </ul>
-                </div>
 
-                <div class="experience-item">
-                    <div class="job-title">Nairobi County, Nairobi — Attache</div>
-                    <div class="date">MAY 2021 - JULY 2021</div>
-                    <ul>
-                        <li>OS Installation and Network configuration</li>
-                        <li>Hard Disk slaving and Database management</li>
-                        <li>Cleaning and maintenance of hardware</li>
-                    </ul>
-                </div>
-
-                <div class="experience-item">
-                    <div class="job-title">Kenya National Bureau of Statistic, Voi- Enumerator</div>
-                    <div class="date">AUGUST 2019</div>
-                    <ul>
-                        <li>Data Collection through questionnaires, interviews and observation.</li>
-                        <li>Verification of data-Ensuring that the information collected is complete, consistent, and accurate.</li>
-                    </ul>
-                </div> -->
             </div>
 
-            <div class="section">
-                <div class="section-title">EDUCATION</div>
+            <div class="section" >
+                <div class="section-title">EDUCATION   <a href="/edit_education/<%= education.user_id %>"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z"/></svg></a>          
+                </div>
                 <% education.forEach(edu =>{ %>
 
-                <div class="experience-item">
+                <div class="experience-item"> 
+                  
                     <div class="job-title"><%= edu.institution %></div>
                     <div class="job-tite"><%= edu.degree %></div>
                     <div class="date"><%= edu.start %>-<%= edu.end%></div>

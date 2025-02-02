@@ -92,12 +92,13 @@
                    <a class="nav-link " aria-current="page" href="/add_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Users</a>
                    <a class="nav-link " aria-current="page" href="/create_users"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Create New</a>
 
-                
+                 </li>
                </ul>
+
            </div>
            </div>
          </div>
-         <div class="accordion-item" style="border: none;">
+         <!-- <div class="accordion-item" style="border: none;">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
               <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/></svg>  Staff
@@ -112,7 +113,7 @@
               </ul>
           </div>
           </div>
-        </div>
+        </div> -->
         <div class="accordion-item" style="border: none;">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseXI" aria-expanded="false" aria-controls="collapseXI">
@@ -126,7 +127,7 @@
                 <li class="nav-item">
                   <a class="nav-link " aria-current="page" href="/categories"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Categories</a>
                   <a class="nav-link " aria-current="page" href="/add_categories"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5f6368"><path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z"/></svg>Create New</a>
-
+                </li>
               </ul>
           </div>
           </div>
@@ -339,14 +340,14 @@
           <!-- /.row-->
           <% if (errorMessage) { %>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <strong><%= errorMessage %><strong>
+              <strong><%= errorMessage %></strong>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
       
           <% if (successMessage) { %>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <strong><%= successMessage %><strong>
+              <strong><%= successMessage %></strong>
               <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
           <% } %>
@@ -413,9 +414,10 @@
           <!-- /.row-->
          
       <!-- </div> -->
-      <footer class="footer px-9" style="position:fixed; bottom: 0px; width: 100%;">
-        <div><a href="#">Ngoli&copy; 2024</a></div>
-      </footer>
+    </div> </div>
+    <footer class="footer" style="position: fixed; bottom: 0; width: 100%; display: flex; justify-content: center; align-items: center; color: grey; background-color: #f8f9fa; padding: 10px 0;">
+      <p style="margin: 0; color: grey;">xcapital&copy; 2024</p>
+  </footer>
     
     <!-- CoreUI and necessary plugins-->
     <script src="node_modules/@coreui/coreui/dist/js/coreui.bundle.min.js"></script>

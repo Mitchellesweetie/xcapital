@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personal Details</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-size: 18px;
+      font-family: Arial, sans-serif;
+
+    }
+
+
+    .form-container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 10px;  
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin: 80px auto;  
+      max-width: 1000px;
+      width: 90%;  
+    }
+
+    .form-title {
+      font-size: 3rem;
+      font-weight: 600;
+      margin-bottom: 30px;  
+      color: #333;
+      text-align: center;
+    }
+
+    .btn-custom {
+      background-color: #007bff;
+      color: #fff;
+      padding: 12px 20px; 
+      font-size: 1.2rem; 
+    }
+    .btn-custom:hover {
+      background-color: #0056b3;
+    }
+
+    .form-label {
+      font-size: 1.3rem; 
+      margin-bottom: 10px; 
+    }
+
+    /* Input Field Styling */
+    .form-control {
+      font-size: 1.2rem;
+      height: 50px; 
+      padding: 10px;
+    }
+    .form-control:focus {
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.6); 
+    }
+
+    /* Input Group Styling */
+    .input-group-append {
+      cursor: pointer;
+    }
+
+    /* Margin Bottom for Form Fields */
+    .mb-3 {
+      margin-bottom: 25px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <% if (errorMessage) { %>
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong><%= errorMessage %><strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
+    <% if (successMessage) { %>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong><%= successMessage %><strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
+    <div class="form-container">
+      <h1 class="form-title">Personal Details</h1>
+
+      <form method="post" action="/edit_details/<%= personal.user_id %>">
+        <!-- Personal Information -->
+        <div class="mb-3">
+          <label for="salutation" class="form-label">Salutation</label>
+          <input type="text" class="form-control" id="salutation" name="salutation"  value=" <%= personal.salutation %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="fullName" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="fullName" name="fullName" value=" <%= personal.fullName %>" placeholder="Enter your full name"  required>
+        </div>
+
+        <div class="mb-3">
+          <label for="about" class="form-label">About yourself</label>
+          <textarea class="form-control custom-textarea" id="about" name="about" style="height: 100px;" style="height: 200px;"  required><%= personal.about %></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label for="gender" class="form-label">Gender</label>
+          <input type="text" class="form-control" id="gender" name="gender" value=" <%= personal.gender %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" name="gmail" placeholder="Enter your email"  value=" <%= personal.gmail %>"required>
+        </div>
+
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="phone" name="number_" placeholder="Enter your phone number" value=" <%= personal.number_ %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="datepicker" class="form-label">Date of birth</label>
+          <input type="text" class="form-control" id="datepicker" name="dob" value=" <%= personal.dob %>" required readonly>
+        </div>
+
+        <div class="mb-3">
+          <label for="ethnicity" class="form-label">Ethnicity</label>
+          <input type="text" class="form-control" id="ethnicity" name="ethnicity" value=" <%= personal.ethnicity %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="religion" class="form-label">Religion</label>
+          <input type="text" class="form-control" id="religion" name="religion"  value=" <%= personal.religion %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="nationality" class="form-label">Nationality</label>
+          <input type="text" class="form-control" id="nationality" name="nationality"  value=" <%= personal.nationality %>" required>
+        </div>
+
+        <div class="text-center">
+          <button type="submit" class="btn btn-custom" style="background: #fd7e14">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+  <!-- Bootstrap Datepicker JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+
+  <!-- Initialize Datepicker -->
+  <script>
+    $(document).ready(function() {
+      $('#datepicker').datepicker({
+        format: 'mm/dd/yyyy',  // Specify date format
+        startDate: '-100y',     // Allow selecting dates from 100 years ago
+        endDate: 'today',       // Allow selecting dates up to today
+        autoclose: true         // Close the datepicker once a date is selected
+      });
+    });
+  </script>
+  
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
