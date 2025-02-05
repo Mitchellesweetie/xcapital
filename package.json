@@ -36,7 +36,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:ejs":"ejslint src/templates -type f -iname '*.ejs' -exec bash -c \"./node_modules/.bin/ejslint '{}'\"\\;"
   },
   "keywords": [],
   "author": "",

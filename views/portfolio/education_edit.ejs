@@ -3,25 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Education History</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+      <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Datepicker CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <title>Education Details</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
             background-color: #f5f5f5;
+            line-height: 1.6;
         }
-
+        
         .container {
-            background-color: white;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .education-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .education-card {
+            background: white;
+            border-radius: 8px;
             padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .education-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .education-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .education-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .detail-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .detail-item strong {
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .no-records {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            background-color: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-top: 50px;
         }
-
+        /*  adding education*/
         .education-entry {
             border: 1px solid #ddd;
             padding: 20px;
@@ -51,6 +129,44 @@
     </style>
 </head>
 <body>
+    <div class="container">
+        <div class="education-list">
+            <% if (edu.length === 0) { %>
+                <div class="no-records">No education records found</div>
+            <% } else { %>
+                <% edu.forEach((eduRecord, index) => { %>
+                    <div class="education-card">
+                        <div class="education-header">
+                            <h3>Education Record <%= index + 1 %></h3>
+                        </div>
+                        <div class="education-details">
+                            <div class="detail-item">
+                                <strong>Degree</strong>
+                                <%= eduRecord.degree %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Institution</strong>
+                                <%= eduRecord.institution %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Start Date</strong>
+                                <%= eduRecord.start %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>End Date</strong>
+                                <%= eduRecord.end %>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <a href="/edit_education/<%= eduRecord.educationid %>" class="btn btn-edit">Edit</a>
+                            <a href="/delete_education/<%= eduRecord.educationid %>" class="btn btn-delete">Delete</a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+    </div>
+
     <div class="container">
         <h2 class="text-center">Education History</h2>
         <div id="educationForms"></div>
@@ -86,7 +202,7 @@
                 </div>
                 <div class="form-group">
                     <label for="degree-${formId}">Degree/Certificate</label>
-                    <input type="text" class="form-control" id="degree-${formId}" value="<%= education.degree %>" placeholder="BACHELOR OF SCIENC IN XYZ"required>
+                    <input type="text" class="form-control" id="degree-${formId}"  placeholder="BACHELOR OF SCIENC IN XYZ"required>
                 </div>
               
                 <div class="form-group">
@@ -108,6 +224,7 @@
 
         document.getElementById('educationForms').insertAdjacentHTML('beforeend', formHtml);
 
+        // Initialize datepicker on newly added text inputs
         $('#start-' + formId).datepicker({
             format: 'mm/dd/yyyy',
             autoclose: true
@@ -118,6 +235,7 @@
             autoclose: true
         });
 
+        // Attach the event listener for the save button
         document.getElementById(`save-btn-${formId}`).addEventListener('click', () => saveEntry(formId));
     }
 
@@ -145,12 +263,14 @@
             endDate: document.getElementById(`present-${formId}`).checked ? 'Present' : document.getElementById(`end-${formId}`).value
         };
 
+        // Validate form data
         if (!validateForm(formData)) {
             alert('Please fill in all required fields');
             return;
         }
 
-        fetch('/edit_education/<%= education.user_id %>', {
+        // Send form data to the backend using fetch
+        fetch('/auth/education_details', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -200,7 +320,7 @@
     }
 
     function proceedToNext() {
-        window.location.href = '/student_blog'; 
+        window.location.href = '/myfortfolio'; 
     }
 </script>
 

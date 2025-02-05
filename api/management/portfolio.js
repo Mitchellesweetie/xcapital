@@ -246,9 +246,12 @@ router.get('/download-cv', isAuthenticated, async (req, res) => {
 router.get('/myportfolio', isAuthenticated, (req, res) => {
     // console.log('Logged in user ID:', req.session.userId);
     const userId = req.session.userId;
+    if(!userId){
+        res.redirect('/login_blog')
+    }
 
     const queries = {
-        education: 'SELECT * FROM education WHERE user_id = ? ORDER BY education.end DESC',
+        education: 'SELECT * FROM education WHERE user_id = ? ORDER BY end DESC',
         experience: 'SELECT * FROM experience WHERE user_id = ?',
         responsibility: 'SELECT * FROM resposiblity WHERE user_id = ?',
         personal: 'SELECT * FROM personal_details WHERE user_id = ?',
@@ -581,7 +584,7 @@ router.get('/portfolio_view_references',isAuthenticated,(req,res)=>{
 
     res.render('portfolio/refrences')
 })
-router.post('/auth/references',async(req,res)=>{
+router.post('/auth/references',isAuthenticated,async(req,res)=>{
     try {
         const userId = req.session.userId;
         if (!userId) {
@@ -757,7 +760,7 @@ router.post('/auth/portfolio_view_languages',isAuthenticated,async(req,res)=>{
    })
 
 
-router.get('/blog/:id', (req, res) => {
+router.get('/blog/:id', isAuthenticated,(req, res) => {
     const blogId = req.params.id;
 
     const query = `
@@ -860,32 +863,44 @@ router.post('/edit_details/:id', isAuthenticated, (req, res) => {
     });
 });
 //education
-router.get('/edit_education/:id',isAuthenticated ,(req,res)=>{
+router.get('/edit_education', isAuthenticated, (req, res) => {
     const userId = req.session.userId;
     const user_id=req.params.id
-    console.log(userId)
-
-
+    console.log('session id is',userId)
     if (!userId) {
-        return res.redirect('/login_blog');
+        return res.status(401).json({ error: 'Not authenticated' });
     }
-
-    pool.query('select * from  education where user_id=?',[userId],(err,results)=>{
-
-        if(err)
-            return res.status(404).send('Error occured')
-
-        if (results.length === 0) {
-            return res.redirect('/portfolio_view_education'); 
+    pool.query('SELECT * FROM education WHERE user_id = ? ', [userId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred,kindly login' });
         }
-  
-        const education = results[0]; 
-
-        res.render('portfolio/education_edit',{successMessage: null,errorMessage:null,education:education})      
-
-    })
-})
-router.post('/edit_education/:id', async (req, res) => {
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No education records found' });
+        }
+        // res.json({edu: results});
+        res.render('portfolio/education_edit',{edu:results})
+    });
+});
+router.get('/edit_education/:id', isAuthenticated, (req, res) => {
+    const userId = req.session.userId;
+    const educationid=req.params.id
+    console.log('session id is',userId)
+    if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    pool.query('SELECT * FROM education WHERE  educationid = ? ', [educationid], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No education records found' });
+        }
+        // res.json({education: results});
+        res.render('portfolio/edit_view_education',{education:results[0]})
+        console.log(results)
+    });
+});
+router.post('/update_education/:id', async (req, res) => {
     try {
         const userId = req.session.userId;
         if (!userId) {
@@ -894,28 +909,399 @@ router.post('/edit_education/:id', async (req, res) => {
 
         }
 
-        const { degree, institution, startDate, endDate, current } = req.body;
-        const endDateValue = current === 'true' ? null : endDate;
+        const { degree, institution, start, end, current } = req.body;
+        const endDateValue = current === 'true' ? null : end;
 
-        await pool.query('UPDATE  education SET degree=?, institution=?, startDate=?, endDate=? WHERE user_id=? AND educationid=?', {
-            degree,
-            institution,
-            start: startDate,
-            end: endDateValue,
-            user_id: userId,
-        });
+        await pool.query('UPDATE  education SET degree=?, institution=?, start=?, end=? WHERE user_id=? AND educationid=?', 
+                [degree, institution, start, endDateValue, userId, educationId])
 
 
-        return res.status(200).json({
-            success: true,
-            message: 'Education details saved successfully',
-            data: { degree, institution, startDate, endDate: endDateValue || 'Present' }
-        });
+        // return res.status(200).json({
+        //     success: true,
+        //     message: 'Education details saved successfully',
+        //     data: { degree, institution, start, end: endDateValue || 'PRESENT' }
+        // });
+        // res.status(200).render('portfolio/education_edit')
+        res.redirect('/edit_education')
 
     } catch (error) {
         console.error('Error saving education details:', error.message);
         return res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
+
+//awards
+router.get('/edit_view_awards',isAuthenticated,(req,res)=>{
+   const userId = req.session.userId;
+    const user_id=req.params.id
+    console.log('session id is',userId)
+    if (!userId) {
+        return res.status(401).json({ error: 'Not authenticated' });
+    }
+    pool.query('SELECT * FROM awards WHERE user_id = ? ', [userId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No education records found' });
+        }
+    res.render('portfolio/award_update',{edu:results})
+
+})
+})
+router.get('/edit_award/:id',isAuthenticated,(req,res)=>{
+    const awardid=req.params.id
+    const userId = req.session.userId;
+    console.log('session id is',userId)
+    if (!userId) {
+        // return res.status(401).json({ error: 'Not authenticated' });
+        return res.redirect('/login_blog')
+    }
+    pool.query('SELECT * FROM awards WHERE  awardsId = ? ', [awardid], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred fetching the awards,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No awards records found' });
+        }
+    res.render('portfolio/edit_view_award',{award:results[0]})
+
+})
+})
+
+router.post('/update_award/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const awardid = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+
+        const { award } = req.body;
+
+        const result = await pool.query(
+            'UPDATE awards SET award = ? WHERE awardsId = ? AND user_id = ?',
+            [award, awardid, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Award not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_awards');
+    } catch (error) {
+        console.error('Error updating award:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+router.post('/delete_award/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const awardid = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+        const result = await pool.query(
+            'DELETE FROM awards WHERE awardsId = ? AND user_id = ?',
+            [awardid, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Award not found or unauthorized' });
+        }
+
+        res.redirect('/myportfolio');
+    } catch (error) {
+        console.error('Error updating award:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+//languages
+router.get('/edit_view_languages',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+     const user_id=req.params.id
+     console.log('session id is',userId)
+     if (!userId) {
+         return res.status(401).json({ error: 'Not authenticated' });
+     }
+     pool.query('SELECT * FROM languages WHERE user_id = ? ', [userId], (err, results) => {
+         if (err) {
+             return res.status(500).json({ error: 'Database error occurred,kindly login' });
+         }
+         if (results.length === 0) {
+             return res.status(404).json({ error: 'No education records found' });
+         }
+     res.render('portfolio/languages_edit',{languages:results})
+ 
+ })
+
+})
+
+router.get('/edit_language/:id',isAuthenticated,(req,res)=>{
+    const languageId=req.params.id
+    const userId = req.session.userId;
+    console.log('session id is',userId)
+    if (!userId) {
+        // return res.status(401).json({ error: 'Not authenticated' });
+        return res.redirect('/login_blog')
+    }
+    pool.query('SELECT * FROM languages WHERE  languagesId = ? ', [languageId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred fetching the awards,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No languages records found' });
+        }
+    res.render('portfolio/language_edit_view',{languages:results[0]})
+
+})
+})
+
+router.post('/update_language/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const languageId = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+
+        const { languages } = req.body;
+
+        const result = await pool.query(
+            'UPDATE languages SET languages = ? WHERE languagesId = ? AND user_id = ?',
+            [languages, languageId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Languages not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_languages');
+    } catch (error) {
+        console.error('Error updating languages:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+router.post('/delete_language/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const languagesId = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+        const result = await pool.query(
+            'DELETE FROM languages WHERE languagesId= ? AND user_id = ?',
+            [languagesId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Languages not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_languages');
+    } catch (error) {
+        console.error('Error updating languages:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    
+}
+});
+
+//skills
+
+router.get('/edit_view_skill',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+     const user_id=req.params.id
+     console.log('session id is',userId)
+     if (!userId) {
+         return res.status(401).json({ error: 'Not authenticated' });
+     }
+     pool.query('SELECT * FROM skills WHERE user_id = ? ', [userId], (err, results) => {
+         if (err) {
+             return res.status(500).json({ error: 'Database error occurred,kindly login' });
+         }
+         if (results.length === 0) {
+             return res.status(404).json({ error: 'No education records found' });
+         }
+     res.render('portfolio/skill_update',{skills:results})
+ 
+ })
+
+})
+
+router.get('/edit_skill/:id',isAuthenticated,(req,res)=>{
+    const skillsId=req.params.id
+    const userId = req.session.userId;
+    console.log('session id is',userId)
+    if (!userId) {
+        // return res.status(401).json({ error: 'Not authenticated' });
+        return res.redirect('/login_blog')
+    }
+    pool.query('SELECT * FROM skills WHERE  skillsId = ? ', [skillsId], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred fetching the Skills,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No skills records found' });
+        }
+    res.render('portfolio/skill_edit',{skills:results[0]})
+
+})
+})
+
+router.post('/update_skills/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const skillsId = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+
+        const { skills } = req.body;
+
+        const result = await pool.query(
+            'UPDATE skills SET skills = ?, skilltitle=? WHERE skillsId = ? AND user_id = ?',
+            [skills, skillsId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Skills not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_skill');
+    } catch (error) {
+        console.error('Error updating skills:', error);
+        res.status(500).send({ success: false, message: 'Internal Server Error' });
+    }
+});
+router.post('/delete_skills/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const skillsId = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+        const result = await pool.query(
+            'DELETE FROM skills WHERE skillsId= ? AND user_id = ?',
+            [skillsId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Skills not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_skill');
+    } catch (error) {
+        console.error('Error updating Skills:', error);
+        res.status(500).send({ success: false, message: 'Internal Server Error' });
+    
+}
+});
+
+//references
+
+router.get('/edit_view_references',isAuthenticated,(req,res)=>{
+    const userId = req.session.userId;
+     const user_id=req.params.id
+     console.log('session id is',userId)
+     if (!userId) {
+         return res.status(401).json({ error: 'Not authenticated' });
+     }
+     pool.query('SELECT * FROM user_references WHERE user_id = ? ', [userId], (err, results) => {
+         if (err) {
+             return res.status(500).json({ error: 'Database error occurred,kindly login' });
+         }
+         if (results.length === 0) {
+             return res.status(404).json({ error: 'No references records found' });
+         }
+     res.render('portfolio/references_edit',{references:results})
+ 
+ })
+
+})
+
+router.get('/edit_references/:id',isAuthenticated,(req,res)=>{
+    const referenceid=req.params.id
+    const userId = req.session.userId;
+    console.log('session id is',userId)
+    if (!userId) {
+        // return res.status(401).json({ error: 'Not authenticated' });
+        return res.redirect('/login_blog')
+    }
+    pool.query('SELECT * FROM user_references WHERE  referenceid = ? ', [referenceid], (err,results ) => {
+        if (err) {
+            return res.status(500).json({ error: 'Database error occurred fetching the references,kindly login' });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No references records found' });
+        }
+    res.render('portfolio/references_edit_view',{references:results[0]})
+
+})
+})
+
+router.post('/update_references/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const referenceId = req.params.id;
+
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+
+        const { username, relationship, organisation, email, phone } = req.body;
+
+        // Fix: Extract affectedRows correctly
+        const [result] = await pool.query(
+            'UPDATE user_references SET username = ?, relationship=?, organisation=?, email=?, phone=? WHERE referenceid = ? AND user_id = ?',
+            [username, relationship, organisation, email, phone, referenceId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'Reference not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_references');
+    } catch (error) {
+        console.error('Error updating reference:', error);
+        res.status(500).send({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+router.post('/delete_references/:id', isAuthenticated, async (req, res) => {
+    try {
+        const userId = req.session.userId;
+        const refrencesid = req.params.id;
+        
+        if (!userId) {
+            return res.redirect('/login_blog');
+        }
+        const result = await pool.query(
+            'DELETE FROM user_references WHERE referenceid= ? AND user_id = ?',
+            [refrencesid, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ success: false, message: 'user_references not found or unauthorized' });
+        }
+
+        res.redirect('/edit_view_references');
+    } catch (error) {
+        console.error('Error updating user references:', error);
+        res.status(500).send({ success: false, message: 'Internal Server Error' });
+    
+}
+});
+
+
+    
+
     
 module.exports = router;

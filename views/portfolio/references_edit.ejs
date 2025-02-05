@@ -1,106 +1,299 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV Resume Form</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .form-container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      margin: 50px auto;
-      max-width: 800px;
-    }
-    .form-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .btn-custom {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .btn-custom:hover {
-      background-color: #0056b3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <title>Education Details</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .education-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .education-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .education-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .education-header h3 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .education-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .detail-item {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .detail-item strong {
+            color: #555;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .btn-edit {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .no-records {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /*  adding education*/
+        .education-entry {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .btn-add, .btn-save, .btn-remove, .btn-next {
+            font-weight: bold;
+        }
+
+        .saved-entries {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .saved-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="form-container">
-      <h1 class="form-title text-center">References Details</h1>
-      <form id="cvForm">
-        <!-- Personal Information -->
-       
+    <div class="container">
+        <div class="education-list">
+          <i class="form-title text-center">Kindly refresh after data manipulation</i>
 
-        <!-- Education Section -->
-        <div class="mb-3">
-          <label class="form-label">References</label>
-          <div id="educationContainer">
-            <!-- Initial Education Group -->
-            <div class="card card-body mb-3">
-              <div class="mb-3">
-                <label for="degree1" class="form-label">Name</label>
-                <input type="text" class="form-control" id="degree1" name="degree[]" placeholder="E.g., Bachelor of Science">
-              </div>
-              <div class="mb-3">
-                <label for="institution1" class="form-label">Institution</label>
-                <input type="text" class="form-control" id="institution1" name="institution[]" placeholder="E.g., University of XYZ">
-              </div>
-              <div class="mb-3">
-                <label for="year1" class="form-label">Year of Graduation</label>
-                <input type="text" class="form-control" id="year1" name="year[]" placeholder="E.g., 2024">
-              </div>
-            </div>
-          </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" id="addEducationButton">Add Another Certificate</button>
+            <% if (references.length === 0) { %>
+                <div class="no-records">No education records found</div>
+            <% } else { %>
+                <% references.forEach((eduRecord, index) => { %>
+                    <div class="education-card">
+                        <div class="education-header">
+                            <h3>Education Record <%= index + 1 %></h3>
+                        </div>
+                        <div class="education-details">
+                            <div class="detail-item">
+                                <strong>Name</strong>
+                                <%= eduRecord.username %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Relationship</strong>
+                                <%= eduRecord.relationship %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Organisation</strong>
+                                <%= eduRecord.organisation %>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Email</strong>
+                                <%= eduRecord.email %>
+                            </div>
+                            <div class="detail-item">
+                              <strong>Phone Number</strong>
+                              <%= eduRecord.phone %>
+                          </div>
+                        </div>
+                        <div class="action-buttons">
+                            <a href="/edit_references/<%= eduRecord.referenceid %>" class="btn btn-edit">Edit</a>
+                            <a href="/delete_references/<%= eduRecord.referenceid %>" class="btn btn-delete">Delete</a>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } %>
         </div>
-
-       
-
-        <!-- Submit Button -->
-        <div class="text-center">
-          <button type="submit" class="btn btn-custom">Submit</button>
-        </div>
-      </form>
     </div>
-  </div>
+    <div class="container">
+        <h2 class="text-center">References</h2>
+        <div id="referenceForms"></div>
+        <div class="d-flex justify-content-between">
+            <button class="btn btn-success btn-add" onclick="addReferenceForm()">+ Add Reference</button>
+            <button class="btn btn-purple btn-next" onclick="proceedToNext()" id="nextButton" disabled>Next</button>
+        </div>
+        <div class="saved-entries" id="savedEntries">
+            <h3>Saved Entries</h3>
+        </div>
+    </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const addEducationButton = document.getElementById('addEducationButton');
-      const educationContainer = document.getElementById('educationContainer');
-      let educationIndex = 1;
+    <!-- jQuery, Popper.js, Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-      addEducationButton.addEventListener('click', function () {
-        educationIndex++;
-        const educationGroup = document.createElement('div');
-        educationGroup.classList.add('card', 'card-body', 'mb-3');
-        educationGroup.innerHTML = `
-          <div class="mb-3">
-            <label for="degree${educationIndex}" class="form-label">Degree</label>
-            <input type="text" class="form-control" id="degree${educationIndex}" name="degree[]" placeholder="E.g., Bachelor of Science">
-          </div>
-          <div class="mb-3">
-            <label for="institution${educationIndex}" class="form-label">Institution</label>
-            <input type="text" class="form-control" id="institution${educationIndex}" name="institution[]" placeholder="E.g., University of XYZ">
-          </div>
-          <div class="mb-3">
-            <label for="year${educationIndex}" class="form-label">Year of Graduation</label>
-            <input type="text" class="form-control" id="year${educationIndex}" name="year[]" placeholder="E.g., 2024">
-          </div>
-        `;
-        educationContainer.appendChild(educationGroup);
-      });
-    });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let referenceEntries = [];
+        let formCount = 0;
+
+        function addReferenceForm() {
+            formCount++;
+            const formId = `reference-${formCount}`;
+
+            const formHtml = `
+                <div class="reference-entry" id="${formId}">
+                    <h5>Reference Entry ${formCount}</h5>
+                    <div class="form-group">
+                        <label for="name-${formId}">Reference Name</label>
+                        <input type="text" class="form-control" id="name-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="relationship-${formId}">Relationship</label>
+                        <input type="text" class="form-control" id="relationship-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="organisation-${formId}">Organisation</label>
+                        <input type="text" class="form-control" id="organisation-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone-${formId}">Phone Number</label>
+                        <input type="text" class="form-control" id="phone-${formId}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email-${formId}">Email Address</label>
+                        <input type="email" class="form-control" id="email-${formId}" required>
+                    </div>
+                    <button class="btn btn-primary btn-save" id="save-btn-${formId}">Save Entry</button>
+                    <button class="btn btn-danger btn-remove" onclick="removeEntry('${formId}')">Remove Entry</button>
+                </div>
+            `;
+
+            document.getElementById('referenceForms').insertAdjacentHTML('beforeend', formHtml);
+
+            // Attach the event listener for the save button
+            document.getElementById(`save-btn-${formId}`).addEventListener('click', () => saveEntry(formId));
+        }
+
+        function saveEntry(formId) {
+            const formData = {
+                name: document.getElementById(`name-${formId}`).value,
+                organisation: document.getElementById(`organisation-${formId}`).value,
+                relationship: document.getElementById(`relationship-${formId}`).value,
+                phone: document.getElementById(`phone-${formId}`).value,
+                email: document.getElementById(`email-${formId}`).value
+            };
+
+            if (!validateForm(formData)) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Send data to the backend using fetch (AJAX)
+            fetch('/auth/references', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Reference saved successfully');
+                    displaySavedEntry(formData);
+                    document.getElementById(formId).remove();
+                    document.getElementById('nextButton').disabled = false;
+                } else {
+                    alert('Error saving reference');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function validateForm(formData) {
+            if (!formData.name || !formData.organisation  ||!formData.relationship || !formData.phone || !formData.email) {
+                return false;
+            }
+            return true;
+        }
+
+        function displaySavedEntry(entry) {
+            const entryHtml = `
+                <div class="saved-entry">
+                    <strong>${entry.name}</strong><br>
+                    Organisation: ${entry.organisation}<br>
+                    Relationship: ${entry.relationship}<br>
+                    Phone: ${entry.phone}<br>
+                    Email: ${entry.email}
+                </div>
+            `;
+            document.getElementById('savedEntries').insertAdjacentHTML('beforeend', entryHtml);
+        }
+
+        function removeEntry(formId) {
+            document.getElementById(formId).remove();
+        }
+
+        function proceedToNext() {
+            window.location.href = '/portfolio_view_skills';
+        }
+    </script>
 </body>
 </html>

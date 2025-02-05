@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <title>Edit Education</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+        }
+
+        .btn-save {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="form-title">Edit Education Details</h2>
+
+        <form action="/update_education/<%= education.user_id %>" method="POST">
+            <div class="form-group">
+                <label for="school">School/University Name</label>
+                <input type="text" id="school" name="school" value="<%= education.institution %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="degree">Degree</label>
+                <input type="text" id="degree" name="degree" value="<%= education.degree %>" required>
+            </div>          
+            
+            <!-- Start Date Picker -->
+            <div class="form-group">
+                <label for="start">Start Date (MM/DD/YYYY)</label>
+                <input type="text" id="start" name="start" class="form-control datepicker" value="<%= education.start %>" placeholder="MM/DD/YYYY" required>
+            </div>
+
+            <!-- End Date Picker -->
+            <div class="form-group">
+                <label for="end">End Date (MM/DD/YYYY)</label>
+                <input type="text" id="end" name="end" class="form-control datepicker" value="<%= education.end %>" placeholder="MM/DD/YYYY">
+            </div>
+
+            <!-- Present Education Checkbox -->
+            <div class="form-group">
+                <input type="checkbox" id="present" onclick="toggleEndDate()" value="PRESENT">
+                <label for="present">Present Education</label>
+            </div>
+
+            <div class="btn-container">
+                <button type="submit" class="btn btn-save">Save Changes</button>
+                <a href="/portfolio_view_education" class="btn btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+        $(document).ready(function(){
+            $('.datepicker').datepicker({
+                format: 'mm/dd/yyyy',
+                autoclose: true,
+                todayHighlight: true
+            });
+    
+            // ✅ FIX: Check if "Present" is already checked on page load
+            if ($('#present').is(':checked')) {
+                $('#end').val('PRESENT').prop('disabled', true);
+            }
+        });
+    
+        function toggleEndDate() {
+            if ($('#present').is(':checked')) {
+                $('#end').val('PRESENT').prop('disabled', true);
+            } else {
+                $('#end').val('').prop('disabled', false);
+            }
+        }
+        function saveEntry() {
+        const formData = {
+            institution: document.getElementById(`institution`).value,
+            degree: document.getElementById(`degree`).value,
+            // field: document.getElementById(`field-${formId}`).value,
+            start: document.getElementById(`start`).value,
+            current: document.getElementById(`present`).checked ? 'true' : 'false',
+            end: document.getElementById(`present`).checked ? 'Present' : document.getElementById(`end`).value
+        };
+
+        // Validate form data
+        if (!validateForm(formData)) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Send form data to the backend using fetch
+        fetch('/auth/education_details', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Education entry saved successfully');
+                displaySavedEntry(data.data); // Pass saved data from backend
+                // document.getElementById().remove();
+                // Enable the Next button after a successful save
+                document.getElementById('nextButton').disabled = false;
+            } else {
+                alert('Error saving education entry');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function validateForm(formData) {
+        if (!formData.institution || !formData.degree  || !formData.startDate) {
+            return false; // If any of these fields are missing, return false
+        }
+
+        if (formData.current === 'false' && !formData.endDate) {
+            return false; // End date is required if the education is not ongoing
+        }
+
+        return true; // All validations passed
+    }
+    </script>
+    
+</body>
+</html>
