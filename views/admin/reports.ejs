@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!--
 * CoreUI - Free Bootstrap Admin Template
@@ -173,9 +174,8 @@
           <div class="accordion-item" style="border: none;">
           <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-              <a href="/report/excel-download"> <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Z"/></svg>
-             
-              </a>   Reports
+              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#666666"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h240l80 80h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm0-80h640v-400H447l-80-80H160v480Zm0 0v-480 480Z"/></svg>
+              Reports
             </button>
           </h2>
           
@@ -414,56 +414,6 @@
             <!-- /.col-->
           </div>
           <!-- /.row-->
-          <form class="d-flex" role="search" method="post" action="/api/search">
-            <input class="form-control" type="search" placeholder="Search" aria-label="Search" style="width: 350px; margin: 7px; height:50px">
-            <button class="btn btn-outline-primary" type="submit"style="width: 200px; margin: 7px; height:50px">Search</button>
-          </form>
-          <% if (errorMessage) { %>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-              <strong><%= errorMessage %></strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% } %>
-      
-          <% if (successMessage) { %>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-              <strong><%= successMessage %></strong>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          <% } %>
-          
-          <div class="card-body">
-            <% if (blogs.length > 0) { %>
-              <% blogs.forEach(blog => { %>
-                <div class="card" style="padding: 30px; margin: 10px;">
-                  <div class="card-body">
-                    <h2 style="font-size: 40px;"><%= blog.title %></h2>
-                    <i>Published on <small style="color: red;"><%= new Date(blog.create_at).toLocaleString() %></small> by</i><br>
-          
-                    <div class="d-flex" style="flex-wrap: wrap;">
-                      <!-- Image on the left -->
-                      <img src="<%= blog.file %>" style="width: 200px; height: 200px; margin-right: 20px;">
-                      
-                      <!-- Content container -->
-                      <div class="content-wrapper" style="flex: 1;">
-                        <div id="blog-content-<%= blog.id %>" class="blog-content">
-                          <div class="blog-message"><%- blog.message %></div>
-                          <button onclick="toggleReadMore('<%= blog.id %>')" 
-                                  class="btn btn-link text-danger"
-                                  style="padding: 0;">Read More</button>
-                        </div>
-                      </div>
-                    </div>
-          
-                    <p>Status: <%= blog.status %></p>
-                   
-                  </div>
-                </div>
-              <% }); %>
-            <% } else { %>
-              <p>No blogs available.</p>
-            <% } %>
-          </div>
 
 
 
@@ -498,37 +448,7 @@
             <!-- /.col-->
           
           <!-- /.row-->
-          <div class="break"></div>
-         
-          <nav aria-label="Page navigation example" style="bottom: 0;">
-            <ul class="pagination justify-content-center">
-                <% if (page > 1) { %>
-                    <li class="page-item">
-                        <a class="page-link" href="/api/approvedblogs page - 1 %>">Previous</a>
-                    </li>
-                <% } %>
         
-                <% for (let i = iterator; i <= endingLink; i++) { %>
-                    <% if (i === page) { %>
-                        <li class="page-item active">
-                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
-                        </li>
-                    <% } else { %>
-                        <li class="page-item">
-                            <a class="page-link" href="/api/approvedblogs?page=<%= i %>"><%= i %></a>
-                        </li>
-                    <% } %>
-                <% } %>
-        
-                <% if (page < numberOfPages) { %>
-                    <li class="page-item">
-                        <a class="page-link" href="/api/approvedblogs?page=<%= page + 1 %>">Next</a>
-                    </li>
-                <% } %>
-            </ul>
-        </nav>
-             
-         
       
       </div> </div></div>
       <footer class="footer" style="position: fixed; bottom: 0; width: 100%; display: flex; justify-content: center; align-items: center; color: grey; background-color: #f8f9fa; padding: 10px 0;">

@@ -1,5 +1,6 @@
 
 const express=require('express')
+const excelJS = require("exceljs");
 const bcrypt=require('bcryptjs')
 const mysql=require('mysql')
 const dotenv=require('dotenv')
@@ -20,6 +21,8 @@ const compression=require('compression')
 const resume=require('./api/management/portfolio')
 const categories=require('./api/management/admin')
 const student_blog=require('./api/management/student_blogs')
+const otpGenerator = require('otp-generator')
+const reportRouter=require('./api/management/reports.js')
 
 
 dotenv.config()
@@ -69,6 +72,7 @@ app.use('/api',require('./api/management/blogs'))
 app.use(resume)
 app.use('/',categories)
 app.use('/student_blog',student_blog)
+app.use('/report',reportRouter)
 app.use(require('./api/management/admin_auth'))
 app.use(require('./api/management/publicroutes'))
 app.use(require('./api/management/student_auth'))
@@ -76,9 +80,8 @@ app.use('/',require('./api/management/download'))
 app.use(require('./api/management/xcapital'))
 
 
-
 app.use('/uploads/images',express.static(path.join(__dirname, 'uploads/images')));
-
+// otpGenerator.generate(6, { upperCaseAlphabets: false, specialChars: false });
 function isAuthenticated(req, res, next) {
     if (req.session && req.session.userId) {
         return next(); 
